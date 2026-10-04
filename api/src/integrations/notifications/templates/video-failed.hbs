@@ -1,0 +1,9 @@
+{{#> layout title="We could not finish your video"}}
+<p style="margin:0 0 16px;">{{#if videoTitle}}Something went wrong while creating &ldquo;{{videoTitle}}&rdquo;.{{else}}Something went wrong while creating your video.{{/if}}</p>
+{{#if reason}}<p style="margin:0 0 16px;">{{reason}}</p>{{/if}}
+{{#if refunded}}<p style="margin:0 0 16px;">Your video credit has been returned, so this did not count against your plan.</p>{{/if}}
+<p style="margin:24px 0;">
+  <a href="{{url}}" style="display:inline-block;background-color:#cc785c;color:#ffffff;text-decoration:none;font-weight:500;font-size:15px;padding:13px 24px;border-radius:8px;">Open your project</a>
+</p>
+<p style="margin:0;font-size:13px;color:#6c6a64;">You can try again from the project page.</p>
+{{/layout}}

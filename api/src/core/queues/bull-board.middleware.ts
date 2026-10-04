@@ -1,5 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { timingSafeEqual } from 'crypto';
+
+const safeEqual = (a: string, b: string) => {
+    const ab = Buffer.from(a);
+    const bb = Buffer.from(b);
+    return ab.length === bb.length && timingSafeEqual(ab, bb);
+};
 
 export function bullBoardAuthMiddleware(configService: ConfigService) {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -18,9 +25,11 @@ export function bullBoardAuthMiddleware(configService: ConfigService) {
         }
 
         const credentials = Buffer.from(authHeader.slice(6), 'base64').toString();
-        const [user, password] = credentials.split(':');
+        const separator = credentials.indexOf(':');
+        const user = separator >= 0 ? credentials.slice(0, separator) : credentials;
+        const password = separator >= 0 ? credentials.slice(separator + 1) : '';
 
-        if (user === adminUser && password === adminPass) {
+        if (safeEqual(user, adminUser) && safeEqual(password, adminPass)) {
             return next();
         }
 
@@ -28,4 +37,3 @@ export function bullBoardAuthMiddleware(configService: ConfigService) {
         return res.status(401).send('Invalid credentials');
     };
 }
-

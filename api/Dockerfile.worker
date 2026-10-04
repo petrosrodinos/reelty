@@ -1,0 +1,39 @@
+# syntax=docker/dockerfile:1
+#
+# Reelty worker image: BullMQ processors (scrape, image-process, render, notify) + FFmpeg + fonts.
+# Sizing guide (spec §12): about 2 vCPU / 4 GB RAM and 5 GB temp disk per concurrent render.
+
+FROM node:22-bookworm-slim AS base
+WORKDIR /app
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+FROM base AS deps
+COPY package.json package-lock.json ./
+RUN npm ci
+
+FROM deps AS build
+COPY . .
+ENV DATABASE_URL=postgresql://build:build@localhost:5432/build
+RUN npx prisma generate && npm run build
+
+FROM base AS prod-deps
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+FROM base AS runtime
+# System ffmpeg + fonts used by drawtext (title/end cards). fonts-inter is optional branding.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core fonts-inter \
+  && rm -rf /var/lib/apt/lists/*
+ENV NODE_ENV=production \
+  FFMPEG_PATH=/usr/bin/ffmpeg \
+  FFPROBE_PATH=/usr/bin/ffprobe \
+  FFMPEG_FONT_PATH=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf
+COPY --from=prod-deps /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+COPY package.json ./
+USER node
+# Nest build output lives in dist/src (prisma.config.ts is compiled next to it)
+CMD ["node", "dist/src/worker.js"]

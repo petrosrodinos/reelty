@@ -4,67 +4,55 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { EmailTemplate } from '../interfaces/mail.interfaces';
 
+/**
+ * Renders the branded Handlebars emails. `_layout.hbs` is registered as the `layout` partial
+ * (`{{#> layout}}...{{/layout}}`), every other `<name>.hbs` is a template.
+ */
 @Injectable()
 export class TemplateService {
-    private readonly logger = new Logger(TemplateService.name);
-    private readonly templatesPath = path.join(process.cwd(), 'dist', 'integrations', 'notifications', 'templates');
-    private compiledTemplates = new Map<string, HandlebarsTemplateDelegate>();
+  private readonly logger = new Logger(TemplateService.name);
+  private readonly hbs = Handlebars.create();
+  private readonly compiled = new Map<string, HandlebarsTemplateDelegate>();
+  private templatesPath: string | null = null;
+  private layoutRegistered = false;
 
-    constructor() {
-        this.registerHelpers();
+  /** Works from `src` (ts-node) and from the nest build (`dist/src/integrations/notifications/templates`). */
+  private resolveTemplatesPath(): string {
+    if (this.templatesPath) return this.templatesPath;
+    const candidates = [
+      path.join(__dirname, '..', '..', 'templates'),
+      path.join(process.cwd(), 'dist', 'src', 'integrations', 'notifications', 'templates'),
+      path.join(process.cwd(), 'src', 'integrations', 'notifications', 'templates'),
+    ];
+    const found = candidates.find((p) => fs.existsSync(path.join(p, '_layout.hbs')));
+    if (!found) throw new Error('Email templates directory not found');
+    this.templatesPath = found;
+    return found;
+  }
+
+  private ensureLayout() {
+    if (this.layoutRegistered) return;
+    const layout = fs.readFileSync(path.join(this.resolveTemplatesPath(), '_layout.hbs'), 'utf8');
+    this.hbs.registerPartial('layout', layout);
+    this.layoutRegistered = true;
+  }
+
+  private load(name: string): HandlebarsTemplateDelegate {
+    const cached = this.compiled.get(name);
+    if (cached) return cached;
+    this.ensureLayout();
+    const source = fs.readFileSync(path.join(this.resolveTemplatesPath(), `${name}.hbs`), 'utf8');
+    const template = this.hbs.compile(source);
+    this.compiled.set(name, template);
+    return template;
+  }
+
+  async renderTemplate(templateName: EmailTemplate, data: Record<string, unknown>): Promise<string> {
+    try {
+      return this.load(templateName)(data);
+    } catch (error) {
+      this.logger.error(`Failed to render template ${templateName}: ${(error as Error).message}`);
+      throw new Error(`Failed to render template ${templateName}`);
     }
-
-    private registerHelpers() {
-        Handlebars.registerHelper('formatDate', (dateString: string) => {
-            if (!dateString) return '';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        });
-
-        Handlebars.registerHelper('formatPrice', (price: number) => {
-            if (typeof price !== 'number') return '0.00';
-            return (price).toFixed(2);
-        });
-
-        Handlebars.registerHelper('eq', (a: any, b: any) => {
-            return a === b;
-        });
-
-        Handlebars.registerHelper('or', (a: any, b: any) => {
-            return a || b;
-        });
-    }
-
-    private async loadTemplate(templateName: string): Promise<HandlebarsTemplateDelegate> {
-        if (this.compiledTemplates.has(templateName)) {
-            return this.compiledTemplates.get(templateName)!;
-        }
-
-        try {
-            const templatePath = path.join(this.templatesPath, `${templateName}.hbs`);
-            const templateContent = fs.readFileSync(templatePath, 'utf8');
-            const compiledTemplate = Handlebars.compile(templateContent);
-
-            this.compiledTemplates.set(templateName, compiledTemplate);
-            return compiledTemplate;
-        } catch (error) {
-            this.logger.error(`Failed to load template ${templateName}:`, error);
-            throw new Error(`Template ${templateName} not found`);
-        }
-    }
-
-    async renderTemplate(templateName: EmailTemplate, data: any): Promise<string> {
-        try {
-            const template = await this.loadTemplate(templateName);
-            return template(data);
-        } catch (error) {
-            this.logger.error(`Failed to render template ${templateName}:`, error);
-            throw new Error(`Failed to render template ${templateName}`);
-        }
-    }
+  }
 }

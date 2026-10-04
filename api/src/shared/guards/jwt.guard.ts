@@ -1,37 +1,50 @@
-import { UnauthorizedException } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { JsonWebTokenError } from 'jsonwebtoken';
-import { GqlExecutionContext } from '@nestjs/graphql';
+import { CanActivate, ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { AuthCookies } from '../constants/auth.constants';
+import { ApiException } from '../errors/api-exception';
+import { ErrorCodes } from '../config/error-codes';
 
-export class JwtGuard extends AuthGuard('jwt') {
-    constructor() {
-        super();
+export interface AccessTokenPayload {
+  sub: string;
+  role: string;
+}
+
+/**
+ * Reads the access JWT from the `reelty_at` cookie (or `Authorization: Bearer` for tooling)
+ * and attaches `request.user = { id, role }`.
+ */
+@Injectable()
+export class JwtGuard implements CanActivate {
+  constructor(private readonly jwtService: JwtService) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const token = this.extractToken(request);
+
+    if (!token) {
+      throw new ApiException(HttpStatus.UNAUTHORIZED, ErrorCodes.UNAUTHORIZED, 'Authentication required');
     }
 
-    getRequest(context: any) {
-        const ctx = GqlExecutionContext.create(context);
-        return ctx.getContext().req;
+    try {
+      const payload = await this.jwtService.verifyAsync<AccessTokenPayload>(token, {
+        algorithms: ['HS256'],
+      });
+      if (!payload?.sub) throw new Error('missing subject');
+      request.user = { id: payload.sub, role: payload.role };
+      return true;
+    } catch {
+      throw new ApiException(HttpStatus.UNAUTHORIZED, ErrorCodes.UNAUTHORIZED, 'Invalid or expired session');
     }
+  }
 
-    handleRequest(err: any, user: any, info: any, context: any, status: any) {
-        if (info instanceof JsonWebTokenError) {
-            throw new UnauthorizedException({
-                message: 'Invalid token',
-                code: 'invalid_token',
-            });
-        }
+  private extractToken(request: any): string | null {
+    const cookie = request.cookies?.[AuthCookies.ACCESS];
+    if (typeof cookie === 'string' && cookie) return cookie;
 
-        if (err || !user) {
-            throw new UnauthorizedException({
-                message: 'Authentication required',
-                code: 'authentication_required',
-            });
-        }
-
-        const ctx = GqlExecutionContext.create(context);
-        const gqlContext = ctx.getContext();
-        gqlContext.user = user;
-
-        return super.handleRequest(err, user, info, context, status);
+    const header = request.headers?.authorization;
+    if (typeof header === 'string' && header.startsWith('Bearer ')) {
+      return header.slice(7).trim() || null;
     }
+    return null;
+  }
 }

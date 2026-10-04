@@ -123,32 +123,139 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
-  phone: 'phone',
-  password: 'password',
+  password_hash: 'password_hash',
   role: 'role',
+  email_verified_at: 'email_verified_at',
+  monthly_video_quota: 'monthly_video_quota',
   created_at: 'created_at',
   updated_at: 'updated_at'
 };
 
-exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+exports.Prisma.RefreshTokenScalarFieldEnum = {
   id: 'id',
+  user_id: 'user_id',
   token_hash: 'token_hash',
-  user_uuid: 'user_uuid',
+  family_id: 'family_id',
+  expires_at: 'expires_at',
+  revoked_at: 'revoked_at',
+  user_agent: 'user_agent',
+  ip: 'ip',
+  created_at: 'created_at'
+};
+
+exports.Prisma.EmailVerificationTokenScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  token_hash: 'token_hash',
   expires_at: 'expires_at',
   used_at: 'used_at',
   created_at: 'created_at'
 };
 
-exports.Prisma.DocumentScalarFieldEnum = {
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
   id: 'id',
-  user_uuid: 'user_uuid',
-  filename: 'filename',
-  mimetype: 'mimetype',
-  size: 'size',
-  url: 'url',
-  path: 'path',
-  type: 'type',
+  user_id: 'user_id',
+  token_hash: 'token_hash',
+  expires_at: 'expires_at',
+  used_at: 'used_at',
   created_at: 'created_at'
+};
+
+exports.Prisma.ProjectScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  source_type: 'source_type',
+  source_url: 'source_url',
+  status: 'status',
+  render_step: 'render_step',
+  partial: 'partial',
+  failure_reason: 'failure_reason',
+  failure_code: 'failure_code',
+  scrape_error: 'scrape_error',
+  title: 'title',
+  subtitle: 'subtitle',
+  location_line: 'location_line',
+  closing_line: 'closing_line',
+  music_enabled: 'music_enabled',
+  rights_attested_at: 'rights_attested_at',
+  submitted_at: 'submitted_at',
+  completed_at: 'completed_at',
+  render_started_at: 'render_started_at',
+  quota_charged: 'quota_charged',
+  video_gcs_path: 'video_gcs_path',
+  poster_gcs_path: 'poster_gcs_path',
+  duration_seconds: 'duration_seconds',
+  clips_total: 'clips_total',
+  clips_done: 'clips_done',
+  skipped_image_ids: 'skipped_image_ids',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
+};
+
+exports.Prisma.ImageScalarFieldEnum = {
+  id: 'id',
+  project_id: 'project_id',
+  position: 'position',
+  gcs_original_path: 'gcs_original_path',
+  gcs_processed_path: 'gcs_processed_path',
+  gcs_thumb_path: 'gcs_thumb_path',
+  width: 'width',
+  height: 'height',
+  bytes: 'bytes',
+  content_hash: 'content_hash',
+  source_url: 'source_url',
+  room_type: 'room_type',
+  use_processed: 'use_processed',
+  wm_status: 'wm_status',
+  wm_attempts: 'wm_attempts',
+  removed: 'removed',
+  ready: 'ready',
+  higgsfield_media_id: 'higgsfield_media_id',
+  clip_job_id: 'clip_job_id',
+  clip_status: 'clip_status',
+  clip_result_url: 'clip_result_url',
+  clip_gcs_path: 'clip_gcs_path',
+  created_at: 'created_at'
+};
+
+exports.Prisma.ConsentScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  project_id: 'project_id',
+  type: 'type',
+  accepted_at: 'accepted_at',
+  ip: 'ip'
+};
+
+exports.Prisma.JobEventScalarFieldEnum = {
+  id: 'id',
+  project_id: 'project_id',
+  job_name: 'job_name',
+  bullmq_job_id: 'bullmq_job_id',
+  step: 'step',
+  status: 'status',
+  message: 'message',
+  created_at: 'created_at'
+};
+
+exports.Prisma.UsageLedgerScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  project_id: 'project_id',
+  kind: 'kind',
+  quota_units: 'quota_units',
+  provider_units: 'provider_units',
+  note: 'note',
+  created_at: 'created_at'
+};
+
+exports.Prisma.SystemFlagScalarFieldEnum = {
+  id: 'id',
+  renders_enabled: 'renders_enabled',
+  dewatermark_enabled: 'dewatermark_enabled',
+  scrape_enabled: 'scrape_enabled',
+  updated_at: 'updated_at'
 };
 
 exports.Prisma.SortOrder = {
@@ -172,21 +279,82 @@ exports.AuthRole = exports.$Enums.AuthRole = {
   SUPPORT: 'SUPPORT'
 };
 
-exports.DocumentType = exports.$Enums.DocumentType = {
-  LOGO: 'LOGO',
-  BANNER: 'BANNER',
-  IMAGE: 'IMAGE',
-  VIDEO: 'VIDEO',
-  AUDIO: 'AUDIO',
-  PDF: 'PDF',
-  DOCUMENT: 'DOCUMENT',
+exports.SourceType = exports.$Enums.SourceType = {
+  website: 'website',
+  airbnb: 'airbnb',
+  upload: 'upload'
+};
+
+exports.ProjectStatus = exports.$Enums.ProjectStatus = {
+  DRAFT: 'DRAFT',
+  FETCHING: 'FETCHING',
+  READY: 'READY',
+  QUEUED: 'QUEUED',
+  CREATING: 'CREATING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+};
+
+exports.RenderStep = exports.$Enums.RenderStep = {
+  QUEUED: 'QUEUED',
+  PREPARING: 'PREPARING',
+  GENERATING: 'GENERATING',
+  ASSEMBLING: 'ASSEMBLING',
+  UPLOADING: 'UPLOADING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED',
+  BLOCKED_NO_CREDITS: 'BLOCKED_NO_CREDITS'
+};
+
+exports.RoomType = exports.$Enums.RoomType = {
+  AUTO: 'AUTO',
+  EXTERIOR: 'EXTERIOR',
+  LIVING_ROOM: 'LIVING_ROOM',
+  KITCHEN: 'KITCHEN',
+  BEDROOM: 'BEDROOM',
+  BATHROOM: 'BATHROOM',
+  TERRACE_VIEW: 'TERRACE_VIEW',
   OTHER: 'OTHER'
+};
+
+exports.WatermarkStatus = exports.$Enums.WatermarkStatus = {
+  none: 'none',
+  processing: 'processing',
+  done: 'done',
+  failed: 'failed'
+};
+
+exports.ClipStatus = exports.$Enums.ClipStatus = {
+  none: 'none',
+  submitted: 'submitted',
+  completed: 'completed',
+  failed: 'failed'
+};
+
+exports.ConsentType = exports.$Enums.ConsentType = {
+  rights: 'rights',
+  watermark: 'watermark'
+};
+
+exports.LedgerKind = exports.$Enums.LedgerKind = {
+  video: 'video',
+  video_refund: 'video_refund',
+  dewatermark: 'dewatermark',
+  scrape: 'scrape',
+  higgsfield: 'higgsfield'
 };
 
 exports.Prisma.ModelName = {
   User: 'User',
+  RefreshToken: 'RefreshToken',
+  EmailVerificationToken: 'EmailVerificationToken',
   PasswordResetToken: 'PasswordResetToken',
-  Document: 'Document'
+  Project: 'Project',
+  Image: 'Image',
+  Consent: 'Consent',
+  JobEvent: 'JobEvent',
+  UsageLedger: 'UsageLedger',
+  SystemFlag: 'SystemFlag'
 };
 
 /**

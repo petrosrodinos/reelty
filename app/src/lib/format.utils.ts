@@ -1,0 +1,60 @@
+import { format, formatDistanceToNowStrict, isToday, isYesterday, parseISO } from "date-fns";
+
+export const VideoLimits = {
+  minImages: 3,
+  maxImages: 12,
+  maxTitle: 60,
+  maxSubtitle: 80,
+  maxLocationLine: 80,
+  maxClosingLine: 120,
+  maxFileBytes: 20 * 1024 * 1024,
+  minShortestSidePx: 640,
+  recommendedLongestSidePx: 1024,
+  watermarkMaxAttempts: 2,
+} as const;
+
+/** 0:50 style duration. */
+export function formatDuration(totalSeconds: number | null | undefined): string {
+  if (totalSeconds === null || totalSeconds === undefined || !Number.isFinite(totalSeconds)) return "–";
+  const s = Math.max(0, Math.round(totalSeconds));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+}
+
+/** Spec formula: 8 + 5N - 0.8 * (N + 1), 0 when N < 3. */
+export function estimateDurationSeconds(imageCount: number): number {
+  if (imageCount < VideoLimits.minImages) return 0;
+  return 8 + 5 * imageCount - 0.8 * (imageCount + 1);
+}
+
+export function pluralize(count: number, singular: string, plural = `${singular}s`): string {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
+export function formatBytes(bytes: number | null | undefined): string {
+  if (!bytes) return "";
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/** "Today", "Yesterday" or "4 Oct 2026". */
+export function formatProjectDate(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const date = parseISO(iso);
+  if (isToday(date)) return "Today";
+  if (isYesterday(date)) return "Yesterday";
+  return format(date, "d MMM yyyy");
+}
+
+export function formatDateLong(iso: string | null | undefined): string {
+  if (!iso) return "";
+  return format(parseISO(iso), "d MMMM yyyy");
+}
+
+export function formatRelative(iso: string | null | undefined): string {
+  if (!iso) return "";
+  return `${formatDistanceToNowStrict(parseISO(iso))} ago`;
+}
+
+export function getInitial(email: string | null | undefined): string {
+  return (email?.trim()[0] ?? "?").toUpperCase();
+}

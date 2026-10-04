@@ -1,11 +1,8 @@
 import { Module } from '@nestjs/common';
-import { TwillioModule } from './twillio/twillio.module';
 import { ResendModule } from './resend/resend.module';
-import { SmtpModule } from './smtp/smtp.module';
 
 @Module({
-    imports: [TwillioModule, ResendModule, SmtpModule],
-    providers: [],
-    exports: [],
+  imports: [ResendModule],
+  exports: [ResendModule],
 })
-export class NotificationsIntegrationModule { }
+export class NotificationsIntegrationModule {}

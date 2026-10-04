@@ -1,8 +1,21 @@
-export const AuthRoles = {
-    ADMIN: 'ADMIN',
-    USER: 'USER',
-    SUPPORT: 'SUPPORT',
-    SUPER_ADMIN: 'SUPER_ADMIN',
-} as const;
+import type { Quota } from '@/modules/usage/interfaces/usage.interface';
 
-export type AuthRole = (typeof AuthRoles)[keyof typeof AuthRoles];
+export interface Me {
+  id: string;
+  email: string;
+  role: string;
+  email_verified: boolean;
+  created_at: string;
+  quota: Quota;
+}
+
+export interface SessionTokens {
+  accessToken: string;
+  refreshToken: string;
+  csrfToken: string;
+}
+
+export interface RequestContext {
+  ip: string | null;
+  userAgent: string | null;
+}

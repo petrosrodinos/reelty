@@ -95,32 +95,139 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
-  phone: 'phone',
-  password: 'password',
+  password_hash: 'password_hash',
   role: 'role',
+  email_verified_at: 'email_verified_at',
+  monthly_video_quota: 'monthly_video_quota',
   created_at: 'created_at',
   updated_at: 'updated_at'
 };
 
-exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+exports.Prisma.RefreshTokenScalarFieldEnum = {
   id: 'id',
+  user_id: 'user_id',
   token_hash: 'token_hash',
-  user_uuid: 'user_uuid',
+  family_id: 'family_id',
+  expires_at: 'expires_at',
+  revoked_at: 'revoked_at',
+  user_agent: 'user_agent',
+  ip: 'ip',
+  created_at: 'created_at'
+};
+
+exports.Prisma.EmailVerificationTokenScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  token_hash: 'token_hash',
   expires_at: 'expires_at',
   used_at: 'used_at',
   created_at: 'created_at'
 };
 
-exports.Prisma.DocumentScalarFieldEnum = {
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
   id: 'id',
-  user_uuid: 'user_uuid',
-  filename: 'filename',
-  mimetype: 'mimetype',
-  size: 'size',
-  url: 'url',
-  path: 'path',
-  type: 'type',
+  user_id: 'user_id',
+  token_hash: 'token_hash',
+  expires_at: 'expires_at',
+  used_at: 'used_at',
   created_at: 'created_at'
+};
+
+exports.Prisma.ProjectScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  source_type: 'source_type',
+  source_url: 'source_url',
+  status: 'status',
+  render_step: 'render_step',
+  partial: 'partial',
+  failure_reason: 'failure_reason',
+  failure_code: 'failure_code',
+  scrape_error: 'scrape_error',
+  title: 'title',
+  subtitle: 'subtitle',
+  location_line: 'location_line',
+  closing_line: 'closing_line',
+  music_enabled: 'music_enabled',
+  rights_attested_at: 'rights_attested_at',
+  submitted_at: 'submitted_at',
+  completed_at: 'completed_at',
+  render_started_at: 'render_started_at',
+  quota_charged: 'quota_charged',
+  video_gcs_path: 'video_gcs_path',
+  poster_gcs_path: 'poster_gcs_path',
+  duration_seconds: 'duration_seconds',
+  clips_total: 'clips_total',
+  clips_done: 'clips_done',
+  skipped_image_ids: 'skipped_image_ids',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+  deleted_at: 'deleted_at'
+};
+
+exports.Prisma.ImageScalarFieldEnum = {
+  id: 'id',
+  project_id: 'project_id',
+  position: 'position',
+  gcs_original_path: 'gcs_original_path',
+  gcs_processed_path: 'gcs_processed_path',
+  gcs_thumb_path: 'gcs_thumb_path',
+  width: 'width',
+  height: 'height',
+  bytes: 'bytes',
+  content_hash: 'content_hash',
+  source_url: 'source_url',
+  room_type: 'room_type',
+  use_processed: 'use_processed',
+  wm_status: 'wm_status',
+  wm_attempts: 'wm_attempts',
+  removed: 'removed',
+  ready: 'ready',
+  higgsfield_media_id: 'higgsfield_media_id',
+  clip_job_id: 'clip_job_id',
+  clip_status: 'clip_status',
+  clip_result_url: 'clip_result_url',
+  clip_gcs_path: 'clip_gcs_path',
+  created_at: 'created_at'
+};
+
+exports.Prisma.ConsentScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  project_id: 'project_id',
+  type: 'type',
+  accepted_at: 'accepted_at',
+  ip: 'ip'
+};
+
+exports.Prisma.JobEventScalarFieldEnum = {
+  id: 'id',
+  project_id: 'project_id',
+  job_name: 'job_name',
+  bullmq_job_id: 'bullmq_job_id',
+  step: 'step',
+  status: 'status',
+  message: 'message',
+  created_at: 'created_at'
+};
+
+exports.Prisma.UsageLedgerScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  project_id: 'project_id',
+  kind: 'kind',
+  quota_units: 'quota_units',
+  provider_units: 'provider_units',
+  note: 'note',
+  created_at: 'created_at'
+};
+
+exports.Prisma.SystemFlagScalarFieldEnum = {
+  id: 'id',
+  renders_enabled: 'renders_enabled',
+  dewatermark_enabled: 'dewatermark_enabled',
+  scrape_enabled: 'scrape_enabled',
+  updated_at: 'updated_at'
 };
 
 exports.Prisma.SortOrder = {
@@ -144,21 +251,82 @@ exports.AuthRole = exports.$Enums.AuthRole = {
   SUPPORT: 'SUPPORT'
 };
 
-exports.DocumentType = exports.$Enums.DocumentType = {
-  LOGO: 'LOGO',
-  BANNER: 'BANNER',
-  IMAGE: 'IMAGE',
-  VIDEO: 'VIDEO',
-  AUDIO: 'AUDIO',
-  PDF: 'PDF',
-  DOCUMENT: 'DOCUMENT',
+exports.SourceType = exports.$Enums.SourceType = {
+  website: 'website',
+  airbnb: 'airbnb',
+  upload: 'upload'
+};
+
+exports.ProjectStatus = exports.$Enums.ProjectStatus = {
+  DRAFT: 'DRAFT',
+  FETCHING: 'FETCHING',
+  READY: 'READY',
+  QUEUED: 'QUEUED',
+  CREATING: 'CREATING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+};
+
+exports.RenderStep = exports.$Enums.RenderStep = {
+  QUEUED: 'QUEUED',
+  PREPARING: 'PREPARING',
+  GENERATING: 'GENERATING',
+  ASSEMBLING: 'ASSEMBLING',
+  UPLOADING: 'UPLOADING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED',
+  BLOCKED_NO_CREDITS: 'BLOCKED_NO_CREDITS'
+};
+
+exports.WatermarkStatus = exports.$Enums.WatermarkStatus = {
+  none: 'none',
+  processing: 'processing',
+  done: 'done',
+  failed: 'failed'
+};
+
+exports.ClipStatus = exports.$Enums.ClipStatus = {
+  none: 'none',
+  submitted: 'submitted',
+  completed: 'completed',
+  failed: 'failed'
+};
+
+exports.RoomType = exports.$Enums.RoomType = {
+  AUTO: 'AUTO',
+  EXTERIOR: 'EXTERIOR',
+  LIVING_ROOM: 'LIVING_ROOM',
+  KITCHEN: 'KITCHEN',
+  BEDROOM: 'BEDROOM',
+  BATHROOM: 'BATHROOM',
+  TERRACE_VIEW: 'TERRACE_VIEW',
   OTHER: 'OTHER'
+};
+
+exports.ConsentType = exports.$Enums.ConsentType = {
+  rights: 'rights',
+  watermark: 'watermark'
+};
+
+exports.LedgerKind = exports.$Enums.LedgerKind = {
+  video: 'video',
+  video_refund: 'video_refund',
+  dewatermark: 'dewatermark',
+  scrape: 'scrape',
+  higgsfield: 'higgsfield'
 };
 
 exports.Prisma.ModelName = {
   User: 'User',
+  RefreshToken: 'RefreshToken',
+  EmailVerificationToken: 'EmailVerificationToken',
   PasswordResetToken: 'PasswordResetToken',
-  Document: 'Document'
+  Project: 'Project',
+  Image: 'Image',
+  Consent: 'Consent',
+  JobEvent: 'JobEvent',
+  UsageLedger: 'UsageLedger',
+  SystemFlag: 'SystemFlag'
 };
 /**
  * Create the Client
@@ -168,10 +336,10 @@ const config = {
   "clientVersion": "7.2.0",
   "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
   "activeProvider": "postgresql",
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nenum AuthRole {\n  USER\n  ADMIN\n  SUPER_ADMIN\n  SUPPORT\n}\n\nenum DocumentType {\n  LOGO\n  BANNER\n  IMAGE\n  VIDEO\n  AUDIO\n  PDF\n  DOCUMENT\n  OTHER\n}\n\nmodel User {\n  id       String  @id @default(uuid())\n  email    String  @unique\n  phone    String? @unique\n  password String\n\n  role       AuthRole\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n\n  password_reset_tokens PasswordResetToken[]\n\n  @@index([email])\n  @@index([phone])\n  @@index([id])\n  @@map(\"users\")\n}\n\nmodel PasswordResetToken {\n  id         String    @id @default(uuid())\n  token_hash String    @unique\n  user_uuid  String\n  expires_at DateTime\n  used_at    DateTime?\n  created_at DateTime  @default(now())\n\n  user User @relation(fields: [user_uuid], references: [id], onDelete: Cascade)\n\n  @@index([user_uuid])\n  @@index([expires_at])\n  @@map(\"password_reset_tokens\")\n}\n\nmodel Document {\n  id         String       @id @default(uuid())\n  user_uuid  String\n  filename   String\n  mimetype   String\n  size       Int\n  url        String\n  path       String\n  type       DocumentType @default(LOGO)\n  created_at DateTime     @default(now())\n\n  @@index([user_uuid])\n  @@index([id])\n  @@map(\"documents\")\n}\n"
+  "inlineSchema": "// Reelty data model — see docs/Product_Specification.md §8\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nenum AuthRole {\n  USER\n  ADMIN\n  SUPER_ADMIN\n  SUPPORT\n}\n\nenum SourceType {\n  website\n  airbnb\n  upload\n}\n\n// Coarse, user-facing project status (spec §2)\nenum ProjectStatus {\n  DRAFT\n  FETCHING\n  READY\n  QUEUED\n  CREATING\n  COMPLETED\n  FAILED\n}\n\n// Resumable render state machine (spec §5.3)\nenum RenderStep {\n  QUEUED\n  PREPARING\n  GENERATING\n  ASSEMBLING\n  UPLOADING\n  COMPLETED\n  FAILED\n  BLOCKED_NO_CREDITS\n}\n\nenum WatermarkStatus {\n  none\n  processing\n  done\n  failed\n}\n\nenum ClipStatus {\n  none\n  submitted\n  completed\n  failed\n}\n\nenum RoomType {\n  AUTO\n  EXTERIOR\n  LIVING_ROOM\n  KITCHEN\n  BEDROOM\n  BATHROOM\n  TERRACE_VIEW\n  OTHER\n}\n\nenum ConsentType {\n  rights\n  watermark\n}\n\nenum LedgerKind {\n  video\n  video_refund\n  dewatermark\n  scrape\n  higgsfield\n}\n\nmodel User {\n  id                  String    @id @default(uuid())\n  email               String    @unique\n  password_hash       String\n  role                AuthRole  @default(USER)\n  email_verified_at   DateTime?\n  monthly_video_quota Int       @default(3)\n  created_at          DateTime  @default(now())\n  updated_at          DateTime  @updatedAt\n\n  refresh_tokens            RefreshToken[]\n  password_reset_tokens     PasswordResetToken[]\n  email_verification_tokens EmailVerificationToken[]\n  projects                  Project[]\n  consents                  Consent[]\n  usage_ledger              UsageLedger[]\n\n  @@map(\"users\")\n}\n\nmodel RefreshToken {\n  id         String    @id @default(uuid())\n  user_id    String\n  token_hash String    @unique\n  family_id  String\n  expires_at DateTime\n  revoked_at DateTime?\n  user_agent String?\n  ip         String?\n  created_at DateTime  @default(now())\n\n  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)\n\n  @@index([user_id])\n  @@index([family_id])\n  @@index([expires_at])\n  @@map(\"refresh_tokens\")\n}\n\nmodel EmailVerificationToken {\n  id         String    @id @default(uuid())\n  user_id    String\n  token_hash String    @unique\n  expires_at DateTime\n  used_at    DateTime?\n  created_at DateTime  @default(now())\n\n  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)\n\n  @@index([user_id])\n  @@map(\"email_verification_tokens\")\n}\n\nmodel PasswordResetToken {\n  id         String    @id @default(uuid())\n  user_id    String\n  token_hash String    @unique\n  expires_at DateTime\n  used_at    DateTime?\n  created_at DateTime  @default(now())\n\n  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)\n\n  @@index([user_id])\n  @@map(\"password_reset_tokens\")\n}\n\nmodel Project {\n  id          String        @id @default(uuid())\n  user_id     String\n  source_type SourceType\n  source_url  String?\n  status      ProjectStatus @default(DRAFT)\n  render_step RenderStep?\n  partial     Boolean       @default(false)\n\n  // human-readable failure info (never raw provider errors)\n  failure_reason String?\n  failure_code   String? // e.g. scrape_empty, provider_timeout, too_few_clips, ffmpeg_error, blocked_no_credits\n  scrape_error   String?\n\n  title         String  @default(\"\")\n  subtitle      String?\n  location_line String?\n  closing_line  String?\n  music_enabled Boolean @default(true)\n\n  rights_attested_at DateTime?\n  submitted_at       DateTime?\n  completed_at       DateTime?\n  render_started_at  DateTime? // start of GENERATING, used for the 20 min hard cap\n  quota_charged      Boolean   @default(false)\n\n  video_gcs_path    String?\n  poster_gcs_path   String?\n  duration_seconds  Float?\n  clips_total       Int      @default(0)\n  clips_done        Int      @default(0)\n  skipped_image_ids String[] @default([])\n\n  created_at DateTime  @default(now())\n  updated_at DateTime  @updatedAt\n  deleted_at DateTime?\n\n  user         User          @relation(fields: [user_id], references: [id], onDelete: Cascade)\n  images       Image[]\n  consents     Consent[]\n  job_events   JobEvent[]\n  usage_ledger UsageLedger[]\n\n  @@index([user_id, created_at(sort: Desc)])\n  @@index([status])\n  @@map(\"projects\")\n}\n\nmodel Image {\n  id         String @id @default(uuid())\n  project_id String\n  position   Int\n\n  gcs_original_path  String?\n  gcs_processed_path String?\n  gcs_thumb_path     String?\n  width              Int?\n  height             Int?\n  bytes              Int?\n  content_hash       String?\n  source_url         String?\n\n  room_type     RoomType        @default(AUTO)\n  use_processed Boolean         @default(false)\n  wm_status     WatermarkStatus @default(none)\n  wm_attempts   Int             @default(0)\n  removed       Boolean         @default(false)\n  // true after the upload is confirmed + validated (magic bytes, size) and thumb created\n  ready         Boolean         @default(false)\n\n  higgsfield_media_id String?\n  clip_job_id         String?\n  clip_status         ClipStatus @default(none)\n  clip_result_url     String?\n  clip_gcs_path       String?\n\n  created_at DateTime @default(now())\n\n  project Project @relation(fields: [project_id], references: [id], onDelete: Cascade)\n\n  @@index([project_id, position])\n  @@index([project_id, content_hash])\n  @@map(\"images\")\n}\n\nmodel Consent {\n  id          String      @id @default(uuid())\n  user_id     String\n  project_id  String\n  type        ConsentType\n  accepted_at DateTime    @default(now())\n  ip          String?\n\n  user    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)\n  project Project @relation(fields: [project_id], references: [id], onDelete: Cascade)\n\n  @@index([user_id])\n  @@index([project_id, type])\n  @@map(\"consents\")\n}\n\nmodel JobEvent {\n  id            String   @id @default(uuid())\n  project_id    String\n  job_name      String\n  bullmq_job_id String?\n  step          String?\n  status        String\n  message       String?\n  created_at    DateTime @default(now())\n\n  project Project @relation(fields: [project_id], references: [id], onDelete: Cascade)\n\n  @@index([project_id, created_at])\n  @@map(\"job_events\")\n}\n\nmodel UsageLedger {\n  id             String     @id @default(uuid())\n  user_id        String\n  project_id     String?\n  kind           LedgerKind\n  quota_units    Int        @default(0) // +1 charge, -1 refund (kind video / video_refund)\n  provider_units Float? // credits / dollars consumed\n  note           String?\n  created_at     DateTime   @default(now())\n\n  user    User     @relation(fields: [user_id], references: [id], onDelete: Cascade)\n  project Project? @relation(fields: [project_id], references: [id], onDelete: SetNull)\n\n  @@index([user_id, created_at])\n  @@index([project_id])\n  @@map(\"usage_ledger\")\n}\n\n// Singleton row (id = \"global\") for the global kill switch / provider circuit breakers\nmodel SystemFlag {\n  id                  String   @id @default(\"global\")\n  renders_enabled     Boolean  @default(true)\n  dewatermark_enabled Boolean  @default(true)\n  scrape_enabled      Boolean  @default(true)\n  updated_at          DateTime @updatedAt\n\n  @@map(\"system_flags\")\n}\n"
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"AuthRole\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"password_reset_tokens\",\"kind\":\"object\",\"type\":\"PasswordResetToken\",\"relationName\":\"PasswordResetTokenToUser\"}],\"dbName\":\"users\"},\"PasswordResetToken\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"token_hash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user_uuid\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"used_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"PasswordResetTokenToUser\"}],\"dbName\":\"password_reset_tokens\"},\"Document\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user_uuid\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"filename\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"mimetype\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"size\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"path\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"enum\",\"type\":\"DocumentType\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"documents\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password_hash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"AuthRole\"},{\"name\":\"email_verified_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"monthly_video_quota\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"refresh_tokens\",\"kind\":\"object\",\"type\":\"RefreshToken\",\"relationName\":\"RefreshTokenToUser\"},{\"name\":\"password_reset_tokens\",\"kind\":\"object\",\"type\":\"PasswordResetToken\",\"relationName\":\"PasswordResetTokenToUser\"},{\"name\":\"email_verification_tokens\",\"kind\":\"object\",\"type\":\"EmailVerificationToken\",\"relationName\":\"EmailVerificationTokenToUser\"},{\"name\":\"projects\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"ProjectToUser\"},{\"name\":\"consents\",\"kind\":\"object\",\"type\":\"Consent\",\"relationName\":\"ConsentToUser\"},{\"name\":\"usage_ledger\",\"kind\":\"object\",\"type\":\"UsageLedger\",\"relationName\":\"UsageLedgerToUser\"}],\"dbName\":\"users\"},\"RefreshToken\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"token_hash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"family_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"revoked_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user_agent\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"ip\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"RefreshTokenToUser\"}],\"dbName\":\"refresh_tokens\"},\"EmailVerificationToken\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"token_hash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"used_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"EmailVerificationTokenToUser\"}],\"dbName\":\"email_verification_tokens\"},\"PasswordResetToken\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"token_hash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"used_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"PasswordResetTokenToUser\"}],\"dbName\":\"password_reset_tokens\"},\"Project\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"source_type\",\"kind\":\"enum\",\"type\":\"SourceType\"},{\"name\":\"source_url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"ProjectStatus\"},{\"name\":\"render_step\",\"kind\":\"enum\",\"type\":\"RenderStep\"},{\"name\":\"partial\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"failure_reason\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"failure_code\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"scrape_error\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"title\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"subtitle\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"location_line\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"closing_line\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"music_enabled\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"rights_attested_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"submitted_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"completed_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"render_started_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"quota_charged\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"video_gcs_path\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"poster_gcs_path\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"duration_seconds\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"clips_total\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"clips_done\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"skipped_image_ids\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"deleted_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"ProjectToUser\"},{\"name\":\"images\",\"kind\":\"object\",\"type\":\"Image\",\"relationName\":\"ImageToProject\"},{\"name\":\"consents\",\"kind\":\"object\",\"type\":\"Consent\",\"relationName\":\"ConsentToProject\"},{\"name\":\"job_events\",\"kind\":\"object\",\"type\":\"JobEvent\",\"relationName\":\"JobEventToProject\"},{\"name\":\"usage_ledger\",\"kind\":\"object\",\"type\":\"UsageLedger\",\"relationName\":\"ProjectToUsageLedger\"}],\"dbName\":\"projects\"},\"Image\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"project_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"position\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"gcs_original_path\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"gcs_processed_path\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"gcs_thumb_path\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"width\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"height\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"bytes\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"content_hash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"source_url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"room_type\",\"kind\":\"enum\",\"type\":\"RoomType\"},{\"name\":\"use_processed\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"wm_status\",\"kind\":\"enum\",\"type\":\"WatermarkStatus\"},{\"name\":\"wm_attempts\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"removed\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"ready\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"higgsfield_media_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"clip_job_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"clip_status\",\"kind\":\"enum\",\"type\":\"ClipStatus\"},{\"name\":\"clip_result_url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"clip_gcs_path\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"ImageToProject\"}],\"dbName\":\"images\"},\"Consent\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"project_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"enum\",\"type\":\"ConsentType\"},{\"name\":\"accepted_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"ip\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"ConsentToUser\"},{\"name\":\"project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"ConsentToProject\"}],\"dbName\":\"consents\"},\"JobEvent\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"project_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"job_name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bullmq_job_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"step\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"message\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"JobEventToProject\"}],\"dbName\":\"job_events\"},\"UsageLedger\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"project_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"kind\",\"kind\":\"enum\",\"type\":\"LedgerKind\"},{\"name\":\"quota_units\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"provider_units\",\"kind\":\"scalar\",\"type\":\"Float\"},{\"name\":\"note\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"UsageLedgerToUser\"},{\"name\":\"project\",\"kind\":\"object\",\"type\":\"Project\",\"relationName\":\"ProjectToUsageLedger\"}],\"dbName\":\"usage_ledger\"},\"SystemFlag\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"renders_enabled\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"dewatermark_enabled\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"scrape_enabled\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"system_flags\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.compilerWasm = {
   getRuntime: async () => require('./query_compiler_bg.js'),

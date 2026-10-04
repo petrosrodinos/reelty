@@ -1,73 +1,51 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Reelty API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS API for Reelty: paste a listing link or upload photos, curate them, and get a cinematic walkthrough video.
+The API only handles HTTP and enqueues jobs; scraping, watermark removal, rendering and emails run in a separate
+worker process (`src/worker.ts`, `src/background/`). Binding contract: `../docs/IMPLEMENTATION_CONTRACT.md`.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Stack
 
-## Description
+NestJS 11, Prisma 7 (PostgreSQL), BullMQ on Redis, Google Cloud Storage (V4 signed URLs), argon2id + cookie sessions.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
+## Local development
 
 ```bash
-$ npm install
+cp .env.template .env.local        # or use .env.staging, which has working integration keys
+npm install
+npx prisma generate                # client is generated into src/generated/prisma
+npm run migrate:local              # needs DATABASE_URL, creates/updates the schema
+npm run start:staging              # API on http://localhost:3000/api, Swagger on /docs
+npm run start:worker:staging       # workers (separate terminal)
 ```
 
-## Running the app
+- Swagger UI: `/docs` (outside the `/api` prefix). Bull Board: `/admin/queues` (basic auth, `BULL_BOARD_USER` / `BULL_BOARD_PASSWORD`).
+- All environment variables are documented in `.env.template`. Provider keys are optional; features degrade with
+  clear error codes. `DATABASE_URL`, `REDIS_URL` and `JWT_SECRET` (min 32 chars) are required in staging/production.
+- Redis must run with `maxmemory-policy noeviction` (BullMQ requirement).
+
+## Auth model
+
+Cookies set by the API: `reelty_at` (15 min), `reelty_rt` (30 days, rotating, path `/api/auth`), `reelty_csrf`
+(readable by JS). Writes need `X-CSRF-Token` (copy of `reelty_csrf`); session-less auth endpoints need
+`X-Requested-With: reelty`. Errors are always `{ "error": { "code", "message", "fields"? } }`.
+
+## Useful scripts
+
+| Script | Purpose |
+|---|---|
+| `npm run build` / `npm run start:prod` | Compile and run (`node dist/src/main`) |
+| `npm run migrate:prod` | `prisma migrate deploy` (uses `DATABASE_URL` from the environment) |
+| `npm run gcs:cors` | Apply bucket CORS for the app origins (`CORS_URLS` / `APP_URL`, or pass origins as arguments) |
+
+## Docker and migrations
+
+`Dockerfile` builds the API image (node 22, multi-stage). **The image CMD does not run `prisma migrate deploy`.**
+Apply migrations as an explicit release step:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+docker build --target migrate -t reelty-api-migrate .
+docker run --rm -e DATABASE_URL=postgresql://... reelty-api-migrate
 ```
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+The baseline schema is `prisma/migrations/0001_init`.

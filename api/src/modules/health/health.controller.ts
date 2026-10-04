@@ -15,7 +15,7 @@ export class HealthController {
     constructor(private readonly healthService: HealthService) {}
 
     @Get()
-    @ApiOperation({ summary: 'Get health status for a single service' })
+    @ApiOperation({ summary: 'Health of the API, Postgres and Redis (or a single service via query)' })
     @ApiQuery({
         name: 'postgres',
         required: false,

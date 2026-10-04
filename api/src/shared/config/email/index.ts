@@ -1,16 +1,10 @@
-import { EmailTemplates } from '@/integrations/notifications/resend/interfaces/mail.interfaces';
-
-const EmailAddress = "info@appointmy.com"
+// Sender address for transactional emails (Resend). Override with RESEND_FROM.
+const DEFAULT_FROM = 'Reelty <hello@reelty.app>';
+const from = process.env.RESEND_FROM || DEFAULT_FROM;
 
 export const EmailConfig = {
     email_addresses: {
-        verification: EmailAddress,
-        confirmation: EmailAddress,
+        verification: from,
+        confirmation: from,
     },
-    templates: {
-        waitlist: {
-            subject: 'Waitlist',
-            template_id: EmailTemplates.WAITLIST,
-        },
-    }
-}
+};
