@@ -28,6 +28,9 @@ const FORGOT_WINDOW_SECONDS = 60 * 60;
 /** A just-rotated refresh token replayed within this window (parallel tabs) is not treated as theft. */
 const REFRESH_REUSE_GRACE_MS = 10_000;
 
+/** Temporarily off: new users are marked verified on register and no verification email is sent. */
+const REQUIRE_EMAIL_VERIFICATION = false;
+
 export const REGISTER_MESSAGE = 'If this email can be registered, we sent a verification link.';
 const FORGOT_MESSAGE = 'If an account exists for this email, we sent a reset link.';
 
@@ -75,6 +78,7 @@ export class AuthService implements OnModuleInit {
           email: dto.email,
           password_hash: passwordHash,
           monthly_video_quota: quota,
+          email_verified_at: REQUIRE_EMAIL_VERIFICATION ? null : new Date(),
         },
         select: { id: true, role: true },
       });
@@ -85,7 +89,9 @@ export class AuthService implements OnModuleInit {
       throw error;
     }
 
-    await this.issueEmailVerification(user.id);
+    if (REQUIRE_EMAIL_VERIFICATION) {
+      await this.issueEmailVerification(user.id);
+    }
     const session = await this.createSession(user, ctx);
 
     return { message: REGISTER_MESSAGE, session };
