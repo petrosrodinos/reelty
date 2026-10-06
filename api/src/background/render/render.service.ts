@@ -5,6 +5,7 @@ import { PrismaService } from '@/core/databases/prisma/prisma.service';
 import { JobNames } from '@/core/queues/queues.constants';
 import { GcsObjectsService } from '@/integrations/storage/gcs/services/gcs-objects.service';
 import { StoragePaths } from '@/integrations/storage/gcs/storage-paths';
+import { AppConfigService } from '@/modules/app-config/app-config.service';
 import { VideoProviderResolver } from '@/integrations/video-generation/video-provider.resolver';
 import {
   ClipRequest,
@@ -58,6 +59,7 @@ export class RenderService {
     private readonly prisma: PrismaService,
     private readonly gcs: GcsObjectsService,
     private readonly providers: VideoProviderResolver,
+    private readonly appConfig: AppConfigService,
     private readonly assembly: AssemblyService,
     private readonly config: WorkerConfigService,
     private readonly flags: SystemFlagsService,
@@ -461,12 +463,16 @@ export class RenderService {
     const accepted = results.filter((r) => r.ok).length;
     if (accepted > 0 && provider.name !== 'local') {
       const { creditsPerClip } = await provider.getCost({ mediaId: requests[0].mediaId, prompt: requests[0].prompt });
+      const cost = await this.appConfig.higgsfieldCost(creditsPerClip * accepted);
       await this.prisma.usageLedger.create({
         data: {
           user_id: project.user_id,
           project_id: project.id,
           kind: 'higgsfield',
-          provider_units: creditsPerClip * accepted,
+          provider_units: cost.credits,
+          credits: cost.credits,
+          cost_usd: cost.cost_usd,
+          cost_estimated: cost.estimated,
           note: `submitted ${accepted} clip(s) at ${creditsPerClip} credits`,
         },
       });

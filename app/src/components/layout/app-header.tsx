@@ -25,6 +25,7 @@ import { Routes } from "@/routes/routes";
 const navLinks = [
   { label: "My Videos", href: Routes.videos },
   { label: "New video", href: Routes.new },
+  { label: "Usage", href: Routes.usage },
 ];
 
 interface AppHeaderProps {

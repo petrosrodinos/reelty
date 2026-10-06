@@ -31,5 +31,6 @@ export const ApiRoutes = {
   },
   usage: {
     prefix: "/usage",
+    history: "/usage/history",
   },
 } as const;

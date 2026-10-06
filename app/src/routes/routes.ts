@@ -10,6 +10,7 @@ export const Routes = {
   privacy: "/privacy",
   new: "/new",
   videos: "/videos",
+  usage: "/usage",
   project: (id: string) => `/projects/${id}`,
   projectCreated: (id: string) => `/projects/${id}?created=1`,
   edit: (id: string) => `/projects/${id}/edit`,

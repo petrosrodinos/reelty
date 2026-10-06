@@ -45,8 +45,6 @@ export const HIGGSFIELD_CONFIG = {
   maxWaitBatch: 12,
   waitTimeoutSeconds: 10,
   requestTimeoutMs: 30_000,
-  /** Used only when the cost endpoint answers in an unexpected shape (TG §7: 7.5 credits per 5 s clip). */
-  fallbackCreditsPerClip: 7.5,
   /** Signed read URL lifetime handed to the import call. */
   importUrlTtlSeconds: 15 * 60,
   maxClipBytes: 500 * 1024 * 1024,

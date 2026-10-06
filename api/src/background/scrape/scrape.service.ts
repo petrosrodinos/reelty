@@ -7,6 +7,7 @@ import { StoragePaths } from '@/integrations/storage/gcs/storage-paths';
 import { ApifyError, ApifyService } from '@/integrations/apify/apify.service';
 import { JobEventsService } from '../common/job-events.service';
 import { SystemFlagsService } from '../common/system-flags.service';
+import { AppConfigService } from '@/modules/app-config/app-config.service';
 import { WorkerConfigService } from '../common/worker-config.service';
 import { safeDownloadBuffer } from '../common/safe-http';
 import { ImageTooSmallError, makeThumbnail, normalizeToJpeg, sha256Hex, sniffImageType } from '../common/image.utils';
@@ -64,6 +65,7 @@ export class ScrapeService {
     private readonly config: WorkerConfigService,
     private readonly flags: SystemFlagsService,
     private readonly events: JobEventsService,
+    private readonly appConfig: AppConfigService,
   ) {}
 
   async run(projectId: string, ctx: ScrapeContext): Promise<void> {
@@ -266,12 +268,15 @@ export class ScrapeService {
 
   private async recordLedger(userId: string, projectId: string, c: Collected): Promise<void> {
     try {
+      const cost = await this.appConfig.apifyCost(c.usageUsd);
       await this.prisma.usageLedger.create({
         data: {
           user_id: userId,
           project_id: projectId,
           kind: 'scrape',
-          provider_units: c.usageUsd,
+          provider_units: cost.cost_usd,
+          cost_usd: cost.cost_usd,
+          cost_estimated: cost.estimated,
           note: `apify ${c.actorId} run ${c.runId}`,
         },
       });

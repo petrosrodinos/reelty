@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { WorkerConfigService } from '@/background/common/worker-config.service';
 import { safeDownloadToFile } from '@/background/common/safe-http';
+import { AppConfigService } from '@/modules/app-config/app-config.service';
+import { AppConfigKeys } from '@/modules/app-config/app-config.constants';
 import { GcsObjectsService } from '@/integrations/storage/gcs/services/gcs-objects.service';
 import {
   ClipCost,
@@ -48,6 +50,7 @@ export class HiggsfieldProvider implements VideoGenerationProvider {
   constructor(
     private readonly config: WorkerConfigService,
     private readonly gcs: GcsObjectsService,
+    private readonly appConfig: AppConfigService,
   ) {}
 
   isConfigured(): boolean {
@@ -90,8 +93,9 @@ export class HiggsfieldProvider implements VideoGenerationProvider {
     });
     const credits = parseCredits(json);
     if (credits === undefined) {
-      this.logger.warn('Cost preflight answered in an unexpected shape; using the documented 7.5 credits per clip');
-      return { creditsPerClip: HIGGSFIELD_CONFIG.fallbackCreditsPerClip };
+      const fallback = await this.appConfig.getNumber(AppConfigKeys.HIGGSFIELD_FALLBACK_CREDITS_PER_CLIP);
+      this.logger.warn(`Cost preflight answered in an unexpected shape; using the configured ${fallback} credits per clip`);
+      return { creditsPerClip: fallback };
     }
     return { creditsPerClip: credits };
   }

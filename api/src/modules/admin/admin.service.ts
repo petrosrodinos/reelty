@@ -3,6 +3,9 @@ import type { SystemFlag } from 'generated/prisma';
 import { ProjectStatus } from 'generated/prisma';
 import { PrismaService } from '@/core/databases/prisma/prisma.service';
 import { QueuesService } from '@/core/queues/queues.service';
+import { AppConfigService } from '@/modules/app-config/app-config.service';
+import type { AdminUsageQueryType } from '@/modules/usage/dto/usage-history-query.schema';
+import { UsageService } from '@/modules/usage/usage.service';
 import { SystemFlagsService } from '@/modules/system-flags/system-flags.service';
 import { UpdateFlagsDto } from './dto/update-flags.dto';
 
@@ -12,7 +15,25 @@ export class AdminService {
     private readonly prisma: PrismaService,
     private readonly queues: QueuesService,
     private readonly flags: SystemFlagsService,
+    private readonly appConfig: AppConfigService,
+    private readonly usage: UsageService,
   ) {}
+
+  listConfig() {
+    return this.appConfig.list();
+  }
+
+  updateConfig(key: string, value: number) {
+    return this.appConfig.update(key, value);
+  }
+
+  getCostHistory(query: AdminUsageQueryType) {
+    return this.usage.getCostHistory(query);
+  }
+
+  getProjectCost(projectId: string) {
+    return this.usage.getProjectCost(projectId);
+  }
 
   private serializeFlags(flags: SystemFlag) {
     return {

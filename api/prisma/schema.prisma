@@ -272,7 +272,10 @@ model UsageLedger {
   project_id     String?
   kind           LedgerKind
   quota_units    Int        @default(0) // +1 charge, -1 refund (kind video / video_refund)
-  provider_units Float? // credits / dollars consumed
+  provider_units Float? // legacy mixed unit (credits / dollars / images by kind); read credits + cost_usd instead
+  credits        Float? // provider credits consumed by this row (null when the provider bills in USD, e.g. Apify)
+  cost_usd       Float? // our price in USD for this row, stored at write time so later price changes do not rewrite history
+  cost_estimated Boolean    @default(false) // true when cost_usd comes from app_config prices instead of a provider-reported figure
   note           String?
   created_at     DateTime   @default(now())
 
@@ -282,6 +285,18 @@ model UsageLedger {
   @@index([user_id, created_at])
   @@index([project_id])
   @@map("usage_ledger")
+}
+
+// Operator-editable numeric settings: provider prices for services that do not report their own cost,
+// and fallbacks. Keys are defined in modules/app-config/app-config.constants.ts.
+model AppConfig {
+  key         String   @id
+  value       Float
+  unit        String
+  description String?
+  updated_at  DateTime @updatedAt
+
+  @@map("app_config")
 }
 
 // Singleton row (id = "global") for the global kill switch / provider circuit breakers

@@ -10,6 +10,7 @@ import {
   DewatermarkError,
   DewatermarkService,
 } from '@/integrations/dewatermark/dewatermark.service';
+import { AppConfigService } from '@/modules/app-config/app-config.service';
 import { JobEventsService } from '../common/job-events.service';
 import { SystemFlagsService } from '../common/system-flags.service';
 import { sniffImageType } from '../common/image.utils';
@@ -62,6 +63,7 @@ export class ImageProcessService {
     private readonly dewatermark: DewatermarkService,
     private readonly flags: SystemFlagsService,
     private readonly events: JobEventsService,
+    private readonly appConfig: AppConfigService,
   ) {}
 
   async run(data: DewatermarkJobData, ctx: ImageProcessContext): Promise<void> {
@@ -190,10 +192,20 @@ export class ImageProcessService {
     await log('failed', `${FAILURE_MESSAGES[cause]}${detail ? ` (${detail})` : ''}`);
   }
 
-  private async recordLedger(userId: string, projectId: string, units: number, note: string): Promise<void> {
+  private async recordLedger(userId: string, projectId: string, images: number, note: string): Promise<void> {
     try {
+      const cost = await this.appConfig.dewatermarkCost(images);
       await this.prisma.usageLedger.create({
-        data: { user_id: userId, project_id: projectId, kind: 'dewatermark', provider_units: units, note },
+        data: {
+          user_id: userId,
+          project_id: projectId,
+          kind: 'dewatermark',
+          provider_units: cost.credits,
+          credits: cost.credits,
+          cost_usd: cost.cost_usd,
+          cost_estimated: cost.estimated,
+          note,
+        },
       });
     } catch (error) {
       this.logger.warn(`Could not write dewatermark ledger row: ${(error as Error).message}`);

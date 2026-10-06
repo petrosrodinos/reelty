@@ -246,8 +246,19 @@ exports.Prisma.UsageLedgerScalarFieldEnum = {
   kind: 'kind',
   quota_units: 'quota_units',
   provider_units: 'provider_units',
+  credits: 'credits',
+  cost_usd: 'cost_usd',
+  cost_estimated: 'cost_estimated',
   note: 'note',
   created_at: 'created_at'
+};
+
+exports.Prisma.AppConfigScalarFieldEnum = {
+  key: 'key',
+  value: 'value',
+  unit: 'unit',
+  description: 'description',
+  updated_at: 'updated_at'
 };
 
 exports.Prisma.SystemFlagScalarFieldEnum = {
@@ -354,6 +365,7 @@ exports.Prisma.ModelName = {
   Consent: 'Consent',
   JobEvent: 'JobEvent',
   UsageLedger: 'UsageLedger',
+  AppConfig: 'AppConfig',
   SystemFlag: 'SystemFlag'
 };
 
