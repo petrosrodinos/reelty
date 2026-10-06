@@ -299,7 +299,7 @@ export class ProjectsService {
     dto: SubmitProjectDto,
     ip: string | null,
   ): Promise<ProjectJson> {
-    const limits = getLimits(this.config);
+    const limits = getLimits();
     const [project, user] = await Promise.all([
       this.findOwnedOrThrow(userId, projectId),
       this.prisma.user.findUnique({

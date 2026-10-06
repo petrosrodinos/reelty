@@ -4,7 +4,7 @@ import { HiggsfieldProvider } from './higgsfield/higgsfield.provider';
 import { LocalKenBurnsProvider } from './local/local-ken-burns.provider';
 import { ProviderConfigError, VideoGenerationProvider } from './video-generation.provider';
 
-/** Chooses the provider: VIDEO_PROVIDER, else higgsfield when a key exists, else the local Ken Burns renderer. */
+/** Chooses the provider: appConfig.videoProvider, else higgsfield when a key exists, else the local Ken Burns renderer. */
 @Injectable()
 export class VideoProviderResolver {
   constructor(
@@ -17,7 +17,7 @@ export class VideoProviderResolver {
     if (this.config.videoProvider === 'higgsfield') {
       if (!this.higgsfield.isConfigured()) {
         throw new ProviderConfigError(
-          'VIDEO_PROVIDER=higgsfield needs HIGGSFIELD_API_KEY and HIGGSFIELD_API_BASE_URL',
+          'The higgsfield video provider needs HIGGSFIELD_API_KEY',
         );
       }
       return this.higgsfield;

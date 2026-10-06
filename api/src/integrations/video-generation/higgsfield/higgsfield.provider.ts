@@ -189,7 +189,7 @@ export class HiggsfieldProvider implements VideoGenerationProvider {
     const key = this.config.higgsfieldApiKey;
     const base = this.config.higgsfieldBaseUrl;
     if (!key || !base) {
-      throw new ProviderConfigError('HIGGSFIELD_API_KEY and HIGGSFIELD_API_BASE_URL are required for the Higgsfield provider');
+      throw new ProviderConfigError('HIGGSFIELD_API_KEY is required for the Higgsfield provider');
     }
     const auth = HIGGSFIELD_CONFIG.auth;
     const headers: Record<string, string> = {

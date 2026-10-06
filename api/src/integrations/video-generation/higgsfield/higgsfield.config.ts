@@ -25,7 +25,7 @@ export const HIGGSFIELD_CONFIG = {
     mediaRole: 'start_image',
   },
 
-  /** Paths are relative to HIGGSFIELD_API_BASE_URL. */
+  /** Paths are relative to appConfig.higgsfield.baseUrl. */
   endpoints: {
     /** -> { balance | credits } */
     balance: { method: 'GET', path: '/v1/balance' },

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Limits } from '@/core/queues/queues.constants';
+import { appConfig } from '@/shared/config/app';
 
 export type VideoProviderName = 'local' | 'higgsfield';
 
@@ -12,12 +12,6 @@ export class WorkerConfigService {
   private str(key: string): string | undefined {
     const v = this.config.get<string>(key);
     return v ? v : undefined;
-  }
-
-  private num(key: string, fallback: number): number {
-    const raw = this.config.get<string | number>(key);
-    const n = raw === undefined || raw === '' ? NaN : Number(raw);
-    return Number.isFinite(n) && n > 0 ? n : fallback;
   }
 
   get nodeEnv(): string {
@@ -34,48 +28,45 @@ export class WorkerConfigService {
     return this.str('APIFY_TOKEN');
   }
   get apifyWebsiteActorId(): string {
-    return this.str('APIFY_WEBSITE_ACTOR_ID') ?? 'apify/web-scraper';
+    return appConfig.apify.websiteActorId;
   }
   get apifyAirbnbActorId(): string {
-    return this.str('APIFY_AIRBNB_ACTOR_ID') ?? 'tri_angle/airbnb-rooms-urls-scraper';
+    return appConfig.apify.airbnbActorId;
   }
 
   get dewatermarkApiKey(): string | undefined {
     return this.str('DEWATERMARK_API_KEY');
   }
   get dewatermarkBaseUrl(): string {
-    return (this.str('DEWATERMARK_API_BASE_URL') ?? 'https://platform.dewatermark.ai').replace(/\/+$/, '');
+    return appConfig.dewatermark.baseUrl;
   }
 
   get higgsfieldApiKey(): string | undefined {
     return this.str('HIGGSFIELD_API_KEY');
   }
-  get higgsfieldBaseUrl(): string | undefined {
-    return this.str('HIGGSFIELD_API_BASE_URL');
+  get higgsfieldBaseUrl(): string {
+    return appConfig.higgsfield.baseUrl;
   }
   /** Per-clip credit ceiling for the cost preflight. */
   get higgsfieldMaxClipCredits(): number {
-    return this.num('HIGGSFIELD_MAX_CLIP_CREDITS', 15);
+    return appConfig.higgsfield.maxClipCredits;
   }
 
-  /** Explicit VIDEO_PROVIDER, else higgsfield when a key is configured, else local. */
+  /** Explicit appConfig.videoProvider, else higgsfield when a key is configured, else local. */
   get videoProvider(): VideoProviderName {
-    const explicit = this.str('VIDEO_PROVIDER');
+    const explicit = appConfig.videoProvider;
     if (explicit === 'local' || explicit === 'higgsfield') return explicit;
     return this.higgsfieldApiKey ? 'higgsfield' : 'local';
   }
 
   get minImages(): number {
-    return this.num('MIN_IMAGES', Limits.MIN_IMAGES);
+    return appConfig.limits.minImages;
   }
   get maxImages(): number {
-    return this.num('MAX_IMAGES', Limits.MAX_IMAGES);
+    return appConfig.limits.maxImages;
   }
 
   get resendApiKey(): string | undefined {
     return this.str('RESEND_API_KEY');
-  }
-  get resendFrom(): string {
-    return this.str('RESEND_FROM') ?? 'Reelty <onboarding@resend.dev>';
   }
 }

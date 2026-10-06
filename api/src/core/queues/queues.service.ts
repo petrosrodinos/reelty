@@ -3,11 +3,11 @@ import { InjectQueue } from '@nestjs/bullmq';
 import type { JobsOptions, Queue } from 'bullmq';
 import { ApiException } from '@/shared/errors/api-exception';
 import { ErrorCodes } from '@/shared/config/error-codes';
+import { appConfig } from '@/shared/config/app';
 import {
   DewatermarkJobData,
   JobIds,
   JobNames,
-  Limits,
   QueueDefaults,
   QueueName,
   QueueNames,
@@ -134,7 +134,7 @@ export class QueuesService {
       [this.renderQueue, JobIds.render(projectId)],
     ];
     for (const imageId of imageIds) {
-      for (let attempt = 1; attempt <= Limits.WM_MAX_ATTEMPTS + 3; attempt++) {
+      for (let attempt = 1; attempt <= appConfig.limits.wmMaxAttempts + 3; attempt++) {
         targets.push([this.imageQueue, JobIds.dewatermark(imageId, attempt)]);
       }
     }

@@ -184,7 +184,7 @@ export class RenderService {
       });
       if (creditsPerClip > this.config.higgsfieldMaxClipCredits) {
         this.logger.error(
-          `[ALERT] Clip cost ${creditsPerClip} exceeds HIGGSFIELD_MAX_CLIP_CREDITS=${this.config.higgsfieldMaxClipCredits}`,
+          `[ALERT] Clip cost ${creditsPerClip} exceeds max clip credits (${this.config.higgsfieldMaxClipCredits})`,
         );
         throw new RenderFailure('cost_ceiling', `Cost per clip ${creditsPerClip} is above the configured ceiling`);
       }

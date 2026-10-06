@@ -85,7 +85,7 @@ export class ImagesService {
     this.assertEditable(project);
     this.media.requireConfigured();
 
-    const { maxImages } = getLimits(this.config);
+    const { maxImages } = getLimits();
 
     await this.discardStalePendingUploads(project);
 
@@ -412,7 +412,7 @@ export class ImagesService {
     const project = image.project;
     this.projects.assertUnlocked(project);
 
-    const { wmMaxAttempts } = getLimits(this.config);
+    const { wmMaxAttempts } = getLimits();
 
     const flags = await this.flags.get();
     if (!flags.dewatermark_enabled) {

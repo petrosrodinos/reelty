@@ -1,8 +1,6 @@
 import { z } from 'zod';
 import { parseCorsUrls } from '../cors';
 
-const optionalNumber = z.coerce.number().int().positive().optional();
-
 const EnvSchema = z.object({
   NODE_ENV: z.enum(['local', 'development', 'test', 'staging', 'production']),
   PORT: z.coerce.number().default(3000),
@@ -27,29 +25,16 @@ const EnvSchema = z.object({
 
   // Email
   RESEND_API_KEY: z.string().optional(),
-  RESEND_FROM: z.string().optional(),
 
   // Providers (all optional: features degrade with clear error codes)
   APIFY_TOKEN: z.string().optional(),
-  APIFY_WEBSITE_ACTOR_ID: z.string().optional(),
-  APIFY_AIRBNB_ACTOR_ID: z.string().optional(),
   DEWATERMARK_API_KEY: z.string().optional(),
-  DEWATERMARK_API_BASE_URL: z.string().url().optional(),
-  VIDEO_PROVIDER: z.enum(['local', 'higgsfield']).optional(),
-  HIGGSFIELD_API_BASE_URL: z.string().url().optional(),
   HIGGSFIELD_API_KEY: z.string().optional(),
-  HIGGSFIELD_MAX_CLIP_CREDITS: z.coerce.number().positive().optional(),
 
   // ffmpeg (workers)
   FFMPEG_PATH: z.string().optional(),
   FFPROBE_PATH: z.string().optional(),
   FFMPEG_FONT_PATH: z.string().optional(),
-
-  // Domain limits
-  MAX_IMAGES: optionalNumber,
-  MIN_IMAGES: optionalNumber,
-  WM_MAX_ATTEMPTS: optionalNumber,
-  DEFAULT_MONTHLY_QUOTA: z.coerce.number().int().min(0).optional(),
 
   // Bull Board
   BULL_BOARD_USER: z.string().optional(),

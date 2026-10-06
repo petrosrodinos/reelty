@@ -25,7 +25,7 @@ export class ProjectSerializer {
     private readonly media: MediaUrlsService,
     config: ConfigService,
   ) {
-    this.wmMaxAttempts = getLimits(config).wmMaxAttempts;
+    this.wmMaxAttempts = getLimits().wmMaxAttempts;
   }
 
   /** Detail shape (images included when `ctx.images` is given). */

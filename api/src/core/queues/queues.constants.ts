@@ -93,11 +93,8 @@ export const WorkerConcurrency = {
   [QueueNames.NOTIFY]: 10,
 } as const;
 
-// Domain limits (env overridable, defaults per spec §18.1)
+// Static domain limits (image count / attempt limits live in shared appConfig)
 export const Limits = {
-  MIN_IMAGES: 3,
-  MAX_IMAGES: 12,
-  WM_MAX_ATTEMPTS: 2,
   MAX_SCRAPE_CANDIDATES: 30,
   MAX_UPLOAD_BYTES: 20 * 1024 * 1024,
   MIN_SIDE_REJECT: 640,

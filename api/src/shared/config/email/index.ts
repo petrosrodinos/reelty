@@ -1,6 +1,7 @@
-// Sender address for transactional emails (Resend). Override with RESEND_FROM.
-const DEFAULT_FROM = 'Reelty <hello@reelty.app>';
-const from = process.env.RESEND_FROM || DEFAULT_FROM;
+import { appConfig } from '../app';
+
+// Sender address for transactional emails (Resend).
+const from = appConfig.email.from;
 
 export const EmailConfig = {
     email_addresses: {

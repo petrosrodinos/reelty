@@ -7,6 +7,7 @@ import { QueuesService } from '@/core/queues/queues.service';
 import { PrismaService } from '@/core/databases/prisma/prisma.service';
 import { AuthTtl } from '@/shared/constants/auth.constants';
 import { ErrorCodes } from '@/shared/config/error-codes';
+import { appConfig } from '@/shared/config/app';
 import { ApiException } from '@/shared/errors/api-exception';
 import { RateLimitService } from '@/shared/services/rate-limit/rate-limit.service';
 import { UsageService } from '@/modules/usage/usage.service';
@@ -65,7 +66,7 @@ export class AuthService implements OnModuleInit {
       return { message: REGISTER_MESSAGE, session: null };
     }
 
-    const quota = this.config.get<number>('DEFAULT_MONTHLY_QUOTA');
+    const quota = appConfig.limits.defaultMonthlyQuota;
 
     let user: { id: string; role: string };
     try {
@@ -73,7 +74,7 @@ export class AuthService implements OnModuleInit {
         data: {
           email: dto.email,
           password_hash: passwordHash,
-          ...(quota !== undefined ? { monthly_video_quota: quota } : {}),
+          monthly_video_quota: quota,
         },
         select: { id: true, role: true },
       });
