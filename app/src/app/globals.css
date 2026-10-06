@@ -121,6 +121,9 @@
   --chart-4: var(--color-surface-strong);
   --chart-5: var(--color-muted-soft);
   --radius: 0.75rem;
+  --button-h-sm: 2rem;
+  --button-h: 2.25rem;
+  --button-h-lg: 2.5rem;
   --sidebar: var(--color-canvas);
   --sidebar-foreground: var(--color-ink);
   --sidebar-primary: var(--color-brand-solid);

@@ -1,8 +1,11 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
-import { environments } from "@/config/environments";
 import { ApiRoutes } from "@/config/api/routes";
+import { environments } from "@/config/environments";
 
 export const CSRF_COOKIE = "reelty_csrf";
+
+/** Origin comes from env; the /api path prefix lives here. */
+export const API_BASE_URL = `${environments.apiUrl}/api`;
 
 /** Error thrown by every service: carries the API's snake_case code and HTTP status. */
 export class ApiError extends Error {
@@ -56,7 +59,7 @@ export function readCookie(name: string): string | null {
 }
 
 const axiosInstance = axios.create({
-  baseURL: environments.apiUrl,
+  baseURL: API_BASE_URL,
   withCredentials: true,
   headers: { "X-Requested-With": "reelty" },
 });

@@ -5,7 +5,7 @@ const isProd = process.env.NODE_ENV === "production";
 // Origins the browser may talk to: our API (set at build time) and Google Cloud Storage for signed uploads/downloads.
 const apiOrigin = (() => {
   try {
-    return new URL(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api").origin;
+    return new URL(process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000").origin;
   } catch {
     return "";
   }

@@ -1,6 +1,5 @@
-import axiosInstance from "@/config/api/axios";
+import axiosInstance, { API_BASE_URL } from "@/config/api/axios";
 import { ApiRoutes } from "@/config/api/routes";
-import { environments } from "@/config/environments";
 import type { SignedDownload } from "@/features/images/interfaces/images.interfaces";
 import type {
   CreateProjectDto,
@@ -60,4 +59,4 @@ export const getVideoDownloadUrl = async (id: string): Promise<SignedDownload> =
 };
 
 /** Absolute URL of the streamed ZIP (cookie-authenticated top-level navigation, no XHR). */
-export const getImagesZipUrl = (id: string): string => `${environments.apiUrl}${ApiRoutes.projects.downloadZip(id)}`;
+export const getImagesZipUrl = (id: string): string => `${API_BASE_URL}${ApiRoutes.projects.downloadZip(id)}`;

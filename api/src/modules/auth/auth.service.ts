@@ -31,7 +31,9 @@ const REFRESH_REUSE_GRACE_MS = 10_000;
 /** Temporarily off: new users are marked verified on register and no verification email is sent. */
 const REQUIRE_EMAIL_VERIFICATION = false;
 
-export const REGISTER_MESSAGE = 'If this email can be registered, we sent a verification link.';
+export const REGISTER_MESSAGE = REQUIRE_EMAIL_VERIFICATION
+  ? 'If this email can be registered, we sent a verification link.'
+  : 'Your account is ready.';
 const FORGOT_MESSAGE = 'If an account exists for this email, we sent a reset link.';
 
 const ARGON_OPTIONS = { type: argon2.argon2id } as const;

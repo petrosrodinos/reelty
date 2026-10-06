@@ -2,7 +2,7 @@
 
 import { useState, type FC } from "react";
 import Link from "next/link";
-import { FilmIcon, PlusIcon, WifiOffIcon } from "lucide-react";
+import { FilmIcon, WifiOffIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ConfirmationDialog from "@/components/ui/confirmation-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -52,9 +52,6 @@ const VideosPage: FC = () => {
           <p className="text-eyebrow text-muted-foreground">Library</p>
           <h1 className="text-display-lg mt-2">My Videos</h1>
         </div>
-        <Button size="lg" render={<Link href={Routes.new} />} nativeButton={false}>
-          <PlusIcon /> New video
-        </Button>
       </div>
 
       <div className="mb-8 flex flex-wrap items-center gap-3">
