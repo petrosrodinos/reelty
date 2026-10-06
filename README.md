@@ -10,15 +10,15 @@ Turn property photos into a cinematic walkthrough video. Paste a listing link (w
 
 | Path | What |
 |---|---|
-| `api/` | NestJS API (`src/main.ts`) and BullMQ worker (`src/worker.ts`), Prisma/PostgreSQL |
+| `api/` | NestJS API (`src/main.ts`) with the BullMQ processors in the same process (`src/background/`), Prisma/PostgreSQL |
 | `app/` | Next.js 16 + shadcn/ui web app |
-| `docker-compose.yml` | Postgres, Redis (`noeviction`), API, worker, web |
+| `docker-compose.yml` | Postgres, Redis (`noeviction`), API (incl. workers), web |
 
 ## Setup
 
 1. `cp api/.env.template api/.env.staging` and fill it in. Required: `DATABASE_URL`, `REDIS_URL`, `JWT_SECRET` (32+ chars). Provider keys are optional; features degrade with clear errors without them.
 2. `cd api && npm install && npx prisma migrate deploy`
-3. API: `npm run start:staging`. Worker (separate process): `npm run start:worker:staging`.
+3. API (also runs the workers): `npm run start:staging`.
 4. Web: `cd app && cp .env.example .env.local && npm install && npm run dev` (port 3001).
 5. Everything at once: `docker compose up --build`.
 

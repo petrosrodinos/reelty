@@ -34,14 +34,6 @@ services:
     ports: ["3000:3000"]
     depends_on: [postgres, redis, migrate]
 
-  worker:
-    build: { context: ./api, dockerfile: Dockerfile.worker }
-    env_file: ./api/.env.staging
-    environment:
-      DATABASE_URL: postgresql://reelty:reelty@postgres:5432/reelty
-      REDIS_URL: redis://redis:6379
-    depends_on: [postgres, redis, migrate]
-
   app:
     build:
       context: ./app

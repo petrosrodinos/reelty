@@ -12,8 +12,9 @@ import { RenderBackgroundModule } from './render/render.module';
 import { ScrapeBackgroundModule } from './scrape/scrape.module';
 
 /**
- * Root module of the worker process (`src/worker.ts`): an application context without HTTP that hosts the
- * BullMQ processors. The API process only registers producers and never imports this module.
+ * Hosts the BullMQ processors (scrape, image-process, render, notify). For now they run inside the API process,
+ * on the same machine. To split them out later, bootstrap this module in its own entry point
+ * (`NestFactory.createApplicationContext`) and drop it from `AppModule`.
  */
 @Module({
   imports: [
@@ -30,4 +31,4 @@ import { ScrapeBackgroundModule } from './scrape/scrape.module';
     NotifyBackgroundModule,
   ],
 })
-export class WorkerModule {}
+export class BackgroundModule {}

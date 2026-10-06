@@ -14,6 +14,7 @@ import { ProjectsModule } from './modules/projects/projects.module';
 import { ImagesModule } from './modules/images/images.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { HealthModule } from './modules/health/health.module';
+import { BackgroundModule } from './background/background.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { HealthModule } from './modules/health/health.module';
     ImagesModule,
     AdminModule,
     HealthModule,
+    BackgroundModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },

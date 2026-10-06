@@ -1,8 +1,8 @@
 # Reelty API
 
 NestJS API for Reelty: paste a listing link or upload photos, curate them, and get a cinematic walkthrough video.
-The API only handles HTTP and enqueues jobs; scraping, watermark removal, rendering and emails run in a separate
-worker process (`src/worker.ts`, `src/background/`). Binding contract: `../docs/IMPLEMENTATION_CONTRACT.md`.
+The API enqueues jobs; scraping, watermark removal, rendering and emails run in BullMQ processors
+(`src/background/`) hosted in the same process and machine as the HTTP API for now. Binding contract: `../docs/IMPLEMENTATION_CONTRACT.md`.
 
 ## Stack
 
@@ -15,8 +15,7 @@ cp .env.template .env.local        # or use .env.staging, which has working inte
 npm install
 npx prisma generate                # client is generated into src/generated/prisma
 npm run migrate:local              # needs DATABASE_URL, creates/updates the schema
-npm run start:staging              # API on http://localhost:3000/api, Swagger on /docs
-npm run start:worker:staging       # workers (separate terminal)
+npm run start:staging              # API (+ workers) on http://localhost:3000/api, Swagger on /docs
 ```
 
 - Swagger UI: `/docs` (outside the `/api` prefix). Bull Board: `/admin/queues` (basic auth, `BULL_BOARD_USER` / `BULL_BOARD_PASSWORD`).

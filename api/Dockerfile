@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
 #
-# Reelty API image (HTTP only; the worker has its own Dockerfile.worker).
+# Reelty API image: HTTP API + BullMQ processors in one process on one machine (FFmpeg + fonts included).
+# Sizing guide (spec §12): about 2 vCPU / 4 GB RAM and 5 GB temp disk per concurrent render.
 #
 # IMPORTANT: the image CMD does NOT run `prisma migrate deploy`. Apply migrations as a
 # separate, explicit release step so a crash-looping API never races with schema changes:

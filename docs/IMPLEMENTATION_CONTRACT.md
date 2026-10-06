@@ -133,8 +133,7 @@ Status transitions (owned by the API and workers exactly as in the spec): `DRAFT
 
 ## 5. Workers (spec §5, §10) — run in a separate process
 
-- Entry `api/src/worker.ts` bootstraps `WorkerModule` (an application context, no HTTP) with the processors in `api/src/background/`. Scripts: `start:worker`, `start:worker:staging`, `start:worker:prod`. Graceful SIGTERM shutdown (`app.enableShutdownHooks()`; `worker.close()` waits for the current job).
-- The API process only registers **producers** (`Queue`), never processors.
+- `BackgroundModule` (`api/src/background/background.module.ts`) hosts the processors and is imported by `AppModule`, so `npm run start*` runs API and workers together. Graceful SIGTERM shutdown (`app.enableShutdownHooks()`; `worker.close()` waits for the current job). To split later, bootstrap `BackgroundModule` in its own entry point and remove it from `AppModule`.
 - Queues and job ids per `queues.constants.ts`. Payloads hold IDs only.
 - Every job loads state from Postgres, is idempotent and resumable, and writes `JobEvent` rows for noteworthy transitions.
 - Provider abstraction: `VideoGenerationProvider { importImage, getCost, submitClips, waitForJobs, downloadClip }` with a `HiggsfieldProvider` (HTTP client, configurable via `HIGGSFIELD_API_BASE_URL`/`HIGGSFIELD_API_KEY`; endpoint paths are an **assumption** pending spec Q1 and must live in one clearly commented config object) and a `LocalKenBurnsProvider` that renders each "clip" locally with ffmpeg `zoompan` from the still (selected with `VIDEO_PROVIDER=local|higgsfield`; default `local` when no Higgsfield key is configured). Both satisfy the same state machine so the rest of the pipeline is identical.
@@ -165,5 +164,5 @@ Env: `NEXT_PUBLIC_API_URL`. `app/.env.example` documents it.
 ## 7. Ops deliverables
 
 - `api/.env.template` updated with every variable (spec §18.1 + `COOKIE_DOMAIN`, `VIDEO_PROVIDER`, `HIGGSFIELD_*`, `APIFY_TOKEN`, `DEWATERMARK_API_KEY`, `FFMPEG_*`, `MAX_IMAGES`, `MIN_IMAGES`, `WM_MAX_ATTEMPTS`, `DEFAULT_MONTHLY_QUOTA`, `HIGGSFIELD_MAX_CLIP_CREDITS`, `RESEND_FROM`). All provider keys optional in the Zod env schema so the app boots without them (features degrade with clear error codes); `DATABASE_URL`, `JWT_SECRET` (min 32 chars outside local), `REDIS_URL` are required in staging/production.
-- `api/Dockerfile` (API), `api/Dockerfile.worker` (worker with ffmpeg + fonts), `app/Dockerfile` (Next standalone output), root `docker-compose.yml` (postgres, redis with `--maxmemory-policy noeviction`, api, worker, app) and a root `README.md` with setup, env, GCS bucket + CORS setup (`npm run gcs:cors` script), legal checklist (spec §13.2) and the open questions the owner must still answer (Q1–Q7).
+- `api/Dockerfile` (API + workers, with ffmpeg + fonts), `app/Dockerfile` (Next standalone output), root `docker-compose.yml` (postgres, redis with `--maxmemory-policy noeviction`, api, app) and a root `README.md` with setup, env, GCS bucket + CORS setup (`npm run gcs:cors` script), legal checklist (spec §13.2) and the open questions the owner must still answer (Q1–Q7).
 - `api/src/scripts/set-gcs-cors.ts` + npm script `gcs:cors`.
