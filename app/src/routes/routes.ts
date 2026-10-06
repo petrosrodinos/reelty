@@ -11,6 +11,8 @@ export const Routes = {
   new: "/new",
   videos: "/videos",
   usage: "/usage",
+  adminConfig: "/admin/config",
+  adminUsage: "/admin/usage",
   project: (id: string) => `/projects/${id}`,
   projectCreated: (id: string) => `/projects/${id}?created=1`,
   edit: (id: string) => `/projects/${id}/edit`,

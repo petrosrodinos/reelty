@@ -1,8 +1,14 @@
 export const UserRoles = {
   USER: "USER",
   ADMIN: "ADMIN",
+  SUPER_ADMIN: "SUPER_ADMIN",
+  SUPPORT: "SUPPORT",
 } as const;
 export type UserRole = (typeof UserRoles)[keyof typeof UserRoles];
+
+/** Roles the API admin endpoints accept (ADMIN, plus SUPER_ADMIN which bypasses role checks). */
+export const isAdminRole = (role: UserRole | undefined): boolean =>
+  role === UserRoles.ADMIN || role === UserRoles.SUPER_ADMIN;
 
 export interface Quota {
   used: number;

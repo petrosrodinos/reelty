@@ -29,6 +29,11 @@ export const ApiRoutes = {
     removeWatermark: (id: string) => `/images/${id}/remove-watermark`,
     downloadUrl: (id: string) => `/images/${id}/download-url`,
   },
+  admin: {
+    config: "/admin/config",
+    configByKey: (key: string) => `/admin/config/${encodeURIComponent(key)}`,
+    usage: "/admin/usage",
+  },
   usage: {
     prefix: "/usage",
     history: "/usage/history",

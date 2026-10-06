@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useLogout, useResendVerification } from "@/features/auth/hooks/use-auth";
-import type { Me } from "@/features/auth/interfaces/auth.interfaces";
+import { isAdminRole, type Me } from "@/features/auth/interfaces/auth.interfaces";
 import { formatDateLong, getInitial } from "@/lib/format.utils";
 import { cn } from "@/lib/utils";
 import { Routes } from "@/routes/routes";
@@ -47,14 +47,19 @@ export const AppHeader: FC<AppHeaderProps> = ({ me }) => {
     logout.mutate(undefined, { onSettled: () => router.replace(Routes.home) });
   };
 
-  const isActive = (href: string) => pathname === href || (href === Routes.videos && pathname.startsWith("/projects"));
+  const links = isAdminRole(me.role) ? [...navLinks, { label: "Admin", href: Routes.adminConfig }] : navLinks;
+
+  const isActive = (href: string) =>
+    pathname === href ||
+    (href === Routes.videos && pathname.startsWith("/projects")) ||
+    (href === Routes.adminConfig && pathname.startsWith("/admin"));
 
   return (
     <header className="sticky top-0 z-40 h-16 border-b border-hairline-soft bg-canvas">
       <div className="page-container flex h-16 items-center gap-4 md:gap-8">
         <BrandLogo href={Routes.videos} />
         <nav aria-label="Primary" className="hidden flex-1 items-center gap-1 md:flex">
-          {navLinks.map((link) => (
+          {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -122,7 +127,7 @@ export const AppHeader: FC<AppHeaderProps> = ({ me }) => {
                 <SheetTitle className="font-display text-2xl">Menu</SheetTitle>
               </SheetHeader>
               <nav aria-label="Mobile" className="flex flex-col gap-1 p-4">
-                {navLinks.map((link) => (
+                {links.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}

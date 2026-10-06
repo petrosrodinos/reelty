@@ -55,6 +55,18 @@ export function formatRelative(iso: string | null | undefined): string {
   return `${formatDistanceToNowStrict(parseISO(iso))} ago`;
 }
 
+/** "$0.1000" for small amounts, "$12.50" from a dollar up. */
+export function formatUsd(amount: number | null | undefined): string {
+  if (amount === null || amount === undefined || !Number.isFinite(amount)) return "–";
+  return `$${amount.toFixed(Math.abs(amount) < 1 ? 4 : 2)}`;
+}
+
+/** "7.5", "1", "22.25": up to 2 decimals, no trailing zeros. */
+export function formatCredits(credits: number | null | undefined): string {
+  if (credits === null || credits === undefined || !Number.isFinite(credits)) return "–";
+  return String(Number(credits.toFixed(2)));
+}
+
 export function getInitial(email: string | null | undefined): string {
   return (email?.trim()[0] ?? "?").toUpperCase();
 }
