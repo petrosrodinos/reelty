@@ -5,12 +5,12 @@ import type { UseFormReturn } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { useSoundtracks, useUpdateProject } from "@/features/projects/hooks/use-projects";
 import type { Project } from "@/features/projects/interfaces/projects.interfaces";
 import type { VideoDetailsFormData } from "@/features/projects/validation-schemas/projects.schema";
 import { VideoLimits } from "@/lib/format.utils";
+import { SoundtrackPicker } from "@/views/projects/edit/components/soundtrack-picker";
 
 interface VideoDetailsFormProps {
   project: Project;
@@ -103,34 +103,18 @@ export const VideoDetailsForm: FC<VideoDetailsFormProps> = ({ project, form }) =
         </div>
         <p className="mt-1.5 text-[0.8125rem] text-muted-foreground">
           {project.music_enabled
-            ? "Pick a built-in royalty-free track. It fades in and out."
+            ? "Choose a royalty-free track. It fades in and out."
             : "No music. A silent audio track keeps the file compatible everywhere."}
         </p>
         {project.music_enabled && soundtracks ? (
-          <RadioGroup
-            aria-label="Soundtrack"
-            className="mt-3"
-            value={project.soundtrack_id}
-            disabled={updateProject.isPending}
-            onValueChange={(value) =>
-              value !== project.soundtrack_id &&
-              updateProject.mutate({ id: project.id, dto: { soundtrack_id: String(value) } })
-            }
-          >
-            {soundtracks.map((track) => (
-              <Label
-                key={track.id}
-                htmlFor={`soundtrack-${track.id}`}
-                className="flex cursor-pointer items-start gap-3 rounded-md border border-hairline p-3 has-data-checked:border-primary"
-              >
-                <RadioGroupItem id={`soundtrack-${track.id}`} value={track.id} className="mt-0.5" />
-                <span className="flex flex-col gap-0.5">
-                  <span className="text-sm font-medium text-ink">{track.name}</span>
-                  <span className="text-[0.8125rem] font-normal text-muted-foreground">{track.description}</span>
-                </span>
-              </Label>
-            ))}
-          </RadioGroup>
+          <div className="mt-3">
+            <SoundtrackPicker
+              tracks={soundtracks}
+              value={project.soundtrack_id}
+              disabled={updateProject.isPending}
+              onChange={(id) => id !== project.soundtrack_id && updateProject.mutate({ id: project.id, dto: { soundtrack_id: id } })}
+            />
+          </div>
         ) : null}
       </div>
     </section>

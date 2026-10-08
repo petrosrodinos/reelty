@@ -37,7 +37,7 @@ export const SummaryPanel: FC<SummaryPanelProps> = ({
   const blocked = blockers.length > 0;
 
   return (
-    <section id="summary" className="rounded-lg border border-hairline bg-canvas p-5 sm:p-6">
+    <section id="summary" className="rounded-lg border border-hairline bg-canvas p-5 sm:p-6 lg:sticky lg:top-24">
       {quote?.tier ? (
         <div className="mb-4 flex items-start justify-between gap-3 border-b border-hairline-soft pb-4">
           <div className="flex items-start gap-2 text-sm">

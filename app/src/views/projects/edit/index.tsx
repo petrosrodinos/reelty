@@ -91,7 +91,7 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
 
       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
         <ImageManager project={project} />
-        <aside className="flex flex-col gap-5 lg:sticky lg:top-24" aria-label="Video details and summary">
+        <aside className="flex flex-col gap-5 lg:self-stretch" aria-label="Video details and summary">
           <VideoDetailsForm project={project} form={form} />
           <SummaryPanel
             blockers={blockers}
