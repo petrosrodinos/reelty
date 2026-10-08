@@ -67,6 +67,24 @@ export function formatCredits(credits: number | null | undefined): string {
   return String(Number(credits.toFixed(2)));
 }
 
+/** "€12.50" from integer euro cents. */
+export function formatEurCents(cents: number | null | undefined): string {
+  if (cents === null || cents === undefined || !Number.isFinite(cents)) return "–";
+  return `€${(cents / 100).toFixed(2)}`;
+}
+
+/** "$12.50" from integer dollar cents. */
+export function formatUsdCents(cents: number | null | undefined): string {
+  if (cents === null || cents === undefined || !Number.isFinite(cents)) return "–";
+  return `$${(cents / 100).toFixed(2)}`;
+}
+
+/** "3.2%". */
+export function formatPercent(value: number | null | undefined): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return "–";
+  return `${Number(value.toFixed(2))}%`;
+}
+
 export function getInitial(email: string | null | undefined): string {
   return (email?.trim()[0] ?? "?").toUpperCase();
 }

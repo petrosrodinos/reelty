@@ -10,11 +10,8 @@ export type UserRole = (typeof UserRoles)[keyof typeof UserRoles];
 export const isAdminRole = (role: UserRole | undefined): boolean =>
   role === UserRoles.ADMIN || role === UserRoles.SUPER_ADMIN;
 
-export interface Quota {
-  used: number;
-  limit: number;
-  remaining: number;
-  resets_at: string;
+export interface CreditBalance {
+  balance: number;
 }
 
 export interface Me {
@@ -23,7 +20,7 @@ export interface Me {
   role: UserRole;
   email_verified: boolean;
   created_at: string;
-  quota: Quota;
+  credits: CreditBalance;
 }
 
 export interface AuthUserResponse {

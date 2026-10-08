@@ -23,7 +23,7 @@ export class RenderFailure extends Error {
   constructor(
     readonly code: string,
     readonly detail?: string,
-    /** Give the quota unit back (always true except for failures that are the user's doing). */
+    /** Give the charged credits back (always true except for failures that are the user's doing). */
     readonly refund: boolean = true,
   ) {
     super(code);
@@ -31,7 +31,7 @@ export class RenderFailure extends Error {
   }
 }
 
-const REFUND_NOTE = ' Your video credit has been returned.';
+const REFUND_NOTE = ' Your credits have been returned.';
 
 /** Plain-language `failure_reason` shown in the UI. Never contains provider errors. */
 export function userMessageFor(code: string, refunded: boolean): string {

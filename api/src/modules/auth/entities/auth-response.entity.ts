@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { QuotaEntity } from '@/modules/usage/entities/usage.entity';
 
 export class MessageEntity {
   @ApiProperty()
@@ -22,8 +21,8 @@ export class MeEntity {
   @ApiProperty()
   created_at: string;
 
-  @ApiProperty({ type: QuotaEntity })
-  quota: QuotaEntity;
+  @ApiProperty({ example: { balance: 12 }, description: 'Credit balance' })
+  credits: { balance: number };
 }
 
 export class AuthUserEntity {

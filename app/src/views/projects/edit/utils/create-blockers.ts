@@ -1,4 +1,5 @@
 import type { Me } from "@/features/auth/interfaces/auth.interfaces";
+import type { VideoQuote } from "@/features/credits/interfaces/credits.interfaces";
 import { WatermarkStatuses } from "@/features/images/interfaces/images.interfaces";
 import type { Project } from "@/features/projects/interfaces/projects.interfaces";
 import type { Usage } from "@/features/usage/interfaces/usage.interfaces";
@@ -8,10 +9,12 @@ interface BlockerInput {
   project: Project;
   me: Me;
   usage: Usage | undefined;
+  /** Price of the video as it stands; undefined while pricing loads. */
+  quote: VideoQuote | undefined;
 }
 
 /** Everything that currently stops "Create video", in priority order. Empty array means ready. */
-export function getCreateBlockers({ project, me, usage }:BlockerInput): string[] {
+export function getCreateBlockers({ project, me, usage, quote }: BlockerInput): string[] {
   const images = project.images ?? [];
   const count = images.length;
   const blockers: string[] = [];
@@ -25,7 +28,9 @@ export function getCreateBlockers({ project, me, usage }:BlockerInput): string[]
   if (images.some((image) => image.wm_status === WatermarkStatuses.PROCESSING)) {
     blockers.push("Waiting for watermark removal to finish.");
   }
-  if (me.quota.remaining <= 0) blockers.push("Monthly quota reached. It resets next month.");
+  if (quote && count >= VideoLimits.minImages && me.credits.balance < quote.total) {
+    blockers.push(`This video costs ${quote.total} credits and you have ${me.credits.balance}. Buy credits to continue.`);
+  }
   if (usage?.active_render_project_id && usage.active_render_project_id !== project.id) {
     blockers.push("You already have a video being created. One at a time.");
   }

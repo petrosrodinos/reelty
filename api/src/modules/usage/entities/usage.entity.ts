@@ -1,20 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class QuotaEntity {
-  @ApiProperty({ example: 1, description: 'Videos charged in the current UTC month' })
-  used: number;
+export class UsageEntity {
+  @ApiProperty({ example: 12 })
+  credit_balance: number;
 
-  @ApiProperty({ example: 3 })
-  limit: number;
-
-  @ApiProperty({ example: 2 })
-  remaining: number;
-
-  @ApiProperty({ example: '2026-11-01T00:00:00.000Z' })
-  resets_at: string;
-}
-
-export class UsageEntity extends QuotaEntity {
   @ApiProperty({ nullable: true, type: String, description: 'Project with a render queued or running' })
   active_render_project_id: string | null;
 }
@@ -28,20 +17,6 @@ export class PaginationEntity {
   @ApiProperty() total_pages: number;
   @ApiProperty() has_next: boolean;
   @ApiProperty() has_prev: boolean;
-}
-
-export class QuotaLedgerEntryEntity {
-  @ApiProperty() id: string;
-  @ApiProperty({ nullable: true, type: String }) project_id: string | null;
-  @ApiProperty({ nullable: true, type: String }) project_title: string | null;
-  @ApiProperty({ enum: ['video', 'video_refund'] }) kind: string;
-  @ApiProperty({ example: 1, description: '+1 charge, -1 refund' }) quota_units: number;
-  @ApiProperty({ example: '2026-10-06T10:00:00.000Z' }) created_at: string;
-}
-
-export class QuotaHistoryEntity {
-  @ApiProperty({ type: [QuotaLedgerEntryEntity] }) data: QuotaLedgerEntryEntity[];
-  @ApiProperty({ type: PaginationEntity }) pagination: PaginationEntity;
 }
 
 export class CostBreakdownItemEntity {

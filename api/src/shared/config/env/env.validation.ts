@@ -31,6 +31,10 @@ const EnvSchema = z.object({
   DEWATERMARK_API_KEY: z.string().optional(),
   HIGGSFIELD_API_KEY: z.string().optional(),
 
+  // Stripe (credit purchases; empty = buying credits is unavailable)
+  STRIPE_SECRET_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+
   // ffmpeg (workers)
   FFMPEG_PATH: z.string().optional(),
   FFPROBE_PATH: z.string().optional(),

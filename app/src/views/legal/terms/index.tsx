@@ -8,15 +8,15 @@ const TermsPage: FC = () => (
     <LegalSection heading="1. The service">
       <p>
         Reelty turns photos of a property into a short walkthrough video. You supply photos by uploading them or by pasting a
-        listing link, choose and order the shots, and we generate an MP4 for you. The service is in beta and limited by a
-        monthly video quota.
+        listing link, choose and order the shots, and we generate an MP4 for you. Creating a video uses credits, which you
+        receive on signup or buy in the app.
       </p>
     </LegalSection>
 
     <LegalSection heading="2. Your account">
       <p>
         You need an account to use Reelty. Keep your password private and use a real email address you can access. You are
-        responsible for activity on your account. We may suspend accounts that abuse the service or its quotas.
+        responsible for activity on your account. We may suspend accounts that abuse the service.
       </p>
     </LegalSection>
 
@@ -53,10 +53,11 @@ const TermsPage: FC = () => (
       </p>
     </LegalSection>
 
-    <LegalSection heading="7. Quotas, refunds and availability">
+    <LegalSection heading="7. Credits, refunds and availability">
       <LegalList
         items={[
-          "Each account has a monthly video quota. A video that fails to render does not use up your quota, and failed renders are refunded.",
+          "Creating a video uses credits based on its length and add-ons, shown before you create it. Credits are taken when you create a video and returned automatically if it fails to render.",
+          "Credits are bought through Stripe, are tied to your account and do not expire. Purchased credits are non-transferable.",
           "Only one video can be rendering at a time per account.",
           "Rendering depends on third-party providers. Delays and temporary outages can happen, and we show a clear status when they do.",
         ]}

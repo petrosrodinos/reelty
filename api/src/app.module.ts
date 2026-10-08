@@ -10,6 +10,8 @@ import { RateLimitModule } from './shared/services/rate-limit/rate-limit.module'
 import { CsrfGuard } from './shared/guards/csrf.guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsageModule } from './modules/usage/usage.module';
+import { CreditsModule } from './modules/credits/credits.module';
+import { BillingModule } from './modules/billing/billing.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { SoundtracksModule } from './modules/soundtracks/soundtracks.module';
 import { ImagesModule } from './modules/images/images.module';
@@ -29,6 +31,8 @@ import { BackgroundModule } from './background/background.module';
     RateLimitModule,
     AuthModule,
     UsageModule,
+    CreditsModule,
+    BillingModule,
     ProjectsModule,
     SoundtracksModule,
     ImagesModule,

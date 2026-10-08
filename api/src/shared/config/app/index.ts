@@ -4,7 +4,6 @@ export const appConfig = {
     minImages: 3,
     maxImages: 12,
     wmMaxAttempts: 2,
-    defaultMonthlyQuota: 3,
   },
   email: {
     from: 'Reelty <hello@reelty.app>',

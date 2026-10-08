@@ -2,15 +2,15 @@ import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as argon2 from 'argon2';
 import { randomUUID } from 'crypto';
+import { CreditTxKind } from 'generated/prisma';
 import { EmailKinds } from '@/core/queues/queues.constants';
 import { QueuesService } from '@/core/queues/queues.service';
 import { PrismaService } from '@/core/databases/prisma/prisma.service';
 import { AuthTtl } from '@/shared/constants/auth.constants';
 import { ErrorCodes } from '@/shared/config/error-codes';
-import { appConfig } from '@/shared/config/app';
 import { ApiException } from '@/shared/errors/api-exception';
 import { RateLimitService } from '@/shared/services/rate-limit/rate-limit.service';
-import { UsageService } from '@/modules/usage/usage.service';
+import { CreditsService } from '@/modules/credits/credits.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -47,7 +47,7 @@ export class AuthService implements OnModuleInit {
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
     private readonly tokens: TokenService,
-    private readonly usage: UsageService,
+    private readonly credits: CreditsService,
     private readonly queues: QueuesService,
     private readonly rateLimit: RateLimitService,
   ) {}
@@ -71,18 +71,23 @@ export class AuthService implements OnModuleInit {
       return { message: REGISTER_MESSAGE, session: null };
     }
 
-    const quota = appConfig.limits.defaultMonthlyQuota;
+    const signupCredits = await this.credits.signupGrant();
 
     let user: { id: string; role: string };
     try {
-      user = await this.prisma.user.create({
-        data: {
-          email: dto.email,
-          password_hash: passwordHash,
-          monthly_video_quota: quota,
-          email_verified_at: REQUIRE_EMAIL_VERIFICATION ? null : new Date(),
-        },
-        select: { id: true, role: true },
+      user = await this.prisma.$transaction(async (tx) => {
+        const created = await tx.user.create({
+          data: {
+            email: dto.email,
+            password_hash: passwordHash,
+            email_verified_at: REQUIRE_EMAIL_VERIFICATION ? null : new Date(),
+          },
+          select: { id: true, role: true },
+        });
+        await this.credits.apply(tx, created.id, signupCredits, CreditTxKind.signup_grant, {
+          note: 'Welcome credits',
+        });
+        return created;
       });
     } catch (error) {
       if ((error as { code?: string }).code === 'P2002') {
@@ -348,16 +353,15 @@ export class AuthService implements OnModuleInit {
     role: string;
     email_verified_at: Date | null;
     created_at: Date;
-    monthly_video_quota: number;
+    credit_balance: number;
   }): Promise<Me> {
-    const quota = await this.usage.getQuota(user.id, user.monthly_video_quota);
     return {
       id: user.id,
       email: user.email,
       role: user.role,
       email_verified: user.email_verified_at !== null,
       created_at: user.created_at.toISOString(),
-      quota,
+      credits: { balance: user.credit_balance },
     };
   }
 

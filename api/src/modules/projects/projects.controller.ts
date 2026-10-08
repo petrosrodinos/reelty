@@ -89,7 +89,7 @@ export class ProjectsController {
     status: 409,
     description: 'render_in_progress | watermark_processing | invalid_status',
   })
-  @ApiResponse({ status: 402, description: 'quota_exceeded' })
+  @ApiResponse({ status: 402, description: 'insufficient_credits' })
   @ApiResponse({ status: 403, description: 'email_not_verified' })
   submit(
     @CurrentUser('id') userId: string,

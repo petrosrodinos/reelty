@@ -1,17 +1,15 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { LedgerKind, Prisma, ProjectStatus } from 'generated/prisma';
+import { Prisma, ProjectStatus } from 'generated/prisma';
 import { PrismaService } from '@/core/databases/prisma/prisma.service';
 import { ApiException } from '@/shared/errors/api-exception';
 import { ErrorCodes } from '@/shared/config/error-codes';
-import type { AdminUsageQueryType, UsageHistoryQueryType } from './dto/usage-history-query.schema';
+import type { AdminUsageQueryType } from './dto/usage-history-query.schema';
 import type {
   CostBreakdownItem,
   CostHistoryResponse,
   CostSummary,
   Pagination,
   ProjectCostSummary,
-  QuotaHistoryResponse,
-  Quota,
   UsageResponse,
 } from './interfaces/usage.interface';
 
@@ -22,41 +20,6 @@ export const ACTIVE_RENDER_STATUSES = [ProjectStatus.QUEUED, ProjectStatus.CREAT
 @Injectable()
 export class UsageService {
   constructor(private readonly prisma: PrismaService) {}
-
-  /** [start, nextStart) of the current UTC calendar month. */
-  monthWindow(now = new Date()): { start: Date; end: Date } {
-    const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-    const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
-    return { start, end };
-  }
-
-  /** Quota used = sum of ledger quota_units this UTC month (refunds are negative rows). */
-  async usedThisMonth(userId: string, db: Db = this.prisma): Promise<number> {
-    const { start, end } = this.monthWindow();
-    const result = await db.usageLedger.aggregate({
-      where: { user_id: userId, created_at: { gte: start, lt: end } },
-      _sum: { quota_units: true },
-    });
-    return Math.max(0, result._sum.quota_units ?? 0);
-  }
-
-  async getQuota(userId: string, limit?: number, db: Db = this.prisma): Promise<Quota> {
-    const [used, resolvedLimit] = await Promise.all([
-      this.usedThisMonth(userId, db),
-      limit !== undefined
-        ? Promise.resolve(limit)
-        : db.user
-            .findUnique({ where: { id: userId }, select: { monthly_video_quota: true } })
-            .then((u) => u?.monthly_video_quota ?? 0),
-    ]);
-
-    return {
-      used,
-      limit: resolvedLimit,
-      remaining: Math.max(0, resolvedLimit - used),
-      resets_at: this.monthWindow().end.toISOString(),
-    };
-  }
 
   async findActiveRenderProjectId(userId: string, excludeProjectId?: string, db: Db = this.prisma) {
     const project = await db.project.findFirst({
@@ -72,43 +35,13 @@ export class UsageService {
     return project?.id ?? null;
   }
 
+  /** Credit balance plus the render in progress (polled by the app while a video is being created). */
   async getUsage(userId: string): Promise<UsageResponse> {
-    const [quota, activeId] = await Promise.all([
-      this.getQuota(userId),
+    const [user, activeId] = await Promise.all([
+      this.prisma.user.findUnique({ where: { id: userId }, select: { credit_balance: true } }),
       this.findActiveRenderProjectId(userId),
     ]);
-    return { ...quota, active_render_project_id: activeId };
-  }
-
-  /** The user's own quota activity (charges and refunds). Provider costs are never exposed here. */
-  async getQuotaHistory(userId: string, query: UsageHistoryQueryType): Promise<QuotaHistoryResponse> {
-    const where: Prisma.UsageLedgerWhereInput = {
-      user_id: userId,
-      kind: query.kind ?? { in: [LedgerKind.video, LedgerKind.video_refund] },
-    };
-
-    const [rows, total] = await Promise.all([
-      this.prisma.usageLedger.findMany({
-        where,
-        orderBy: { created_at: 'desc' },
-        skip: (query.page - 1) * query.limit,
-        take: query.limit,
-        include: { project: { select: { title: true } } },
-      }),
-      this.prisma.usageLedger.count({ where }),
-    ]);
-
-    return {
-      data: rows.map((row) => ({
-        id: row.id,
-        project_id: row.project_id,
-        project_title: row.project?.title ?? null,
-        kind: row.kind as 'video' | 'video_refund',
-        quota_units: row.quota_units,
-        created_at: row.created_at.toISOString(),
-      })),
-      pagination: this.paginate(total, query.page, query.limit),
-    };
+    return { credit_balance: user?.credit_balance ?? 0, active_render_project_id: activeId };
   }
 
   /** Operator view: every ledger row across users with credits and USD cost, plus totals over the filtered set. */

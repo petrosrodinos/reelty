@@ -15,12 +15,12 @@ export const PricingSection: FC = () => (
   <section id="pricing" className="bg-surface-soft py-16 md:py-24">
     <div className="page-container">
       <p className="text-eyebrow text-muted-foreground">Pricing</p>
-      <h2 className="text-display-lg mt-3">Free while we are in beta.</h2>
+      <h2 className="text-display-lg mt-3">Pay only for the videos you make.</h2>
       <div className="mt-10 grid max-w-4xl gap-6 md:grid-cols-2">
         <article className="dark rounded-lg bg-surface-dark p-6 text-on-dark sm:p-8">
-          <span className="inline-flex rounded-full bg-brand px-3 py-1 text-eyebrow text-ink">Beta</span>
-          <h3 className="mt-4 font-display text-3xl font-medium leading-tight tracking-tight">3 videos per month</h3>
-          <p className="mt-1 text-on-dark-soft">No card needed.</p>
+          <span className="inline-flex rounded-full bg-brand px-3 py-1 text-eyebrow text-ink">Free to start</span>
+          <h3 className="mt-4 font-display text-3xl font-medium leading-tight tracking-tight">Free credits on signup</h3>
+          <p className="mt-1 text-on-dark-soft">No card needed to try it.</p>
           <ul className="mt-6 flex flex-col gap-2.5 text-[0.9375rem]">
             {perks.map((perk) => (
               <li key={perk} className="flex items-start gap-3">
@@ -34,14 +34,14 @@ export const PricingSection: FC = () => (
           </Button>
         </article>
         <article className="rounded-lg border border-hairline bg-canvas p-6 sm:p-8">
-          <p className="text-[1.375rem] font-medium text-ink">Paid plans</p>
-          <h3 className="mt-3 font-display text-3xl font-medium leading-tight tracking-tight text-ink">Not yet.</h3>
+          <p className="text-[1.375rem] font-medium text-ink">Credits</p>
+          <h3 className="mt-3 font-display text-3xl font-medium leading-tight tracking-tight text-ink">No subscription.</h3>
           <p className="mt-2 text-muted-foreground">
-            Payments, credit packs and retention tiers are planned for a later release. Until then, usage is controlled by the
-            monthly quota.
+            Buy credits when you need them and use them for any video. A video costs more credits the more photos it uses,
+            plus a small add-on for watermark removal. Credits never expire.
           </p>
           <hr className="my-5 border-hairline-soft" />
-          <p className="text-sm text-muted-foreground">Failed renders refund your quota automatically.</p>
+          <p className="text-sm text-muted-foreground">Failed renders refund your credits automatically.</p>
         </article>
       </div>
     </div>

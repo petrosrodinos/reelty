@@ -14,7 +14,8 @@ import { BULL_BOARD_ADAPTER } from './core/queues/queues.constants';
 import { bullBoardAuthMiddleware } from './core/queues/bull-board.middleware';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // rawBody: Stripe webhook signatures are verified against the exact request bytes.
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true });
   const config = app.get(ConfigService);
 
   // One reverse proxy (Cloud Run, Coolify, nginx...) in front: req.ip comes from X-Forwarded-For.

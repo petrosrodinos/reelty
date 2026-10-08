@@ -21,6 +21,8 @@ export default () => ({
   APIFY_TOKEN: str(process.env.APIFY_TOKEN),
   DEWATERMARK_API_KEY: str(process.env.DEWATERMARK_API_KEY),
   HIGGSFIELD_API_KEY: str(process.env.HIGGSFIELD_API_KEY),
+  STRIPE_SECRET_KEY: str(process.env.STRIPE_SECRET_KEY),
+  STRIPE_WEBHOOK_SECRET: str(process.env.STRIPE_WEBHOOK_SECRET),
   FFMPEG_PATH: str(process.env.FFMPEG_PATH),
   FFPROBE_PATH: str(process.env.FFPROBE_PATH),
   FFMPEG_FONT_PATH: str(process.env.FFMPEG_FONT_PATH),

@@ -142,7 +142,7 @@ export const useSubmitProject = () => {
       queryClient.invalidateQueries({ queryKey: [ME_QUERY_KEY] });
     },
     onError: (error) => {
-      if (error instanceof ApiError && (error.code === "email_not_verified" || error.code === "quota_exceeded")) {
+      if (error instanceof ApiError && (error.code === "email_not_verified" || error.code === "insufficient_credits")) {
         queryClient.invalidateQueries({ queryKey: [ME_QUERY_KEY] });
       }
       toast({ title: "Could not create your video", description: getApiErrorMessage(error), variant: "error" });

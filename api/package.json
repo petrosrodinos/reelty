@@ -64,6 +64,7 @@
     "resend": "^6.16.0",
     "rxjs": "^7.8.1",
     "sharp": "^0.35.5",
+    "stripe": "^23.0.0",
     "uuid": "^11.1.0",
     "zod": "^3.25.67"
   },
@@ -116,6 +117,10 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1",
+      "^generated/(.*)$": "<rootDir>/generated/$1"
+    }
   }
 }

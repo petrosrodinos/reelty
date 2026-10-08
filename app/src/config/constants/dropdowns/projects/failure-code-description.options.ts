@@ -4,13 +4,13 @@ import { FailureCodes } from "@/features/projects/interfaces/projects.interfaces
 export const FailureCodeDescriptionOptions: Record<string, string> = {
   [FailureCodes.SCRAPE_EMPTY]: "We could not find any photos on that page. Try the Upload tab instead.",
   [FailureCodes.SCRAPE_FAILED]: "We could not read that page. Try again, or upload your photos instead.",
-  [FailureCodes.PROVIDER_TIMEOUT]: "Our video provider took too long to respond. Your credit was refunded. You can retry.",
-  [FailureCodes.TOO_FEW_CLIPS]: "Fewer than 3 clips could be generated. Your credit was refunded. You can retry.",
-  [FailureCodes.FFMPEG_ERROR]: "Something went wrong while assembling the final video. Your credit was refunded. You can retry.",
+  [FailureCodes.PROVIDER_TIMEOUT]: "Our video provider took too long to respond. Your credits were refunded. You can retry.",
+  [FailureCodes.TOO_FEW_CLIPS]: "Fewer than 3 clips could be generated. Your credits were refunded. You can retry.",
+  [FailureCodes.FFMPEG_ERROR]: "Something went wrong while assembling the final video. Your credits were refunded. You can retry.",
   [FailureCodes.BLOCKED_NO_CREDITS]: "Our video provider is temporarily out of capacity. We are on it.",
 };
 
-export const DEFAULT_FAILURE_DESCRIPTION = "We could not finish this video. You can retry, and your credit was not lost.";
+export const DEFAULT_FAILURE_DESCRIPTION = "We could not finish this video. You can retry, and your credits were not lost.";
 
 export function getFailureDescription(reason: string | null | undefined, code: string | null | undefined): string {
   if (reason) return reason;

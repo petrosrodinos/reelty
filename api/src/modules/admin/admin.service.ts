@@ -1,12 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import type { SystemFlag } from 'generated/prisma';
-import { ProjectStatus } from 'generated/prisma';
+import { CreditTxKind, ProjectStatus } from 'generated/prisma';
 import { PrismaService } from '@/core/databases/prisma/prisma.service';
 import { QueuesService } from '@/core/queues/queues.service';
 import { AppConfigService } from '@/modules/app-config/app-config.service';
 import type { AdminUsageQueryType } from '@/modules/usage/dto/usage-history-query.schema';
 import { UsageService } from '@/modules/usage/usage.service';
 import { SystemFlagsService } from '@/modules/system-flags/system-flags.service';
+import { BillingService } from '@/modules/billing/billing.service';
+import type { AdminPurchasesQueryType } from '@/modules/billing/dto/purchases-query.schema';
+import { CreditsService } from '@/modules/credits/credits.service';
+import { CreditTiersService } from '@/modules/credits/services/credit-tiers.service';
+import { ReplaceCreditTiersDto } from '@/modules/credits/dto/credit-tier.dto';
+import { GrantCreditsDto } from '@/modules/credits/dto/grant-credits.dto';
+import { ErrorCodes } from '@/shared/config/error-codes';
+import { ApiException } from '@/shared/errors/api-exception';
 import { UpdateFlagsDto } from './dto/update-flags.dto';
 
 @Injectable()
@@ -17,6 +25,9 @@ export class AdminService {
     private readonly flags: SystemFlagsService,
     private readonly appConfig: AppConfigService,
     private readonly usage: UsageService,
+    private readonly credits: CreditsService,
+    private readonly tiers: CreditTiersService,
+    private readonly billing: BillingService,
   ) {}
 
   listConfig() {
@@ -30,9 +41,33 @@ export class AdminService {
   async listUsers() {
     const users = await this.prisma.user.findMany({
       orderBy: { email: 'asc' },
-      select: { id: true, email: true },
+      select: { id: true, email: true, credit_balance: true },
     });
     return users;
+  }
+
+  // ------------------------------------------------------------------ credits
+
+  listCreditTiers() {
+    return this.tiers.listJson();
+  }
+
+  replaceCreditTiers(dto: ReplaceCreditTiersDto) {
+    return this.tiers.replaceAll(dto);
+  }
+
+  getPurchases(query: AdminPurchasesQueryType) {
+    return this.billing.listForAdmin(query);
+  }
+
+  /** Manual balance change (goodwill, support refunds). Removing more than the balance is refused. */
+  async adjustCredits(userId: string, dto: GrantCreditsDto) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+    if (!user) throw new ApiException(HttpStatus.NOT_FOUND, ErrorCodes.NOT_FOUND, 'User not found');
+    await this.prisma.$transaction((tx) =>
+      this.credits.apply(tx, userId, dto.credits, CreditTxKind.admin_adjustment, { note: dto.note ?? null }),
+    );
+    return { user_id: userId, balance: await this.credits.getBalance(userId) };
   }
 
   getCostHistory(query: AdminUsageQueryType) {

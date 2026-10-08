@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '@/shared/guards/jwt.guard';
 import { RolesGuard } from '@/shared/guards/roles.guard';
@@ -8,6 +19,14 @@ import { AppConfigEntity } from '@/modules/app-config/entities/app-config.entity
 import { UpdateAppConfigDto } from '@/modules/app-config/dto/update-app-config.dto';
 import { CostHistoryEntity, ProjectCostEntity } from '@/modules/usage/entities/usage.entity';
 import { AdminUsageQuerySchema, type AdminUsageQueryType } from '@/modules/usage/dto/usage-history-query.schema';
+import { CreditTierEntity } from '@/modules/credits/entities/credits.entity';
+import { ReplaceCreditTiersDto } from '@/modules/credits/dto/credit-tier.dto';
+import { GrantCreditsDto } from '@/modules/credits/dto/grant-credits.dto';
+import { AdminPurchasesEntity } from '@/modules/billing/entities/billing.entity';
+import {
+  AdminPurchasesQuerySchema,
+  type AdminPurchasesQueryType,
+} from '@/modules/billing/dto/purchases-query.schema';
 import { AdminService } from './admin.service';
 import { UpdateFlagsDto } from './dto/update-flags.dto';
 import { AdminStatsEntity, FlagsEntity } from './entities/admin.entity';
@@ -50,9 +69,48 @@ export class AdminController {
   }
 
   @Get('users')
-  @ApiOperation({ summary: 'All users (id, email) for admin filters' })
+  @ApiOperation({ summary: 'All users (id, email, credit balance) for admin filters' })
   listUsers() {
     return this.adminService.listUsers();
+  }
+
+  @Post('users/:id/credits')
+  @ApiOperation({ summary: 'Add (positive) or remove (negative) credits for a user, recorded as admin_adjustment' })
+  @ApiResponse({ status: 201, description: '{ user_id, balance }' })
+  @ApiResponse({ status: 402, description: 'insufficient_credits (removing more than the balance)' })
+  adjustCredits(@Param('id', ParseUUIDPipe) id: string, @Body() dto: GrantCreditsDto) {
+    return this.adminService.adjustCredits(id, dto);
+  }
+
+  @Get('credit-tiers')
+  @ApiOperation({ summary: 'Video price tiers (credits by clip count)' })
+  @ApiResponse({ status: 200, type: [CreditTierEntity] })
+  listCreditTiers() {
+    return this.adminService.listCreditTiers();
+  }
+
+  @Put('credit-tiers')
+  @ApiOperation({
+    summary:
+      'Replace the whole tier set (must cover the clip range with no gaps or overlaps and exactly one default)',
+  })
+  @ApiResponse({ status: 200, type: [CreditTierEntity] })
+  @ApiResponse({ status: 400, description: 'invalid_tiers' })
+  replaceCreditTiers(@Body() dto: ReplaceCreditTiersDto) {
+    return this.adminService.replaceCreditTiers(dto);
+  }
+
+  @Get('purchases')
+  @ApiOperation({ summary: 'Credit purchases across users with Stripe fees and net (EUR + USD), plus totals' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'max 100' })
+  @ApiQuery({ name: 'user_id', required: false, type: String })
+  @ApiQuery({ name: 'status', required: false, type: String })
+  @ApiQuery({ name: 'from', required: false, type: String, description: 'ISO datetime, inclusive' })
+  @ApiQuery({ name: 'to', required: false, type: String, description: 'ISO datetime, exclusive' })
+  @ApiResponse({ status: 200, type: AdminPurchasesEntity })
+  getPurchases(@Query(new ZodValidationPipe(AdminPurchasesQuerySchema)) query: AdminPurchasesQueryType) {
+    return this.adminService.getPurchases(query);
   }
 
   @Get('usage')

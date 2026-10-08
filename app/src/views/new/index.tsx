@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FC } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { InfoIcon, LinkIcon, UploadIcon } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -13,8 +14,7 @@ import {
 } from "@/config/constants/dropdowns/projects/new-project-tab-form.options";
 import { useMe } from "@/features/auth/hooks/use-auth";
 import { SourceTypes } from "@/features/projects/interfaces/projects.interfaces";
-import { formatDateLong } from "@/lib/format.utils";
-import { QueryParams } from "@/routes/routes";
+import { QueryParams, Routes } from "@/routes/routes";
 import { LinkIntakeForm } from "@/views/new/components/link-intake-form";
 import { UploadIntakePanel } from "@/views/new/components/upload-intake-panel";
 
@@ -36,7 +36,7 @@ const NewVideoPage: FC = () => {
   const requested = useSearchParams().get(QueryParams.tab);
   const [tab, setTab] = useState<NewProjectTab>(isNewProjectTab(requested) ? requested : NewProjectTabs.WEBSITE);
   const { data: me } = useMe();
-  const quotaReached = !!me && me.quota.remaining <= 0;
+  const outOfCredits = !!me && me.credits.balance <= 0;
 
   return (
     <div className="page-container max-w-3xl py-10 md:py-14">
@@ -44,12 +44,15 @@ const NewVideoPage: FC = () => {
       <h1 className="text-display-lg mt-2">New video</h1>
       <p className="mt-2 text-muted-foreground">Start from a listing link or your own photos. You will pick and order the shots next.</p>
 
-      {quotaReached ? (
+      {outOfCredits ? (
         <Alert className="mt-6 border-hairline bg-notice-warn">
           <InfoIcon aria-hidden="true" />
           <AlertDescription className="text-ink">
-            You have used all {me.quota.limit} videos this month, so you cannot create a new video until {formatDateLong(me.quota.resets_at)}. You can still
-            prepare a project.
+            You have no credits left, so you cannot create a video yet. You can still prepare a project, then{" "}
+            <Link href={Routes.credits} className="font-medium underline underline-offset-4">
+              buy credits
+            </Link>{" "}
+            to create it.
           </AlertDescription>
         </Alert>
       ) : null}

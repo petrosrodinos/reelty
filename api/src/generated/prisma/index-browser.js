@@ -126,7 +126,8 @@ exports.Prisma.UserScalarFieldEnum = {
   password_hash: 'password_hash',
   role: 'role',
   email_verified_at: 'email_verified_at',
-  monthly_video_quota: 'monthly_video_quota',
+  credit_balance: 'credit_balance',
+  stripe_customer_id: 'stripe_customer_id',
   created_at: 'created_at',
   updated_at: 'updated_at'
 };
@@ -183,6 +184,7 @@ exports.Prisma.ProjectScalarFieldEnum = {
   completed_at: 'completed_at',
   render_started_at: 'render_started_at',
   quota_charged: 'quota_charged',
+  credits_charged: 'credits_charged',
   video_gcs_path: 'video_gcs_path',
   poster_gcs_path: 'poster_gcs_path',
   duration_seconds: 'duration_seconds',
@@ -252,6 +254,61 @@ exports.Prisma.UsageLedgerScalarFieldEnum = {
   cost_estimated: 'cost_estimated',
   note: 'note',
   created_at: 'created_at'
+};
+
+exports.Prisma.CreditTierScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  min_clips: 'min_clips',
+  max_clips: 'max_clips',
+  credits: 'credits',
+  is_default: 'is_default',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.CreditTransactionScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  kind: 'kind',
+  credits: 'credits',
+  balance_after: 'balance_after',
+  project_id: 'project_id',
+  purchase_id: 'purchase_id',
+  note: 'note',
+  created_at: 'created_at'
+};
+
+exports.Prisma.CreditPurchaseScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  status: 'status',
+  credits: 'credits',
+  videos_selected: 'videos_selected',
+  credits_per_eur: 'credits_per_eur',
+  currency: 'currency',
+  amount_eur_cents: 'amount_eur_cents',
+  stripe_fee_eur_cents: 'stripe_fee_eur_cents',
+  net_eur_cents: 'net_eur_cents',
+  stripe_fee_pct: 'stripe_fee_pct',
+  usd_per_eur: 'usd_per_eur',
+  amount_usd_cents: 'amount_usd_cents',
+  stripe_fee_usd_cents: 'stripe_fee_usd_cents',
+  net_usd_cents: 'net_usd_cents',
+  refunded_eur_cents: 'refunded_eur_cents',
+  refunded_credits: 'refunded_credits',
+  stripe_checkout_session_id: 'stripe_checkout_session_id',
+  stripe_payment_intent_id: 'stripe_payment_intent_id',
+  stripe_charge_id: 'stripe_charge_id',
+  stripe_balance_transaction_id: 'stripe_balance_transaction_id',
+  payment_method_type: 'payment_method_type',
+  card_brand: 'card_brand',
+  card_country: 'card_country',
+  receipt_url: 'receipt_url',
+  paid_at: 'paid_at',
+  refunded_at: 'refunded_at',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 };
 
 exports.Prisma.AppConfigScalarFieldEnum = {
@@ -356,6 +413,24 @@ exports.LedgerKind = exports.$Enums.LedgerKind = {
   higgsfield: 'higgsfield'
 };
 
+exports.CreditTxKind = exports.$Enums.CreditTxKind = {
+  signup_grant: 'signup_grant',
+  purchase: 'purchase',
+  video_charge: 'video_charge',
+  video_refund: 'video_refund',
+  purchase_refund: 'purchase_refund',
+  admin_adjustment: 'admin_adjustment'
+};
+
+exports.PurchaseStatus = exports.$Enums.PurchaseStatus = {
+  pending: 'pending',
+  paid: 'paid',
+  failed: 'failed',
+  expired: 'expired',
+  refunded: 'refunded',
+  partially_refunded: 'partially_refunded'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   RefreshToken: 'RefreshToken',
@@ -366,6 +441,9 @@ exports.Prisma.ModelName = {
   Consent: 'Consent',
   JobEvent: 'JobEvent',
   UsageLedger: 'UsageLedger',
+  CreditTier: 'CreditTier',
+  CreditTransaction: 'CreditTransaction',
+  CreditPurchase: 'CreditPurchase',
   AppConfig: 'AppConfig',
   SystemFlag: 'SystemFlag'
 };

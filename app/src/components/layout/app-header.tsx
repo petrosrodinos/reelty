@@ -3,7 +3,7 @@
 import { useState, type FC } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOutIcon, MailIcon, MenuIcon, PlusIcon, ShieldCheckIcon } from "lucide-react";
+import { CoinsIcon, LogOutIcon, MailIcon, MenuIcon, PlusIcon, ShieldCheckIcon } from "lucide-react";
 import { BrandLogo } from "@/components/layout/brand-logo";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +18,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useLogout, useResendVerification } from "@/features/auth/hooks/use-auth";
 import { isAdminRole, type Me } from "@/features/auth/interfaces/auth.interfaces";
-import { formatDateLong, getInitial } from "@/lib/format.utils";
+import { getInitial, pluralize } from "@/lib/format.utils";
 import { cn } from "@/lib/utils";
 import { Routes } from "@/routes/routes";
 
@@ -39,8 +39,8 @@ export const AppHeader: FC<AppHeaderProps> = ({ me }) => {
   const logout = useLogout();
   const resend = useResendVerification();
 
-  const quotaReached = me.quota.remaining <= 0;
-  const quotaLabel = `${me.quota.remaining} of ${me.quota.limit} videos left`;
+  const outOfCredits = me.credits.balance <= 0;
+  const creditsLabel = pluralize(me.credits.balance, "credit");
 
   const handleLogout = () => {
     setSheetOpen(false);
@@ -75,15 +75,18 @@ export const AppHeader: FC<AppHeaderProps> = ({ me }) => {
         </nav>
 
         <div className="ml-auto flex items-center gap-2 md:gap-3">
-          <span
-            title={`Resets ${formatDateLong(me.quota.resets_at)}`}
+          <Link
+            href={Routes.credits}
+            title="Buy credits"
             className={cn(
-              "hidden rounded-full px-3 py-1.5 text-[0.8125rem] font-medium sm:inline-block",
-              quotaReached ? "bg-notice-warn text-ink" : "bg-surface-card text-muted-foreground",
+              "hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-[0.8125rem] font-medium outline-none transition-colors hover:text-ink focus-visible:ring-3 focus-visible:ring-ring/50 sm:inline-flex",
+              outOfCredits ? "bg-notice-warn text-ink" : "bg-surface-card text-muted-foreground",
             )}
           >
-            {quotaLabel}
-          </span>
+            <CoinsIcon className="size-3.5" aria-hidden="true" />
+            {creditsLabel}
+            <span className="text-ink">· Buy</span>
+          </Link>
           <Button className="hidden md:inline-flex" render={<Link href={Routes.new} />} nativeButton={false}>
             <PlusIcon /> New video
           </Button>
@@ -103,10 +106,13 @@ export const AppHeader: FC<AppHeaderProps> = ({ me }) => {
                     <ShieldCheckIcon className="size-3.5" aria-hidden="true" />
                     {me.email_verified ? "Email verified" : "Email not verified"}
                   </span>
-                  <span className="text-[0.8125rem] font-normal text-muted-foreground sm:hidden">{quotaLabel}</span>
+                  <span className="text-[0.8125rem] font-normal text-muted-foreground sm:hidden">{creditsLabel}</span>
                 </DropdownMenuLabel>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => router.push(Routes.credits)} className="py-2">
+                <CoinsIcon /> Buy credits
+              </DropdownMenuItem>
               {!me.email_verified ? (
                 <DropdownMenuItem onClick={() => resend.mutate()} className="py-2">
                   <MailIcon /> Resend verification
@@ -141,7 +147,13 @@ export const AppHeader: FC<AppHeaderProps> = ({ me }) => {
                     {link.label}
                   </Link>
                 ))}
-                <p className="mt-3 px-3 text-sm text-muted-foreground">{quotaLabel}</p>
+                <Link
+                  href={Routes.credits}
+                  onClick={() => setSheetOpen(false)}
+                  className="mt-3 px-3 text-sm text-muted-foreground underline-offset-4 hover:underline"
+                >
+                  {creditsLabel} · Buy credits
+                </Link>
                 <Button className="mt-3 h-12" onClick={handleLogout} variant="outline">
                   <LogOutIcon /> Log out
                 </Button>

@@ -2,7 +2,7 @@ import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   ConsentType,
-  LedgerKind,
+  CreditTxKind,
   Prisma,
   type Project,
   ProjectStatus,
@@ -19,6 +19,7 @@ import { ErrorCodes } from '@/shared/config/error-codes';
 import { ApiException } from '@/shared/errors/api-exception';
 import { SystemFlagsService } from '@/modules/system-flags/system-flags.service';
 import { UsageService } from '@/modules/usage/usage.service';
+import { CreditsService } from '@/modules/credits/credits.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { SubmitProjectDto } from './dto/submit-project.dto';
@@ -49,6 +50,7 @@ export class ProjectsService {
     private readonly config: ConfigService,
     private readonly queues: QueuesService,
     private readonly usage: UsageService,
+    private readonly credits: CreditsService,
     private readonly flags: SystemFlagsService,
     private readonly gcs: GcsObjectsService,
     private readonly media: MediaUrlsService,
@@ -307,7 +309,7 @@ export class ProjectsService {
       this.findOwnedOrThrow(userId, projectId),
       this.prisma.user.findUnique({
         where: { id: userId },
-        select: { email_verified_at: true, monthly_video_quota: true },
+        select: { email_verified_at: true },
       }),
     ]);
 
@@ -345,12 +347,14 @@ export class ProjectsService {
       );
     }
 
-    await this.assertRenderSlot(this.prisma, userId, project.id, user.monthly_video_quota, true);
+    const quote = await this.credits.quoteProject(project.id, project.source_type);
+    await this.assertRenderSlot(this.prisma, userId, project.id);
+    await this.credits.assertAffordable(userId, quote.total);
     await this.assertRendersEnabled();
 
     const now = new Date();
     await this.runSerializable(async (tx) => {
-      await this.assertRenderSlot(tx, userId, project.id, user.monthly_video_quota, true);
+      await this.assertRenderSlot(tx, userId, project.id);
 
       const claimed = await tx.project.updateMany({
         where: {
@@ -366,6 +370,7 @@ export class ProjectsService {
           submitted_at: now,
           rights_attested_at: project.rights_attested_at ?? now,
           quota_charged: true,
+          credits_charged: quote.total,
           partial: false,
           failure_reason: null,
           failure_code: null,
@@ -382,28 +387,23 @@ export class ProjectsService {
         );
       }
 
-      await tx.usageLedger.create({
-        data: {
-          user_id: userId,
-          project_id: project.id,
-          kind: LedgerKind.video,
-          quota_units: 1,
-          note: 'render submitted',
-        },
+      await this.credits.apply(tx, userId, -quote.total, CreditTxKind.video_charge, {
+        projectId: project.id,
+        note: this.chargeNote(quote),
       });
     });
 
     try {
       await this.queues.enqueueRender(project.id);
     } catch (error) {
-      await this.revertSubmit(project);
+      await this.revertSubmit(project, quote.total);
       throw error;
     }
 
     return this.findOne(userId, projectId);
   }
 
-  private async revertSubmit(project: Project) {
+  private async revertSubmit(project: Project, charged: number) {
     try {
       await this.prisma.$transaction(async (tx) => {
         await tx.project.update({
@@ -413,11 +413,13 @@ export class ProjectsService {
             render_step: null,
             submitted_at: null,
             quota_charged: false,
+            credits_charged: 0,
             clips_total: project.clips_total,
           },
         });
-        await tx.usageLedger.deleteMany({
-          where: { project_id: project.id, kind: LedgerKind.video, note: 'render submitted' },
+        await this.credits.apply(tx, project.user_id, charged, CreditTxKind.video_refund, {
+          projectId: project.id,
+          note: 'Video could not be queued',
         });
       });
     } catch (error) {
@@ -443,26 +445,17 @@ export class ProjectsService {
       return this.retryScrape(userId, project);
     }
 
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { monthly_video_quota: true },
-    });
-    const quotaLimit = user?.monthly_video_quota ?? 0;
+    // A failure that refunded flipped quota_charged off, so the retry charges again (at today's prices).
+    const recharged = !project.quota_charged;
+    const quote = recharged ? await this.credits.quoteProject(project.id, project.source_type) : null;
+    if (quote) await this.credits.assertAffordable(userId, quote.total);
 
     await this.assertRendersEnabled();
 
     let retryNumber = 0;
-    let recharged = false;
 
     await this.runSerializable(async (tx) => {
-      // Charged = net quota units on this project's ledger rows (refunds are negative rows).
-      const net = await tx.usageLedger.aggregate({
-        where: { project_id: project.id, user_id: userId },
-        _sum: { quota_units: true },
-      });
-      recharged = (net._sum.quota_units ?? 0) < 1;
-
-      await this.assertRenderSlot(tx, userId, project.id, quotaLimit, recharged);
+      await this.assertRenderSlot(tx, userId, project.id);
 
       const previousRetries = await tx.jobEvent.count({
         where: { project_id: project.id, job_name: JobNames.RENDER_VIDEO, step: 'RETRY' },
@@ -479,6 +472,7 @@ export class ProjectsService {
           completed_at: null,
           render_started_at: null,
           quota_charged: true,
+          ...(quote ? { credits_charged: quote.total } : {}),
         },
       });
       if (claimed.count === 0) {
@@ -489,15 +483,10 @@ export class ProjectsService {
         );
       }
 
-      if (recharged) {
-        await tx.usageLedger.create({
-          data: {
-            user_id: userId,
-            project_id: project.id,
-            kind: LedgerKind.video,
-            quota_units: 1,
-            note: 'render retried',
-          },
+      if (quote) {
+        await this.credits.apply(tx, userId, -quote.total, CreditTxKind.video_charge, {
+          projectId: project.id,
+          note: `${this.chargeNote(quote)} (retry)`,
         });
       }
       await tx.jobEvent.create({
@@ -514,7 +503,7 @@ export class ProjectsService {
     try {
       await this.queues.enqueueRender(project.id, retryNumber);
     } catch (error) {
-      await this.revertRetry(project, recharged, retryNumber);
+      await this.revertRetry(project, quote?.total ?? 0, retryNumber);
       throw error;
     }
 
@@ -563,7 +552,7 @@ export class ProjectsService {
     return this.findOne(userId, project.id);
   }
 
-  private async revertRetry(project: Project, recharged: boolean, retryNumber: number) {
+  private async revertRetry(project: Project, recharged: number, retryNumber: number) {
     try {
       await this.prisma.$transaction(async (tx) => {
         await tx.project.update({
@@ -576,11 +565,13 @@ export class ProjectsService {
             completed_at: project.completed_at,
             render_started_at: project.render_started_at,
             quota_charged: project.quota_charged,
+            credits_charged: project.credits_charged,
           },
         });
-        if (recharged) {
-          await tx.usageLedger.deleteMany({
-            where: { project_id: project.id, kind: LedgerKind.video, note: 'render retried' },
+        if (recharged > 0) {
+          await this.credits.apply(tx, project.user_id, recharged, CreditTxKind.video_refund, {
+            projectId: project.id,
+            note: 'Retry could not be queued',
           });
         }
         await tx.jobEvent.deleteMany({
@@ -633,25 +624,18 @@ export class ProjectsService {
     }
   }
 
-  /** Quota (402) and one-active-render (409) rules. Works on the prisma client or a transaction. */
+  /** "8 clips, Standard tier + watermark removal" (stored on the charge row). */
+  private chargeNote(quote: { clips: number; tier: { name: string }; addons: { key: string }[] }): string {
+    const addons = quote.addons.map((a) => a.key.replace(/_/g, ' '));
+    return [`${quote.clips} clips, ${quote.tier.name} tier`, ...addons].join(' + ');
+  }
+
+  /** One-active-render (409) rule. Works on the prisma client or a transaction. */
   private async assertRenderSlot(
     db: Pick<PrismaService, 'usageLedger' | 'project' | 'user'>,
     userId: string,
     projectId: string,
-    quotaLimit: number,
-    needsCharge: boolean,
   ) {
-    if (needsCharge) {
-      const quota = await this.usage.getQuota(userId, quotaLimit, db);
-      if (quota.remaining <= 0) {
-        throw new ApiException(
-          HttpStatus.PAYMENT_REQUIRED,
-          ErrorCodes.QUOTA_EXCEEDED,
-          'You have used all your videos for this month.',
-        );
-      }
-    }
-
     const active = await this.usage.findActiveRenderProjectId(userId, projectId, db);
     if (active) {
       throw new ApiException(

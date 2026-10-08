@@ -91,7 +91,7 @@ export interface VideoFailedInput {
   title: string;
   /** Plain-language reason already safe to show. */
   reason: string | null;
-  /** The quota unit was returned. */
+  /** The charged credits were returned. */
   refunded: boolean;
 }
 
@@ -104,7 +104,7 @@ export function buildVideoFailedEmail(appUrl: string, p: VideoFailedInput): Buil
     text:
       `We could not finish your video\n\n${title ? `Something went wrong while creating "${title}".` : 'Something went wrong while creating your video.'}` +
       `${p.reason ? `\n${p.reason}` : ''}` +
-      `${p.refunded ? '\nYour video credit has been returned.' : ''}` +
+      `${p.refunded ? '\nYour credits have been returned.' : ''}` +
       `\n\nOpen your project to try again:\n${url}`,
     data: { url, videoTitle: title || null, reason: p.reason, refunded: p.refunded },
     containsSecretLink: false,

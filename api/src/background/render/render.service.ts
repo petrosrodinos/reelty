@@ -6,6 +6,7 @@ import { JobNames } from '@/core/queues/queues.constants';
 import { GcsObjectsService } from '@/integrations/storage/gcs/services/gcs-objects.service';
 import { StoragePaths } from '@/integrations/storage/gcs/storage-paths';
 import { AppConfigService } from '@/modules/app-config/app-config.service';
+import { CreditsService } from '@/modules/credits/credits.service';
 import { VideoProviderResolver } from '@/integrations/video-generation/video-provider.resolver';
 import {
   ClipRequest,
@@ -65,6 +66,7 @@ export class RenderService {
     private readonly flags: SystemFlagsService,
     private readonly events: JobEventsService,
     private readonly notify: NotifyQueueService,
+    private readonly credits: CreditsService,
   ) {}
 
   async run(projectId: string, ctx: RenderContext): Promise<RenderOutcome> {
@@ -576,14 +578,9 @@ export class RenderService {
           data: { quota_charged: false },
         });
         if (flipped.count === 1) {
-          await tx.usageLedger.create({
-            data: {
-              user_id: project.user_id,
-              project_id: projectId,
-              kind: 'video_refund',
-              quota_units: -1,
-              note: `refund: ${failure.code}`,
-            },
+          await this.credits.apply(tx, project.user_id, project.credits_charged, 'video_refund', {
+            projectId,
+            note: `Refund: ${failure.code}`,
           });
         }
       }

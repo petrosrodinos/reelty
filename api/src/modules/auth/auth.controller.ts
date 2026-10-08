@@ -137,7 +137,7 @@ export class AuthController {
   @Get('me')
   @UseGuards(JwtGuard)
   @ApiCookieAuth('reelty_at')
-  @ApiOperation({ summary: 'Current user with monthly quota' })
+  @ApiOperation({ summary: 'Current user with credit balance' })
   @ApiResponse({ status: 200, type: MeEntity })
   me(@CurrentUser('id') userId: string) {
     return this.authService.me(userId);

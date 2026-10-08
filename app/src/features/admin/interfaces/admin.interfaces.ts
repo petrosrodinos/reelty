@@ -3,7 +3,7 @@ import type { Pagination } from "@/features/projects/interfaces/projects.interfa
 export interface AppConfigItem {
   key: string;
   value: number;
-  unit: "usd" | "credits";
+  unit: "usd" | "credits" | "ratio";
   description: string | null;
   /** False when no row exists yet and the built-in default is in use. */
   stored: boolean;
@@ -70,4 +70,5 @@ export interface CostHistoryQuery {
 export interface AdminUserOption {
   id: string;
   email: string;
+  credit_balance: number;
 }

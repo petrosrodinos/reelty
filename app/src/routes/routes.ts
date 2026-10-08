@@ -11,8 +11,11 @@ export const Routes = {
   new: "/new",
   videos: "/videos",
   usage: "/usage",
+  credits: "/credits",
   adminConfig: "/admin/config",
   adminUsage: "/admin/usage",
+  adminCreditTiers: "/admin/credit-tiers",
+  adminPurchases: "/admin/purchases",
   project: (id: string) => `/projects/${id}`,
   projectCreated: (id: string) => `/projects/${id}?created=1`,
   edit: (id: string) => `/projects/${id}/edit`,
@@ -28,6 +31,8 @@ export const QueryParams = {
   tab: "tab",
   expired: "expired",
   created: "created",
+  /** Stripe Checkout return: success | cancelled */
+  status: "status",
 } as const;
 
 /** Only allow same-origin relative redirect targets (blocks open redirects). */

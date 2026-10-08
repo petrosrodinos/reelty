@@ -37,9 +37,20 @@ export const ApiRoutes = {
     configByKey: (key: string) => `/admin/config/${encodeURIComponent(key)}`,
     usage: "/admin/usage",
     users: "/admin/users",
+    userCredits: (id: string) => `/admin/users/${id}/credits`,
+    creditTiers: "/admin/credit-tiers",
+    purchases: "/admin/purchases",
   },
   usage: {
     prefix: "/usage",
-    history: "/usage/history",
+  },
+  credits: {
+    prefix: "/credits",
+    transactions: "/credits/transactions",
+    quote: (projectId: string) => `/credits/quote/${projectId}`,
+  },
+  billing: {
+    checkout: "/billing/checkout",
+    purchases: "/billing/purchases",
   },
 } as const;

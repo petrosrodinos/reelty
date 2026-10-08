@@ -2,7 +2,8 @@ import { ApiError } from "@/config/api/axios";
 
 /** Plain-language messages for API error codes (contract section 4). Falls back to the server message. */
 export const ApiErrorMessageOptions: Record<string, string> = {
-  quota_exceeded: "You have used all your videos for this month. Your quota resets at the start of next month.",
+  insufficient_credits: "You do not have enough credits for this video. Buy more credits to continue.",
+  payments_unavailable: "Payments are temporarily unavailable. Please try again later.",
   render_in_progress: "You already have a video being created. Only one at a time, please wait for it to finish.",
   email_not_verified: "Please verify your email address before creating a video. We can resend the link.",
   watermark_processing: "A watermark removal is still running. Wait for it to finish, then create your video.",

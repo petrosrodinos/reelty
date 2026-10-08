@@ -13,14 +13,6 @@ const limit = z
   .transform((v) => (v ? parseInt(v, 10) : 20))
   .pipe(z.number().int().min(1).max(100));
 
-/** User-facing history: quota charges and refunds only. */
-export const UsageHistoryQuerySchema = z.object({
-  page,
-  limit,
-  kind: z.enum([LedgerKind.video, LedgerKind.video_refund]).optional(),
-});
-export type UsageHistoryQueryType = z.infer<typeof UsageHistoryQuerySchema>;
-
 /** Operator history across all users, including provider costs. */
 export const AdminUsageQuerySchema = z.object({
   page,

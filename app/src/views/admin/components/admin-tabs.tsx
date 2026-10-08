@@ -8,6 +8,8 @@ import { Routes } from "@/routes/routes";
 
 const tabs = [
   { label: "Prices", href: Routes.adminConfig },
+  { label: "Credit tiers", href: Routes.adminCreditTiers },
+  { label: "Purchases", href: Routes.adminPurchases },
   { label: "Cost ledger", href: Routes.adminUsage },
 ];
 

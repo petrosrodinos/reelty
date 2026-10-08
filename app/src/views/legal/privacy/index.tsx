@@ -19,7 +19,7 @@ const PrivacyPage: FC = () => (
     <LegalSection heading="2. How we use it">
       <p>
         To run the service: create your videos, send transactional emails (verification, password reset, video ready or failed),
-        keep your account secure, and enforce quotas. We do not sell your data and we do not use advertising trackers.
+        keep your account secure, and track your credit balance and purchases. We do not sell your data and we do not use advertising trackers.
       </p>
     </LegalSection>
 
@@ -32,6 +32,7 @@ const PrivacyPage: FC = () => (
           <span key="dewatermark"><strong>Dewatermark</strong>: edits an individual photo only when you click Remove watermark.</span>,
           <span key="higgsfield"><strong>Higgsfield</strong>: generates video clips from your photos.</span>,
           <span key="email"><strong>Our email provider</strong>: delivers account and status emails.</span>,
+          <span key="stripe"><strong>Stripe</strong>: processes credit purchases. Card details go to Stripe directly and never reach our servers.</span>,
         ]}
       />
     </LegalSection>

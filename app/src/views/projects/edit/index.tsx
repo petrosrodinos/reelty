@@ -12,6 +12,9 @@ import { useMe } from "@/features/auth/hooks/use-auth";
 import { useDeleteProject, useProject, useSubmitProject } from "@/features/projects/hooks/use-projects";
 import { EditableStatuses, ProjectStatuses } from "@/features/projects/interfaces/projects.interfaces";
 import { useUsage } from "@/features/usage/hooks/use-usage";
+import { useCredits } from "@/features/credits/hooks/use-credits";
+import { quoteVideo } from "@/features/credits/utils/credit-pricing.utils";
+import { WatermarkStatuses } from "@/features/images/interfaces/images.interfaces";
 import { Routes } from "@/routes/routes";
 import { EditSkeleton } from "@/views/projects/edit/components/edit-skeleton";
 import { FetchingView, ScrapeFailedView } from "@/views/projects/edit/components/fetching-view";
@@ -36,12 +39,21 @@ interface EditorProps {
 const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
   const router = useRouter();
   const { data: usage } = useUsage();
+  const { data: credits } = useCredits();
   const submit = useSubmitProject();
   const deleteProject = useDeleteProject();
   const { form, saveState, flush, retrySave } = useVideoDetailsAutosave(project);
   const [discarding, setDiscarding] = useState(false);
 
-  const blockers = getCreateBlockers({ project, me, usage });
+  const images = project.images ?? [];
+  const quote = credits
+    ? quoteVideo(credits.pricing, {
+        clips: images.length,
+        dewatermarked: images.some((image) => image.wm_status === WatermarkStatuses.DONE),
+        imported: project.source_type !== "upload",
+      })
+    : undefined;
+  const blockers = getCreateBlockers({ project, me, usage, quote });
 
   const handleSubmit = async () => {
     if (blockers.length > 0 || submit.isPending) return;
@@ -81,7 +93,14 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
         <ImageManager project={project} />
         <aside className="flex flex-col gap-5 lg:sticky lg:top-24" aria-label="Video details and summary">
           <VideoDetailsForm project={project} form={form} />
-          <SummaryPanel blockers={blockers} isSubmitting={submit.isPending} submitError={submit.error} onSubmit={handleSubmit} />
+          <SummaryPanel
+            blockers={blockers}
+            quote={quote}
+            needsCredits={!!quote && me.credits.balance < quote.total}
+            isSubmitting={submit.isPending}
+            submitError={submit.error}
+            onSubmit={handleSubmit}
+          />
         </aside>
       </div>
 

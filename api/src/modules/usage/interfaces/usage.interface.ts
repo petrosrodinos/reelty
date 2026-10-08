@@ -1,16 +1,9 @@
-export interface Quota {
-  used: number;
-  limit: number;
-  remaining: number;
-  resets_at: string;
-}
-
-export interface UsageResponse extends Quota {
+export interface UsageResponse {
+  credit_balance: number;
   active_render_project_id: string | null;
 }
 
 export type LedgerKindValue = 'video' | 'video_refund' | 'dewatermark' | 'scrape' | 'higgsfield';
-export type QuotaKindValue = 'video' | 'video_refund';
 
 export interface Pagination {
   total: number;
@@ -19,23 +12,6 @@ export interface Pagination {
   total_pages: number;
   has_next: boolean;
   has_prev: boolean;
-}
-
-// ---- user-facing: quota activity only (no provider costs)
-
-export interface QuotaLedgerEntry {
-  id: string;
-  project_id: string | null;
-  project_title: string | null;
-  kind: QuotaKindValue;
-  /** +1 charge, -1 refund */
-  quota_units: number;
-  created_at: string;
-}
-
-export interface QuotaHistoryResponse {
-  data: QuotaLedgerEntry[];
-  pagination: Pagination;
 }
 
 // ---- operator-only: provider costs
