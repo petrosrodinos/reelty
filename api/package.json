@@ -11,6 +11,7 @@
     "start": "nest start",
     "start:local": "npx dotenv -e .env.local -- nest start --watch",
     "start:dev": "npx dotenv -e .env.development -- nest start --watch",
+    "migrate": "dotenv -e .env.staging -- npx prisma migrate dev --name new-migration && dotenv -e .env.staging -- npx prisma generate && dotenv -e .env.staging -- npx prisma migrate deploy && dotenv -e .env.staging -- nest start --watch",
     "start:staging": "npx dotenv -e .env.staging -- nest start --watch",
     "start:prod": "node dist/src/main",
     "prisma:generate": "prisma generate",
