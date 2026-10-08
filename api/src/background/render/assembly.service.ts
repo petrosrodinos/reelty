@@ -31,6 +31,8 @@ export interface AssemblyInput {
   locationLine?: string | null;
   closingLine?: string | null;
   music: boolean;
+  /** Which built-in track to use when `music` is on. */
+  soundtrackId: string;
 }
 
 export interface AssemblyResult {
@@ -91,7 +93,7 @@ export class AssemblyService {
       );
 
       // 3. audio source
-      const audio = await this.prepareAudio(dir, input.music);
+      const audio = await this.prepareAudio(dir, input.music, input.soundtrackId);
 
       // 4. xfade chain + fades + audio
       const graph = buildAssemblyFilterGraph({ clipCount: n, music: audio.source.kind === 'music' });
@@ -145,11 +147,11 @@ export class AssemblyService {
     await this.ffmpeg.run(buildCardArgs({ vf, seconds, outFile: `${name}.mp4` }), { cwd: dir });
   }
 
-  private async prepareAudio(dir: string, music: boolean): Promise<{ source: AudioSource }> {
+  private async prepareAudio(dir: string, music: boolean, soundtrackId: string): Promise<{ source: AudioSource }> {
     if (!music) return { source: { kind: 'silent' } };
     try {
       const file = join(dir, 'track.mp3');
-      await this.soundtrack.fetchTrack(file);
+      await this.soundtrack.fetchTrack(soundtrackId, file);
       return { source: { kind: 'music', file } };
     } catch (error) {
       // A missing soundtrack must not fail the render: fall back to the silent AAC track.

@@ -423,7 +423,7 @@ export function buildAssemblyArgs(input: {
   const args: string[] = [];
   for (const f of input.videoFiles) args.push('-i', f);
   if (input.audio.kind === 'music') {
-    // Loop as a safety net; the synthesised track (64 s) is longer than the longest video (57.6 s).
+    // Loop as a safety net in case a track is shorter than the video (the longest is 57.6 s).
     args.push('-stream_loop', '-1', '-i', input.audio.file);
   } else {
     args.push('-f', 'lavfi', '-i', `anullsrc=r=${VideoSpec.audioSampleRate}:cl=stereo`);

@@ -11,6 +11,7 @@ import { CsrfGuard } from './shared/guards/csrf.guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsageModule } from './modules/usage/usage.module';
 import { ProjectsModule } from './modules/projects/projects.module';
+import { SoundtracksModule } from './modules/soundtracks/soundtracks.module';
 import { ImagesModule } from './modules/images/images.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { HealthModule } from './modules/health/health.module';
@@ -29,6 +30,7 @@ import { BackgroundModule } from './background/background.module';
     AuthModule,
     UsageModule,
     ProjectsModule,
+    SoundtracksModule,
     ImagesModule,
     AdminModule,
     HealthModule,

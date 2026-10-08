@@ -237,6 +237,9 @@ export class ProjectsService {
         ...(dto.music_enabled !== undefined && dto.music_enabled !== null
           ? { music_enabled: dto.music_enabled }
           : {}),
+        ...(dto.soundtrack_id !== undefined && dto.soundtrack_id !== null
+          ? { soundtrack_id: dto.soundtrack_id }
+          : {}),
       },
     });
 

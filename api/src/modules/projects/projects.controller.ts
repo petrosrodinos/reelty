@@ -65,7 +65,7 @@ export class ProjectsController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update title, subtitle, location line, closing line, music' })
+  @ApiOperation({ summary: 'Update title, subtitle, location line, closing line, music, soundtrack' })
   @ApiResponse({ status: 200, type: ProjectEntity })
   @ApiResponse({ status: 409, description: 'project_locked' })
   update(@CurrentUser('id') userId: string, @Param('id') id: string, @Body() dto: UpdateProjectDto) {

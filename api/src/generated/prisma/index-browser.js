@@ -177,6 +177,7 @@ exports.Prisma.ProjectScalarFieldEnum = {
   location_line: 'location_line',
   closing_line: 'closing_line',
   music_enabled: 'music_enabled',
+  soundtrack_id: 'soundtrack_id',
   rights_attested_at: 'rights_attested_at',
   submitted_at: 'submitted_at',
   completed_at: 'completed_at',

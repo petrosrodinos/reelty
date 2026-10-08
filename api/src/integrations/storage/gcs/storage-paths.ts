@@ -13,6 +13,4 @@ export const StoragePaths = {
   workClip: (userId: string, projectId: string, imageId: string) =>
     `users/${userId}/projects/${projectId}/work/clips/${imageId}.mp4`,
   workPrefix: (userId: string, projectId: string) => `users/${userId}/projects/${projectId}/work/`,
-  soundtrack: () => `assets/soundtrack/track.mp3`,
-  soundtrackLicense: () => `assets/soundtrack/LICENSE.txt`,
 } as const;

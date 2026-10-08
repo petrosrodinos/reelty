@@ -338,6 +338,7 @@ export class RenderService {
             locationLine: project.location_line,
             closingLine: project.closing_line,
             music: project.music_enabled,
+            soundtrackId: project.soundtrack_id,
           });
         } catch (error) {
           lastError = error as AssemblyError;

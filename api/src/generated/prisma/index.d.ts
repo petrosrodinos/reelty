@@ -6620,6 +6620,7 @@ export namespace Prisma {
     location_line: string | null
     closing_line: string | null
     music_enabled: boolean | null
+    soundtrack_id: string | null
     rights_attested_at: Date | null
     submitted_at: Date | null
     completed_at: Date | null
@@ -6651,6 +6652,7 @@ export namespace Prisma {
     location_line: string | null
     closing_line: string | null
     music_enabled: boolean | null
+    soundtrack_id: string | null
     rights_attested_at: Date | null
     submitted_at: Date | null
     completed_at: Date | null
@@ -6682,6 +6684,7 @@ export namespace Prisma {
     location_line: number
     closing_line: number
     music_enabled: number
+    soundtrack_id: number
     rights_attested_at: number
     submitted_at: number
     completed_at: number
@@ -6728,6 +6731,7 @@ export namespace Prisma {
     location_line?: true
     closing_line?: true
     music_enabled?: true
+    soundtrack_id?: true
     rights_attested_at?: true
     submitted_at?: true
     completed_at?: true
@@ -6759,6 +6763,7 @@ export namespace Prisma {
     location_line?: true
     closing_line?: true
     music_enabled?: true
+    soundtrack_id?: true
     rights_attested_at?: true
     submitted_at?: true
     completed_at?: true
@@ -6790,6 +6795,7 @@ export namespace Prisma {
     location_line?: true
     closing_line?: true
     music_enabled?: true
+    soundtrack_id?: true
     rights_attested_at?: true
     submitted_at?: true
     completed_at?: true
@@ -6909,6 +6915,7 @@ export namespace Prisma {
     location_line: string | null
     closing_line: string | null
     music_enabled: boolean
+    soundtrack_id: string
     rights_attested_at: Date | null
     submitted_at: Date | null
     completed_at: Date | null
@@ -6960,6 +6967,7 @@ export namespace Prisma {
     location_line?: boolean
     closing_line?: boolean
     music_enabled?: boolean
+    soundtrack_id?: boolean
     rights_attested_at?: boolean
     submitted_at?: boolean
     completed_at?: boolean
@@ -6998,6 +7006,7 @@ export namespace Prisma {
     location_line?: boolean
     closing_line?: boolean
     music_enabled?: boolean
+    soundtrack_id?: boolean
     rights_attested_at?: boolean
     submitted_at?: boolean
     completed_at?: boolean
@@ -7031,6 +7040,7 @@ export namespace Prisma {
     location_line?: boolean
     closing_line?: boolean
     music_enabled?: boolean
+    soundtrack_id?: boolean
     rights_attested_at?: boolean
     submitted_at?: boolean
     completed_at?: boolean
@@ -7064,6 +7074,7 @@ export namespace Prisma {
     location_line?: boolean
     closing_line?: boolean
     music_enabled?: boolean
+    soundtrack_id?: boolean
     rights_attested_at?: boolean
     submitted_at?: boolean
     completed_at?: boolean
@@ -7080,7 +7091,7 @@ export namespace Prisma {
     deleted_at?: boolean
   }
 
-  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "source_type" | "source_url" | "status" | "render_step" | "partial" | "failure_reason" | "failure_code" | "scrape_error" | "title" | "subtitle" | "location_line" | "closing_line" | "music_enabled" | "rights_attested_at" | "submitted_at" | "completed_at" | "render_started_at" | "quota_charged" | "video_gcs_path" | "poster_gcs_path" | "duration_seconds" | "clips_total" | "clips_done" | "skipped_image_ids" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["project"]>
+  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "source_type" | "source_url" | "status" | "render_step" | "partial" | "failure_reason" | "failure_code" | "scrape_error" | "title" | "subtitle" | "location_line" | "closing_line" | "music_enabled" | "soundtrack_id" | "rights_attested_at" | "submitted_at" | "completed_at" | "render_started_at" | "quota_charged" | "video_gcs_path" | "poster_gcs_path" | "duration_seconds" | "clips_total" | "clips_done" | "skipped_image_ids" | "created_at" | "updated_at" | "deleted_at", ExtArgs["result"]["project"]>
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     images?: boolean | Project$imagesArgs<ExtArgs>
@@ -7121,6 +7132,7 @@ export namespace Prisma {
       location_line: string | null
       closing_line: string | null
       music_enabled: boolean
+      soundtrack_id: string
       rights_attested_at: Date | null
       submitted_at: Date | null
       completed_at: Date | null
@@ -7578,6 +7590,7 @@ export namespace Prisma {
     readonly location_line: FieldRef<"Project", 'String'>
     readonly closing_line: FieldRef<"Project", 'String'>
     readonly music_enabled: FieldRef<"Project", 'Boolean'>
+    readonly soundtrack_id: FieldRef<"Project", 'String'>
     readonly rights_attested_at: FieldRef<"Project", 'DateTime'>
     readonly submitted_at: FieldRef<"Project", 'DateTime'>
     readonly completed_at: FieldRef<"Project", 'DateTime'>
@@ -14936,6 +14949,7 @@ export namespace Prisma {
     location_line: 'location_line',
     closing_line: 'closing_line',
     music_enabled: 'music_enabled',
+    soundtrack_id: 'soundtrack_id',
     rights_attested_at: 'rights_attested_at',
     submitted_at: 'submitted_at',
     completed_at: 'completed_at',
@@ -15571,6 +15585,7 @@ export namespace Prisma {
     location_line?: StringNullableFilter<"Project"> | string | null
     closing_line?: StringNullableFilter<"Project"> | string | null
     music_enabled?: BoolFilter<"Project"> | boolean
+    soundtrack_id?: StringFilter<"Project"> | string
     rights_attested_at?: DateTimeNullableFilter<"Project"> | Date | string | null
     submitted_at?: DateTimeNullableFilter<"Project"> | Date | string | null
     completed_at?: DateTimeNullableFilter<"Project"> | Date | string | null
@@ -15608,6 +15623,7 @@ export namespace Prisma {
     location_line?: SortOrderInput | SortOrder
     closing_line?: SortOrderInput | SortOrder
     music_enabled?: SortOrder
+    soundtrack_id?: SortOrder
     rights_attested_at?: SortOrderInput | SortOrder
     submitted_at?: SortOrderInput | SortOrder
     completed_at?: SortOrderInput | SortOrder
@@ -15648,6 +15664,7 @@ export namespace Prisma {
     location_line?: StringNullableFilter<"Project"> | string | null
     closing_line?: StringNullableFilter<"Project"> | string | null
     music_enabled?: BoolFilter<"Project"> | boolean
+    soundtrack_id?: StringFilter<"Project"> | string
     rights_attested_at?: DateTimeNullableFilter<"Project"> | Date | string | null
     submitted_at?: DateTimeNullableFilter<"Project"> | Date | string | null
     completed_at?: DateTimeNullableFilter<"Project"> | Date | string | null
@@ -15685,6 +15702,7 @@ export namespace Prisma {
     location_line?: SortOrderInput | SortOrder
     closing_line?: SortOrderInput | SortOrder
     music_enabled?: SortOrder
+    soundtrack_id?: SortOrder
     rights_attested_at?: SortOrderInput | SortOrder
     submitted_at?: SortOrderInput | SortOrder
     completed_at?: SortOrderInput | SortOrder
@@ -15725,6 +15743,7 @@ export namespace Prisma {
     location_line?: StringNullableWithAggregatesFilter<"Project"> | string | null
     closing_line?: StringNullableWithAggregatesFilter<"Project"> | string | null
     music_enabled?: BoolWithAggregatesFilter<"Project"> | boolean
+    soundtrack_id?: StringWithAggregatesFilter<"Project"> | string
     rights_attested_at?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
     submitted_at?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
     completed_at?: DateTimeNullableWithAggregatesFilter<"Project"> | Date | string | null
@@ -16540,6 +16559,7 @@ export namespace Prisma {
     location_line?: string | null
     closing_line?: string | null
     music_enabled?: boolean
+    soundtrack_id?: string
     rights_attested_at?: Date | string | null
     submitted_at?: Date | string | null
     completed_at?: Date | string | null
@@ -16577,6 +16597,7 @@ export namespace Prisma {
     location_line?: string | null
     closing_line?: string | null
     music_enabled?: boolean
+    soundtrack_id?: string
     rights_attested_at?: Date | string | null
     submitted_at?: Date | string | null
     completed_at?: Date | string | null
@@ -16612,6 +16633,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -16649,6 +16671,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -16685,6 +16708,7 @@ export namespace Prisma {
     location_line?: string | null
     closing_line?: string | null
     music_enabled?: boolean
+    soundtrack_id?: string
     rights_attested_at?: Date | string | null
     submitted_at?: Date | string | null
     completed_at?: Date | string | null
@@ -16716,6 +16740,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -16748,6 +16773,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -17732,6 +17758,7 @@ export namespace Prisma {
     location_line?: SortOrder
     closing_line?: SortOrder
     music_enabled?: SortOrder
+    soundtrack_id?: SortOrder
     rights_attested_at?: SortOrder
     submitted_at?: SortOrder
     completed_at?: SortOrder
@@ -17770,6 +17797,7 @@ export namespace Prisma {
     location_line?: SortOrder
     closing_line?: SortOrder
     music_enabled?: SortOrder
+    soundtrack_id?: SortOrder
     rights_attested_at?: SortOrder
     submitted_at?: SortOrder
     completed_at?: SortOrder
@@ -17801,6 +17829,7 @@ export namespace Prisma {
     location_line?: SortOrder
     closing_line?: SortOrder
     music_enabled?: SortOrder
+    soundtrack_id?: SortOrder
     rights_attested_at?: SortOrder
     submitted_at?: SortOrder
     completed_at?: SortOrder
@@ -19435,6 +19464,7 @@ export namespace Prisma {
     location_line?: string | null
     closing_line?: string | null
     music_enabled?: boolean
+    soundtrack_id?: string
     rights_attested_at?: Date | string | null
     submitted_at?: Date | string | null
     completed_at?: Date | string | null
@@ -19470,6 +19500,7 @@ export namespace Prisma {
     location_line?: string | null
     closing_line?: string | null
     music_enabled?: boolean
+    soundtrack_id?: string
     rights_attested_at?: Date | string | null
     submitted_at?: Date | string | null
     completed_at?: Date | string | null
@@ -19684,6 +19715,7 @@ export namespace Prisma {
     location_line?: StringNullableFilter<"Project"> | string | null
     closing_line?: StringNullableFilter<"Project"> | string | null
     music_enabled?: BoolFilter<"Project"> | boolean
+    soundtrack_id?: StringFilter<"Project"> | string
     rights_attested_at?: DateTimeNullableFilter<"Project"> | Date | string | null
     submitted_at?: DateTimeNullableFilter<"Project"> | Date | string | null
     completed_at?: DateTimeNullableFilter<"Project"> | Date | string | null
@@ -20355,6 +20387,7 @@ export namespace Prisma {
     location_line?: string | null
     closing_line?: string | null
     music_enabled?: boolean
+    soundtrack_id?: string
     rights_attested_at?: Date | string | null
     submitted_at?: Date | string | null
     completed_at?: Date | string | null
@@ -20391,6 +20424,7 @@ export namespace Prisma {
     location_line?: string | null
     closing_line?: string | null
     music_enabled?: boolean
+    soundtrack_id?: string
     rights_attested_at?: Date | string | null
     submitted_at?: Date | string | null
     completed_at?: Date | string | null
@@ -20441,6 +20475,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -20477,6 +20512,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -20548,6 +20584,7 @@ export namespace Prisma {
     location_line?: string | null
     closing_line?: string | null
     music_enabled?: boolean
+    soundtrack_id?: string
     rights_attested_at?: Date | string | null
     submitted_at?: Date | string | null
     completed_at?: Date | string | null
@@ -20584,6 +20621,7 @@ export namespace Prisma {
     location_line?: string | null
     closing_line?: string | null
     music_enabled?: boolean
+    soundtrack_id?: string
     rights_attested_at?: Date | string | null
     submitted_at?: Date | string | null
     completed_at?: Date | string | null
@@ -20677,6 +20715,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -20713,6 +20752,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -20747,6 +20787,7 @@ export namespace Prisma {
     location_line?: string | null
     closing_line?: string | null
     music_enabled?: boolean
+    soundtrack_id?: string
     rights_attested_at?: Date | string | null
     submitted_at?: Date | string | null
     completed_at?: Date | string | null
@@ -20783,6 +20824,7 @@ export namespace Prisma {
     location_line?: string | null
     closing_line?: string | null
     music_enabled?: boolean
+    soundtrack_id?: string
     rights_attested_at?: Date | string | null
     submitted_at?: Date | string | null
     completed_at?: Date | string | null
@@ -20833,6 +20875,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -20869,6 +20912,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -20940,6 +20984,7 @@ export namespace Prisma {
     location_line?: string | null
     closing_line?: string | null
     music_enabled?: boolean
+    soundtrack_id?: string
     rights_attested_at?: Date | string | null
     submitted_at?: Date | string | null
     completed_at?: Date | string | null
@@ -20976,6 +21021,7 @@ export namespace Prisma {
     location_line?: string | null
     closing_line?: string | null
     music_enabled?: boolean
+    soundtrack_id?: string
     rights_attested_at?: Date | string | null
     submitted_at?: Date | string | null
     completed_at?: Date | string | null
@@ -21069,6 +21115,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -21105,6 +21152,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -21166,6 +21214,7 @@ export namespace Prisma {
     location_line?: string | null
     closing_line?: string | null
     music_enabled?: boolean
+    soundtrack_id?: string
     rights_attested_at?: Date | string | null
     submitted_at?: Date | string | null
     completed_at?: Date | string | null
@@ -21299,6 +21348,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -21334,6 +21384,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -21369,6 +21420,7 @@ export namespace Prisma {
     location_line?: NullableStringFieldUpdateOperationsInput | string | null
     closing_line?: NullableStringFieldUpdateOperationsInput | string | null
     music_enabled?: BoolFieldUpdateOperationsInput | boolean
+    soundtrack_id?: StringFieldUpdateOperationsInput | string
     rights_attested_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     submitted_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

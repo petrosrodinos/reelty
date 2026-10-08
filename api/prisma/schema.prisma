@@ -168,6 +168,7 @@ model Project {
   location_line String?
   closing_line  String?
   music_enabled Boolean  @default(true)
+  soundtrack_id String   @default("ambient") // one of SOUNDTRACKS (shared/constants/soundtracks.constants.ts)
 
   rights_attested_at DateTime?
   submitted_at       DateTime?

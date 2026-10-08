@@ -120,6 +120,7 @@ export class ProjectSerializer {
       location_line: project.location_line,
       closing_line: project.closing_line,
       music_enabled: project.music_enabled,
+      soundtrack_id: project.soundtrack_id,
       rights_attested: project.rights_attested_at !== null,
       watermark_consent: ctx.watermarkConsent,
       submitted_at: project.submitted_at ? project.submitted_at.toISOString() : null,

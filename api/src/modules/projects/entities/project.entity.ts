@@ -36,6 +36,7 @@ export class ProjectEntity {
   @ApiProperty({ nullable: true, type: String }) location_line: string | null;
   @ApiProperty({ nullable: true, type: String }) closing_line: string | null;
   @ApiProperty() music_enabled: boolean;
+  @ApiProperty({ example: 'ambient' }) soundtrack_id: string;
   @ApiProperty() rights_attested: boolean;
   @ApiProperty() watermark_consent: boolean;
   @ApiProperty({ nullable: true, type: String }) submitted_at: string | null;

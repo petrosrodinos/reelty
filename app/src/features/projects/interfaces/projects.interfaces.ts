@@ -63,6 +63,7 @@ export interface Project {
   location_line: string | null;
   closing_line: string | null;
   music_enabled: boolean;
+  soundtrack_id: string;
   rights_attested: boolean;
   watermark_consent: boolean;
   submitted_at: string | null;
@@ -113,6 +114,13 @@ export interface UpdateProjectDto {
   location_line?: string | null;
   closing_line?: string | null;
   music_enabled?: boolean;
+  soundtrack_id?: string;
+}
+
+export interface Soundtrack {
+  id: string;
+  name: string;
+  description: string;
 }
 
 export interface SubmitProjectDto {

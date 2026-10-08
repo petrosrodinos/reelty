@@ -17,6 +17,7 @@ import {
   deleteProject,
   getProject,
   getProjects,
+  getSoundtracks,
   getVideoDownloadUrl,
   getVideoPlayUrl,
   retryProject,
@@ -28,6 +29,7 @@ import { triggerDownload } from "@/lib/download.utils";
 
 export const PROJECTS_QUERY_KEY = "projects";
 export const PROJECT_QUERY_KEY = "project";
+export const SOUNDTRACKS_QUERY_KEY = "soundtracks";
 export const VIDEO_PLAY_URL_QUERY_KEY = "video-play-url";
 
 const POLL_INTERVAL_MS = 5000;
@@ -53,13 +55,23 @@ export const useProject = (id: string) => {
     retry: (failureCount, error) => !(error instanceof ApiError && error.status === 404) && failureCount < 2,
     refetchInterval: (q) => {
       const project = q.state.data;
-      if (!project) return false;
+      // after retries are exhausted the last good data is kept; don't keep hammering a failing endpoint
+      if (!project || q.state.status === 'error') return false;
       if (InProgressStatuses.includes(project.status)) return POLL_INTERVAL_MS;
       if (project.images?.some((image) => image.wm_status === WatermarkStatuses.PROCESSING)) {
         return WATERMARK_POLL_INTERVAL_MS;
       }
       return false;
     },
+  });
+};
+
+/** The built-in soundtrack catalog. Static on the server, so it is fetched once per session. */
+export const useSoundtracks = () => {
+  return useQuery({
+    queryKey: [SOUNDTRACKS_QUERY_KEY],
+    queryFn: getSoundtracks,
+    staleTime: Infinity,
   });
 };
 

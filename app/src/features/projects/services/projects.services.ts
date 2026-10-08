@@ -8,6 +8,7 @@ import type {
   Project,
   ProjectListItem,
   ProjectsQuery,
+  Soundtrack,
   SubmitProjectDto,
   UpdateProjectDto,
 } from "@/features/projects/interfaces/projects.interfaces";
@@ -31,6 +32,11 @@ export const createProject = async (dto: CreateProjectDto): Promise<Project> => 
 
 export const updateProject = async ({ id, dto }: { id: string; dto: UpdateProjectDto }): Promise<Project> => {
   const response = await axiosInstance.patch<Project>(ApiRoutes.projects.byId(id), dto);
+  return response.data;
+};
+
+export const getSoundtracks = async (): Promise<Soundtrack[]> => {
+  const response = await axiosInstance.get<Soundtrack[]>(ApiRoutes.soundtracks.prefix);
   return response.data;
 };
 

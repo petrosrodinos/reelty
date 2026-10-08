@@ -53,6 +53,7 @@ export interface ProjectJson {
   location_line: string | null;
   closing_line: string | null;
   music_enabled: boolean;
+  soundtrack_id: string;
   rights_attested: boolean;
   watermark_consent: boolean;
   submitted_at: string | null;

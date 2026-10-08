@@ -1,6 +1,7 @@
 import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsString, MaxLength, ValidateIf } from 'class-validator';
+import { IsBoolean, IsIn, IsString, MaxLength, ValidateIf } from 'class-validator';
+import { SOUNDTRACK_IDS } from '@/shared/constants/soundtracks.constants';
 
 const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
 
@@ -35,6 +36,10 @@ export class ProjectDetailsDto {
   @ApiPropertyOptional()
   @IsBoolean()
   music_enabled: boolean;
+
+  @ApiPropertyOptional({ enum: SOUNDTRACK_IDS, example: 'ambient' })
+  @IsIn(SOUNDTRACK_IDS)
+  soundtrack_id: string;
 }
 
 export class UpdateProjectDto extends PartialType(ProjectDetailsDto) {}

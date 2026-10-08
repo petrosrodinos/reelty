@@ -31,7 +31,7 @@ Create one private bucket (uniform access, no public access), set `GCS_PROJECT_I
 ## Open items before launch (spec §13.2, §17.2)
 
 - **Q1** How the backend calls Higgsfield (supported API, commercial terms, rate limits).
-- **Q2** Soundtrack: a CC0 ambient track is synthesised by the worker; replace it if you license a different one.
+- **Q2** Soundtrack: five CC0 tracks (from Freesound) are bundled in `api/assets/soundtracks`; credits are in `CREDITS.md` there.
 - **Q3–Q7** Free quota, email sender domain, scraping restrictions (legal review of Airbnb/website scraping), video retention, target markets.
 - Terms and privacy pages are drafts and need legal review.
 - Tests are intentionally not included yet (no database available at build time).

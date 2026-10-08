@@ -24,6 +24,9 @@ export const ApiRoutes = {
     downloadUrl: (id: string) => `/projects/${id}/video/download-url`,
     downloadZip: (id: string) => `/projects/${id}/images/download-zip`,
   },
+  soundtracks: {
+    prefix: "/soundtracks",
+  },
   images: {
     byId: (id: string) => `/images/${id}`,
     removeWatermark: (id: string) => `/images/${id}/remove-watermark`,
