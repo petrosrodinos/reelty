@@ -116,7 +116,7 @@ export interface UpdateProjectDto {
 }
 
 export interface SubmitProjectDto {
-  rights_attested: true;
+  rights_attested?: boolean;
 }
 
 export interface PlayUrlResponse {

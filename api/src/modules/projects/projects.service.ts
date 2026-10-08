@@ -322,18 +322,6 @@ export class ProjectsService {
         'This video is not ready to be created.',
       );
     }
-    if (!project.title.trim()) {
-      throw new ApiException(HttpStatus.BAD_REQUEST, ErrorCodes.TITLE_REQUIRED, 'Add a title for your video.');
-    }
-
-    const attested = project.rights_attested_at !== null;
-    if (!attested && dto.rights_attested !== true) {
-      throw new ApiException(
-        HttpStatus.BAD_REQUEST,
-        ErrorCodes.RIGHTS_REQUIRED,
-        'Please confirm you own these photos or have permission to use them.',
-      );
-    }
 
     const images = await this.prisma.image.findMany({
       where: { project_id: project.id, ...READY_IMAGES },
@@ -391,11 +379,6 @@ export class ProjectsService {
         );
       }
 
-      if (!attested) {
-        await tx.consent.create({
-          data: { user_id: userId, project_id: project.id, type: ConsentType.rights, ip },
-        });
-      }
       await tx.usageLedger.create({
         data: {
           user_id: userId,
@@ -618,7 +601,7 @@ export class ProjectsService {
 
   async getDownloadUrl(userId: string, projectId: string): Promise<SignedDownloadResponse> {
     const project = await this.requireCompletedVideo(userId, projectId);
-    const filename = `${slugify(project.title)}.mp4`;
+    const filename = `${slugify(project.title) || 'video'}.mp4`;
     const url = await this.media.requireRead(project.video_gcs_path as string, {
       downloadFilename: filename,
       contentType: 'video/mp4',

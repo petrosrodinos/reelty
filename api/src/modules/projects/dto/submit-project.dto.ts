@@ -3,7 +3,7 @@ import { IsBoolean, IsOptional } from 'class-validator';
 
 export class SubmitProjectDto {
   @ApiPropertyOptional({
-    description: 'Must be true the first time: "I own these photos or have permission to use them."',
+    description: 'Optional. No longer required to submit.',
   })
   @IsOptional()
   @IsBoolean()

@@ -38,18 +38,16 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
   const { data: usage } = useUsage();
   const submit = useSubmitProject();
   const deleteProject = useDeleteProject();
-  const { form, saveState, flush, retrySave, title } = useVideoDetailsAutosave(project);
-  const [rightsChecked, setRightsChecked] = useState(project.rights_attested);
+  const { form, saveState, flush, retrySave } = useVideoDetailsAutosave(project);
   const [discarding, setDiscarding] = useState(false);
 
-  const images = project.images ?? [];
-  const blockers = getCreateBlockers({ project, me, usage, title, rightsChecked });
+  const blockers = getCreateBlockers({ project, me, usage });
 
   const handleSubmit = async () => {
     if (blockers.length > 0 || submit.isPending) return;
     await flush();
     submit.mutate(
-      { id: project.id, dto: { rights_attested: true } },
+      { id: project.id, dto: {} },
       {
         onSuccess: () => {
           onCreated();
@@ -83,17 +81,7 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
         <ImageManager project={project} />
         <aside className="flex flex-col gap-5 lg:sticky lg:top-24" aria-label="Video details and summary">
           <VideoDetailsForm project={project} form={form} />
-          <SummaryPanel
-            me={me}
-            imageCount={images.length}
-            musicEnabled={project.music_enabled}
-            rightsChecked={rightsChecked}
-            onRightsChange={setRightsChecked}
-            blockers={blockers}
-            isSubmitting={submit.isPending}
-            submitError={submit.error}
-            onSubmit={handleSubmit}
-          />
+          <SummaryPanel blockers={blockers} isSubmitting={submit.isPending} submitError={submit.error} onSubmit={handleSubmit} />
         </aside>
       </div>
 

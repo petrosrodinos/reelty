@@ -44,8 +44,7 @@ export function useVideoDetailsAutosave(project: Project) {
       await mutateAsync({
         id: projectId,
         dto: {
-          // An empty title is never sent: the server keeps the last good one and the form blocks "Create".
-          ...(title ? { title } : {}),
+          title,
           subtitle: values.subtitle.trim(),
           location_line: values.location_line.trim(),
           closing_line: values.closing_line.trim(),

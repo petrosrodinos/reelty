@@ -4,7 +4,6 @@ import { createHash, randomUUID } from 'crypto';
 import { ZipArchive } from 'archiver';
 import sharp = require('sharp');
 import {
-  ConsentType,
   type Image,
   type Project,
   ProjectStatus,
@@ -445,18 +444,6 @@ export class ImagesService {
       );
     }
 
-    const hasConsent =
-      (await this.prisma.consent.count({
-        where: { project_id: project.id, user_id: userId, type: ConsentType.watermark },
-      })) > 0;
-    if (!hasConsent && dto.accept_terms !== true) {
-      throw new ApiException(
-        HttpStatus.BAD_REQUEST,
-        ErrorCodes.CONSENT_REQUIRED,
-        'Please confirm you have the right to edit these images.',
-      );
-    }
-
     // Claim the attempt atomically (guards against double clicks).
     const attempt = await this.prisma.$transaction(async (tx) => {
       const claimed = await tx.image.updateMany({
@@ -469,11 +456,6 @@ export class ImagesService {
       });
       if (claimed.count === 0) return null;
 
-      if (!hasConsent) {
-        await tx.consent.create({
-          data: { user_id: userId, project_id: project.id, type: ConsentType.watermark, ip },
-        });
-      }
       const fresh = await tx.image.findUniqueOrThrow({
         where: { id: image.id },
         select: { wm_attempts: true },

@@ -32,7 +32,6 @@ import { cn } from "@/lib/utils";
 import { ImageCard } from "@/views/projects/edit/components/image-card";
 import { ImageLightbox } from "@/views/projects/edit/components/image-lightbox";
 import { UploadTile } from "@/views/projects/edit/components/upload-tile";
-import { WatermarkConsentDialog } from "@/views/projects/edit/components/watermark-consent-dialog";
 
 interface ImageManagerProps {
   project: Project;
@@ -62,7 +61,6 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
 
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [removing, setRemoving] = useState<ProjectImage | null>(null);
-  const [consentFor, setConsentFor] = useState<ProjectImage | null>(null);
   const headerInputRef = useRef<HTMLInputElement>(null);
 
   const sensors = useSensors(
@@ -92,19 +90,7 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
   };
 
   const startWatermarkRemoval = (image: ProjectImage) => {
-    if (!project.watermark_consent) {
-      setConsentFor(image);
-      return;
-    }
     removeWatermark.mutate({ id: image.id, dto: {} });
-  };
-
-  const confirmConsent = () => {
-    if (!consentFor) return;
-    removeWatermark.mutate(
-      { id: consentFor.id, dto: { accept_terms: true } },
-      { onSettled: () => setConsentFor(null) },
-    );
   };
 
   const handleFiles = async (files: File[]) => {
@@ -213,13 +199,6 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
       </DndContext>
 
       <ImageLightbox image={previewImage} position={previewPosition} onClose={() => setPreviewId(null)} />
-
-      <WatermarkConsentDialog
-        isOpen={!!consentFor}
-        isLoading={removeWatermark.isPending}
-        onClose={() => setConsentFor(null)}
-        onConfirm={confirmConsent}
-      />
 
       <ConfirmationDialog
         isOpen={!!removing}

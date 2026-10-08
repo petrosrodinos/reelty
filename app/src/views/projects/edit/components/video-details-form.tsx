@@ -32,9 +32,7 @@ export const VideoDetailsForm: FC<VideoDetailsFormProps> = ({ project, form }) =
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Title <span className="font-normal text-muted-foreground">(required)</span>
-                </FormLabel>
+                <FormLabel>Title</FormLabel>
                 <FormControl>
                   <Input maxLength={VideoLimits.maxTitle} placeholder="Sunlit Loft in Plaka" autoComplete="off" {...field} />
                 </FormControl>
