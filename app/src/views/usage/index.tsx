@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { StatePanel } from "@/components/ui/state-panel";
 import { LedgerKindFilterOptions } from "@/config/constants/dropdowns/usage/ledger-kind-filter.options";
 import type { LedgerKind } from "@/features/usage/interfaces/usage.interfaces";
-import { useUsageHistory } from "@/features/usage/hooks/use-usage";
+import { useUsage, useUsageHistory } from "@/features/usage/hooks/use-usage";
+import { QuotaSummary } from "@/views/usage/components/quota-summary";
 import { UsageSkeleton } from "@/views/usage/components/usage-skeleton";
 import { UsageTable } from "@/views/usage/components/usage-table";
 
@@ -22,6 +23,8 @@ const UsagePage: FC = () => {
     kind: kind === "all" ? undefined : kind,
   });
 
+  const { data: usage } = useUsage();
+
   const entries = data?.data ?? [];
   const pagination = data?.pagination;
   const filtered = kind !== "all";
@@ -35,6 +38,8 @@ const UsagePage: FC = () => {
           Every video charged to or refunded from your monthly quota, newest first.
         </p>
       </div>
+
+      {usage ? <QuotaSummary usage={usage} /> : null}
 
       <div className="mb-8 flex flex-wrap items-center gap-3">
         <Select
