@@ -73,9 +73,9 @@ export interface VideoGenerationProvider {
   getBalance(): Promise<number | null>;
   importImage(input: ImportImageInput): Promise<ImportImageResult>;
   getCost(query: CostQuery): Promise<ClipCost>;
-  /** Submits up to 12 clips. Per-index failures are reported in the result, never thrown. */
+  /** Submits one clip per photo. Per-index failures are reported in the result, never thrown. */
   submitClips(requests: ClipRequest[], hooks?: SubmitHooks): Promise<ClipSubmitResult[]>;
-  /** One non-blocking status check (at most ~15 s) for up to 12 jobs. */
+  /** One non-blocking status check (at most ~15 s) for a batch of jobs. */
   waitForJobs(jobIds: string[]): Promise<ClipJobState[]>;
   downloadClip(job: { jobId: string; resultUrl: string }, destFile: string): Promise<void>;
 }

@@ -1,8 +1,10 @@
 /** Static, non-secret app configuration. Not env-driven; change here and redeploy. */
 export const appConfig = {
   limits: {
+    /** Fewest photos any video can use (render needs at least 3 clips). The real range comes from the credit tiers. */
     minImages: 3,
-    maxImages: 12,
+    /** Technical guard on the tiers' top end and on per-request image arrays. */
+    maxImagesCeiling: 100,
     wmMaxAttempts: 2,
   },
   email: {

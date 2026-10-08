@@ -23,11 +23,11 @@ import {
   useReorderImages,
   useUpdateImage,
 } from "@/features/images/hooks/use-images";
+import { useVideoLimits } from "@/features/credits/hooks/use-credits";
 import type { ProjectImage } from "@/features/images/interfaces/images.interfaces";
 import { ACCEPT_ATTRIBUTE, prepareUploadBatch } from "@/features/images/utils/image-validation";
 import type { Project } from "@/features/projects/interfaces/projects.interfaces";
 import { toast } from "@/hooks/use-toast";
-import { VideoLimits } from "@/lib/format.utils";
 import { cn } from "@/lib/utils";
 import { ImageCard } from "@/views/projects/edit/components/image-card";
 import { ImageLightbox } from "@/views/projects/edit/components/image-lightbox";
@@ -41,6 +41,7 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
   const projectId = project.id;
   const serverImages = useMemo(() => [...(project.images ?? [])].sort((a, b) => a.position - b.position), [project.images]);
   const total = serverImages.length;
+  const limits = useVideoLimits();
 
   // Local order is applied synchronously on drop so the grid never snaps back while the PATCH is in flight.
   const [localOrder, setLocalOrder] = useState<string[] | null>(null);
@@ -94,12 +95,12 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
   };
 
   const handleFiles = async (files: File[]) => {
-    const remaining = VideoLimits.maxImages - total;
+    const remaining = limits.maxImages - total;
     if (remaining <= 0) {
-      toast({ title: "Maximum reached", description: `A video can use up to ${VideoLimits.maxImages} photos. Remove one to add another.`, variant: "warning" });
+      toast({ title: "Maximum reached", description: `A video can use up to ${limits.maxImages} photos. Remove one to add another.`, variant: "warning" });
       return;
     }
-    const { valid, rejected, warnings } = await prepareUploadBatch(files, remaining);
+    const { valid, rejected, warnings } = await prepareUploadBatch(files, remaining, limits.maxImages);
     try {
       await uploader.upload({ projectId, files: valid, rejected, warnings });
     } catch {
@@ -107,12 +108,12 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
     }
   };
 
-  const under = total < VideoLimits.minImages;
-  const over = total > VideoLimits.maxImages;
+  const under = total < limits.minImages;
+  const over = total > limits.maxImages;
   const helper = under
-    ? `Add at least ${VideoLimits.minImages} photos to continue.`
+    ? `Add at least ${limits.minImages} photos to continue.`
     : over
-      ? `Remove ${total - VideoLimits.maxImages} to continue (max ${VideoLimits.maxImages}).`
+      ? `Remove ${total - limits.maxImages} to continue (max ${limits.maxImages}).`
       : "Drag the handle to reorder, or use the arrows. The video follows this order.";
 
   const previewImage = images.find((image) => image.id === previewId) ?? null;
@@ -124,7 +125,7 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 id="photos-heading" className="text-[1.375rem] font-medium leading-snug text-ink">
-            {total} of {VideoLimits.maxImages} photos
+            {total} of {limits.maxImages} photos
           </h2>
           <p className={cn("flex items-center gap-1.5 text-sm", under || over ? "text-ink" : "text-muted-foreground")} aria-live="polite">
             {under || over ? <InfoIcon className="size-4 shrink-0 text-warning" aria-hidden="true" /> : null}
@@ -134,7 +135,7 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
         <Button
           variant="outline"
           onClick={() => headerInputRef.current?.click()}
-          disabled={uploader.isUploading || total >= VideoLimits.maxImages}
+          disabled={uploader.isUploading || total >= limits.maxImages}
         >
           <UploadIcon /> Upload photos
         </Button>
@@ -171,7 +172,7 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
 
       {total === 0 ? (
         <div className="mb-4 rounded-lg border border-dashed border-hairline px-6 py-10 text-center">
-          <p className="text-lg font-medium text-ink">Add at least {VideoLimits.minImages} photos to continue.</p>
+          <p className="text-lg font-medium text-ink">Add at least {limits.minImages} photos to continue.</p>
           <p className="mt-1 text-muted-foreground">Upload your own photos using the tile below.</p>
         </div>
       ) : null}
@@ -193,7 +194,12 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
                 onUseProcessed={(useProcessed) => updateImage.mutate({ id: image.id, dto: { use_processed: useProcessed } })}
               />
             ))}
-            <UploadTile onFiles={handleFiles} full={total >= VideoLimits.maxImages} busy={uploader.isUploading} />
+            <UploadTile
+              onFiles={handleFiles}
+              full={total >= limits.maxImages}
+              busy={uploader.isUploading}
+              maxImages={limits.maxImages}
+            />
           </ul>
         </SortableContext>
       </DndContext>

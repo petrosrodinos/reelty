@@ -12,7 +12,7 @@ import { useMe } from "@/features/auth/hooks/use-auth";
 import { useDeleteProject, useProject, useSubmitProject } from "@/features/projects/hooks/use-projects";
 import { EditableStatuses, ProjectStatuses } from "@/features/projects/interfaces/projects.interfaces";
 import { useUsage } from "@/features/usage/hooks/use-usage";
-import { useCredits } from "@/features/credits/hooks/use-credits";
+import { useCredits, useVideoLimits } from "@/features/credits/hooks/use-credits";
 import { quoteVideo } from "@/features/credits/utils/credit-pricing.utils";
 import { WatermarkStatuses } from "@/features/images/interfaces/images.interfaces";
 import { Routes } from "@/routes/routes";
@@ -40,6 +40,7 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
   const router = useRouter();
   const { data: usage } = useUsage();
   const { data: credits } = useCredits();
+  const limits = useVideoLimits();
   const submit = useSubmitProject();
   const deleteProject = useDeleteProject();
   const { form, saveState, flush, retrySave } = useVideoDetailsAutosave(project);
@@ -53,7 +54,7 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
         imported: project.source_type !== "upload",
       })
     : undefined;
-  const blockers = getCreateBlockers({ project, me, usage, quote });
+  const blockers = getCreateBlockers({ project, me, usage, quote, limits });
 
   const handleSubmit = async () => {
     if (blockers.length > 0 || submit.isPending) return;

@@ -7,6 +7,7 @@ import { GcsObjectsService } from '@/integrations/storage/gcs/services/gcs-objec
 import { StoragePaths } from '@/integrations/storage/gcs/storage-paths';
 import { AppConfigService } from '@/modules/app-config/app-config.service';
 import { CreditsService } from '@/modules/credits/credits.service';
+import { CreditTiersService } from '@/modules/credits/services/credit-tiers.service';
 import { VideoProviderResolver } from '@/integrations/video-generation/video-provider.resolver';
 import {
   ClipRequest,
@@ -67,6 +68,7 @@ export class RenderService {
     private readonly events: JobEventsService,
     private readonly notify: NotifyQueueService,
     private readonly credits: CreditsService,
+    private readonly tiers: CreditTiersService,
   ) {}
 
   async run(projectId: string, ctx: RenderContext): Promise<RenderOutcome> {
@@ -151,8 +153,9 @@ export class RenderService {
   private async stepPrepare(project: Project, ctx: RenderContext): Promise<RenderOutcome | null> {
     const provider = this.providers.resolve();
     let images = await this.loadImages(project.id);
-    if (images.length < this.config.minImages || images.length > this.config.maxImages) {
-      throw new RenderFailure('invalid_images', `Image count ${images.length} outside ${this.config.minImages}-${this.config.maxImages}`);
+    const limits = await this.tiers.imageLimits();
+    if (images.length < limits.minImages || images.length > limits.maxImages) {
+      throw new RenderFailure('invalid_images', `Image count ${images.length} outside ${limits.minImages}-${limits.maxImages}`);
     }
 
     // 1. import every image that has no media id yet (media id is persisted immediately, never repeated)

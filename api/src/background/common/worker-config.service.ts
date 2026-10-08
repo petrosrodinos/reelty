@@ -62,9 +62,6 @@ export class WorkerConfigService {
   get minImages(): number {
     return appConfig.limits.minImages;
   }
-  get maxImages(): number {
-    return appConfig.limits.maxImages;
-  }
 
   get resendApiKey(): string | undefined {
     return this.str('RESEND_API_KEY');

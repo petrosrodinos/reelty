@@ -1,8 +1,10 @@
 import { format, formatDistanceToNowStrict, isToday, isYesterday, parseISO } from "date-fns";
 
 export const VideoLimits = {
+  /** Fewest photos any video can use. The real range comes from the credit tiers (useVideoLimits). */
   minImages: 3,
-  maxImages: 12,
+  /** Technical upper guard (mirrors the API); used until the tiers have loaded. */
+  maxImagesCeiling: 100,
   maxTitle: 60,
   maxSubtitle: 80,
   maxLocationLine: 80,

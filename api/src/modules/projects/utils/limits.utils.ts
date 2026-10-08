@@ -1,15 +1,12 @@
 import { appConfig } from '@/shared/config/app';
 
 export interface DomainLimits {
-  minImages: number;
-  maxImages: number;
   wmMaxAttempts: number;
 }
 
-/** Domain limits from the shared app config. */
+/** Domain limits from the shared app config. Photos per video come from the credit tiers (CreditTiersService.imageLimits). */
 export function getLimits(): DomainLimits {
-  const { minImages, maxImages, wmMaxAttempts } = appConfig.limits;
-  return { minImages, maxImages, wmMaxAttempts };
+  return { wmMaxAttempts: appConfig.limits.wmMaxAttempts };
 }
 
 /** Spec 4.3: 8 + 5N - 0.8 * (N + 1) seconds; 0 below 3 images. */

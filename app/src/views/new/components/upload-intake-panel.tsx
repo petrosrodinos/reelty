@@ -9,19 +9,20 @@ import { useImageUploader } from "@/features/images/hooks/use-images";
 import { ACCEPT_ATTRIBUTE, prepareUploadBatch } from "@/features/images/utils/image-validation";
 import { useCreateProject } from "@/features/projects/hooks/use-projects";
 import { SourceTypes } from "@/features/projects/interfaces/projects.interfaces";
-import { VideoLimits } from "@/lib/format.utils";
+import { useVideoLimits } from "@/features/credits/hooks/use-credits";
 import { Routes } from "@/routes/routes";
 
 export const UploadIntakePanel: FC = () => {
   const router = useRouter();
   const createProject = useCreateProject();
   const uploader = useImageUploader();
+  const limits = useVideoLimits();
   // Keep the project across retries so a failed upload never creates a second draft.
   const projectIdRef = useRef<string | null>(null);
   const busy = createProject.isPending || uploader.isUploading;
 
   const handleFiles = async (files: File[]) => {
-    const { valid, rejected, warnings } = await prepareUploadBatch(files, VideoLimits.maxImages);
+    const { valid, rejected, warnings } = await prepareUploadBatch(files, limits.maxImages, limits.maxImages);
 
     if (valid.length === 0) {
       // Nothing to upload: show the reasons without creating a project.
@@ -63,7 +64,7 @@ export const UploadIntakePanel: FC = () => {
       >
         <UploadIcon className="mx-auto size-8 text-brand" aria-hidden="true" />
         <p className="mt-3 text-lg font-medium text-ink">Drag photos here or click to browse</p>
-        <p className="mt-1 text-sm text-muted-foreground">Minimum 640 px, 3 to 12 photos per video</p>
+        <p className="mt-1 text-sm text-muted-foreground">Minimum 640 px, {limits.minImages} to {limits.maxImages} photos per video</p>
       </Dropzone>
       <UploadProgressList items={uploader.items} />
     </div>

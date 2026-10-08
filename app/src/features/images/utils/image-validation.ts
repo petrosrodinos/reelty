@@ -63,8 +63,8 @@ export interface UploadBatch {
   warnings: string[];
 }
 
-/** Validates a drop/pick, trims to the free slots (spec: max 12 photos) and collects per-file reasons. */
-export async function prepareUploadBatch(files: File[], remainingSlots: number): Promise<UploadBatch> {
+/** Validates a drop/pick, trims to the free slots (max photos come from the credit tiers) and collects per-file reasons. */
+export async function prepareUploadBatch(files: File[], remainingSlots: number, maxImages: number): Promise<UploadBatch> {
   const checks = await Promise.all(files.map(checkImageFile));
   const rejected = checks
     .filter((check) => !check.ok)
@@ -73,7 +73,7 @@ export async function prepareUploadBatch(files: File[], remainingSlots: number):
   const slots = Math.max(0, remainingSlots);
   if (valid.length > slots) {
     valid.slice(slots).forEach((check) =>
-      rejected.push({ file: check.file, message: `Only ${VideoLimits.maxImages} photos fit in one video.` }),
+      rejected.push({ file: check.file, message: `Only ${maxImages} photos fit in one video.` }),
     );
     valid = valid.slice(0, slots);
   }

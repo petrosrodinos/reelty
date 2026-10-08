@@ -18,6 +18,7 @@ import { StoragePaths } from '@/integrations/storage/gcs/storage-paths';
 import { ErrorCodes } from '@/shared/config/error-codes';
 import { ApiException } from '@/shared/errors/api-exception';
 import { SystemFlagsService } from '@/modules/system-flags/system-flags.service';
+import { CreditTiersService } from '@/modules/credits/services/credit-tiers.service';
 import { ProjectsService } from '@/modules/projects/projects.service';
 import { MediaUrlsService } from '@/modules/projects/services/media-urls.service';
 import { ProjectSerializer } from '@/modules/projects/services/project-serializer.service';
@@ -71,6 +72,7 @@ export class ImagesService {
     private readonly gcs: GcsObjectsService,
     private readonly queues: QueuesService,
     private readonly flags: SystemFlagsService,
+    private readonly tiers: CreditTiersService,
   ) {}
 
   // -------------------------------------------------------------- upload urls
@@ -84,7 +86,7 @@ export class ImagesService {
     this.assertEditable(project);
     this.media.requireConfigured();
 
-    const { maxImages } = getLimits();
+    const { maxImages } = await this.tiers.imageLimits();
 
     await this.discardStalePendingUploads(project);
 

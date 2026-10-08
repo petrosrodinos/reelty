@@ -1,8 +1,24 @@
 import {
   VideoAddonKeys,
   type CreditsPricing,
+  type CreditTier,
   type VideoQuote,
 } from "@/features/credits/interfaces/credits.interfaces";
+import { VideoLimits } from "@/lib/format.utils";
+
+export interface VideoImageLimits {
+  minImages: number;
+  maxImages: number;
+}
+
+/** Photos per video allowed by the tiers: lowest min to highest max (mirrors CreditTiersService.imageLimits). */
+export function imageLimitsFromTiers(tiers: CreditTier[] | undefined): VideoImageLimits {
+  if (!tiers?.length) return { minImages: VideoLimits.minImages, maxImages: VideoLimits.maxImagesCeiling };
+  return {
+    minImages: Math.max(VideoLimits.minImages, Math.min(...tiers.map((t) => t.min_clips))),
+    maxImages: Math.max(VideoLimits.minImages, Math.max(...tiers.map((t) => t.max_clips))),
+  };
+}
 
 interface QuoteInput {
   clips: number;
@@ -57,19 +73,19 @@ interface TierShape {
 }
 
 /**
- * Mirror of the API rule (tierCoverageProblems): tiers must exactly cover minClips..maxClips with no
- * gaps or overlaps, and exactly one is the default. Empty array means valid.
+ * Mirror of the API rule (tierCoverageProblems): tiers are contiguous (no gaps or overlaps), start at
+ * `floor` photos or more, end at `ceiling` or less, and exactly one is the default. Empty array means valid.
  */
-export function tierCoverageProblems(tiers: TierShape[], minClips: number, maxClips: number): string[] {
-  if (!tiers.length) return [`Add at least one tier covering ${minClips}-${maxClips} clips.`];
+export function tierCoverageProblems(tiers: TierShape[], floor: number, ceiling: number): string[] {
+  if (!tiers.length) return ["Add at least one tier."];
   const problems: string[] = [];
   for (const t of tiers) {
     if (!t.name.trim()) problems.push("Every tier needs a name.");
     if (t.min_clips > t.max_clips) problems.push(`"${t.name}": min clips is greater than max clips.`);
   }
   const sorted = [...tiers].sort((a, b) => a.min_clips - b.min_clips);
-  if (sorted[0].min_clips !== minClips) problems.push(`The first tier must start at ${minClips} clips.`);
-  if (sorted[sorted.length - 1].max_clips !== maxClips) problems.push(`The last tier must end at ${maxClips} clips.`);
+  if (sorted[0].min_clips < floor) problems.push(`The first tier must start at ${floor} photos or more.`);
+  if (sorted[sorted.length - 1].max_clips > ceiling) problems.push(`The last tier can go up to ${ceiling} photos at most.`);
   for (let i = 1; i < sorted.length; i++) {
     const prev = sorted[i - 1];
     const cur = sorted[i];

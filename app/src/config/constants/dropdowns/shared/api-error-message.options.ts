@@ -7,7 +7,6 @@ export const ApiErrorMessageOptions: Record<string, string> = {
   render_in_progress: "You already have a video being created. Only one at a time, please wait for it to finish.",
   email_not_verified: "Please verify your email address before creating a video. We can resend the link.",
   watermark_processing: "A watermark removal is still running. Wait for it to finish, then create your video.",
-  image_count_invalid: "A video needs between 3 and 12 photos.",
   consent_required: "Please confirm you have the right to edit these images first.",
   attempts_exhausted: "You have used both watermark removal attempts for this photo.",
   project_locked: "This video has already been submitted, so it can no longer be edited.",

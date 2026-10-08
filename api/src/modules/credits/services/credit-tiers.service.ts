@@ -12,18 +12,25 @@ type TierShape = Pick<
   'name' | 'min_clips' | 'max_clips' | 'credits' | 'is_default'
 >;
 
+/** Photos-per-video range of a video, set by the tiers: lowest min_clips to highest max_clips. */
+export interface ImageLimits {
+  minImages: number;
+  maxImages: number;
+}
+
 /**
- * Tiers must exactly cover limits.minImages..maxImages (no gaps, no overlaps) and exactly one is the
- * default. Returns the problems found; an empty list means the set is valid. Exported for unit tests.
+ * Tiers are contiguous (no gaps, no overlaps) and exactly one is the default. They set the allowed
+ * photo range: the first tier may not start below `floor` (fewest clips a video can be assembled
+ * from) and the last may not end above `ceiling` (technical guard). Returns the problems found; an
+ * empty list means the set is valid. Exported for unit tests.
  */
 export function tierCoverageProblems(
   tiers: TierShape[],
-  minClips: number = appConfig.limits.minImages,
-  maxClips: number = appConfig.limits.maxImages,
+  floor: number = appConfig.limits.minImages,
+  ceiling: number = appConfig.limits.maxImagesCeiling,
 ): string[] {
   const problems: string[] = [];
-  if (!tiers.length)
-    return [`Add at least one tier covering ${minClips}-${maxClips} clips.`];
+  if (!tiers.length) return ['Add at least one tier.'];
 
   for (const t of tiers) {
     if (t.min_clips > t.max_clips)
@@ -31,10 +38,10 @@ export function tierCoverageProblems(
   }
 
   const sorted = [...tiers].sort((a, b) => a.min_clips - b.min_clips);
-  if (sorted[0].min_clips !== minClips)
-    problems.push(`The first tier must start at ${minClips} clips.`);
-  if (sorted[sorted.length - 1].max_clips !== maxClips)
-    problems.push(`The last tier must end at ${maxClips} clips.`);
+  if (sorted[0].min_clips < floor)
+    problems.push(`The first tier must start at ${floor} photos or more.`);
+  if (sorted[sorted.length - 1].max_clips > ceiling)
+    problems.push(`The last tier can go up to ${ceiling} photos at most.`);
   for (let i = 1; i < sorted.length; i++) {
     const prev = sorted[i - 1];
     const cur = sorted[i];
@@ -65,6 +72,21 @@ export class CreditTiersService {
 
   async listJson(): Promise<CreditTierJson[]> {
     return (await this.list()).map((t) => this.serialize(t));
+  }
+
+  /** Allowed photos per video, from the tiers (falls back to the floor when no tier exists). */
+  async imageLimits(
+    db: Pick<PrismaService, 'creditTier'> = this.prisma,
+  ): Promise<ImageLimits> {
+    const agg = await db.creditTier.aggregate({
+      _min: { min_clips: true },
+      _max: { max_clips: true },
+    });
+    const floor = appConfig.limits.minImages;
+    return {
+      minImages: Math.max(floor, agg._min.min_clips ?? floor),
+      maxImages: Math.max(floor, agg._max.max_clips ?? floor),
+    };
   }
 
   /** The tier a video with `clips` clips falls in; 400 when the tiers do not cover it. */

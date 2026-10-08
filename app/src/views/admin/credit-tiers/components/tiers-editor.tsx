@@ -60,7 +60,7 @@ export const TiersEditor: FC<TiersEditorProps> = ({ tiers }) => {
     (t) => Number.isFinite(t.min_clips) && Number.isFinite(t.max_clips) && Number.isFinite(t.credits),
   );
   const problems = numbersValid
-    ? tierCoverageProblems(parsed, VideoLimits.minImages, VideoLimits.maxImages)
+    ? tierCoverageProblems(parsed, VideoLimits.minImages, VideoLimits.maxImagesCeiling)
     : ["Clip counts and credits must be whole numbers."];
   const dirty = JSON.stringify(rows) !== JSON.stringify(tiers.map(toDraft));
 
@@ -73,18 +73,22 @@ export const TiersEditor: FC<TiersEditorProps> = ({ tiers }) => {
       }),
     );
 
+  // A new tier continues where the highest one ends, so extending the range is one row.
   const addRow = () =>
-    setRows((current) => [
-      ...current,
-      {
-        key: `new-${Date.now()}`,
-        name: "",
-        min_clips: "",
-        max_clips: String(VideoLimits.maxImages),
-        credits: "",
-        is_default: current.length === 0,
-      },
-    ]);
+    setRows((current) => {
+      const top = Math.max(VideoLimits.minImages - 1, ...current.map((row) => toInt(row.max_clips)).filter(Number.isFinite));
+      return [
+        ...current,
+        {
+          key: `new-${Date.now()}`,
+          name: "",
+          min_clips: String(top + 1),
+          max_clips: "",
+          credits: "",
+          is_default: current.length === 0,
+        },
+      ];
+    });
 
   return (
     <div className="flex flex-col gap-5">

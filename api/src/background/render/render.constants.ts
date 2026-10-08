@@ -46,7 +46,7 @@ export function userMessageFor(code: string, refunded: boolean): string {
     case 'blocked_no_credits':
       return `Video creation is delayed on our side and could not be finished in time.${note} Please try again later.`;
     case 'invalid_images':
-      return 'This project does not have the 3 to 12 usable photos needed for a video. Please check your photos and try again.';
+      return 'This project does not have the number of usable photos a video needs. Please check your photos and try again.';
     case 'cost_ceiling':
     case 'provider_error':
       return `Video creation is temporarily unavailable.${note} Please try again later.`;

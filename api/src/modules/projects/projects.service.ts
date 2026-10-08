@@ -20,6 +20,7 @@ import { ApiException } from '@/shared/errors/api-exception';
 import { SystemFlagsService } from '@/modules/system-flags/system-flags.service';
 import { UsageService } from '@/modules/usage/usage.service';
 import { CreditsService } from '@/modules/credits/credits.service';
+import { CreditTiersService } from '@/modules/credits/services/credit-tiers.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { SubmitProjectDto } from './dto/submit-project.dto';
@@ -51,6 +52,7 @@ export class ProjectsService {
     private readonly queues: QueuesService,
     private readonly usage: UsageService,
     private readonly credits: CreditsService,
+    private readonly tiers: CreditTiersService,
     private readonly flags: SystemFlagsService,
     private readonly gcs: GcsObjectsService,
     private readonly media: MediaUrlsService,
@@ -304,13 +306,13 @@ export class ProjectsService {
     dto: SubmitProjectDto,
     ip: string | null,
   ): Promise<ProjectJson> {
-    const limits = getLimits();
-    const [project, user] = await Promise.all([
+    const [project, user, limits] = await Promise.all([
       this.findOwnedOrThrow(userId, projectId),
       this.prisma.user.findUnique({
         where: { id: userId },
         select: { email_verified_at: true },
       }),
+      this.tiers.imageLimits(),
     ]);
 
     if (!user?.email_verified_at) {

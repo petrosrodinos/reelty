@@ -14,7 +14,7 @@ const tier = (
 });
 
 describe('tierCoverageProblems', () => {
-  it('accepts tiers that exactly cover the range with one default', () => {
+  it('accepts contiguous tiers with one default', () => {
     expect(
       tierCoverageProblems(
         [
@@ -23,35 +23,34 @@ describe('tierCoverageProblems', () => {
           tier('Long', 10, 12),
         ],
         3,
-        12,
+        100,
       ),
     ).toEqual([]);
   });
 
-  it('flags gaps, overlaps, wrong ends and default count', () => {
+  it('lets the tiers set the range (more photos, higher start)', () => {
     expect(
-      tierCoverageProblems([tier('A', 3, 5), tier('B', 7, 12)], 3, 12),
+      tierCoverageProblems([tier('A', 5, 20, true), tier('B', 21, 40)], 3, 100),
+    ).toEqual([]);
+  });
+
+  it('flags gaps, overlaps, floor, ceiling and default count', () => {
+    expect(
+      tierCoverageProblems([tier('A', 3, 5), tier('B', 7, 12)], 3, 100),
     ).toEqual([
       'No tier covers 6-6 clips.',
       'Exactly one tier must be the default.',
     ]);
     expect(
-      tierCoverageProblems([tier('A', 3, 7, true), tier('B', 7, 12)], 3, 12),
+      tierCoverageProblems([tier('A', 3, 7, true), tier('B', 7, 12)], 3, 100),
     ).toEqual(['"A" and "B" overlap.']);
-    expect(tierCoverageProblems([tier('A', 4, 11, true)], 3, 12)).toEqual([
-      'The first tier must start at 3 clips.',
-      'The last tier must end at 12 clips.',
+    expect(tierCoverageProblems([tier('A', 2, 101, true)], 3, 100)).toEqual([
+      'The first tier must start at 3 photos or more.',
+      'The last tier can go up to 100 photos at most.',
     ]);
-    expect(
-      tierCoverageProblems(
-        [tier('A', 3, 12, true), tier('B', 12, 12, true)],
-        3,
-        12,
-      ),
-    ).toContain('Exactly one tier must be the default.');
   });
 
   it('requires at least one tier', () => {
-    expect(tierCoverageProblems([], 3, 12)).toHaveLength(1);
+    expect(tierCoverageProblems([], 3, 100)).toHaveLength(1);
   });
 });

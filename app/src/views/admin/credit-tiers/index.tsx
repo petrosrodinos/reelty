@@ -21,8 +21,9 @@ const AdminCreditTiersContent: FC = () => {
         <p className="text-eyebrow text-muted-foreground">Admin</p>
         <h1 className="text-display-lg mt-2">Credit tiers</h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          What a video costs in credits, by number of photos. Tiers must cover every photo count with no gaps or
-          overlaps. The default tier prices one &ldquo;video&rdquo; on the buy-credits slider. Add-ons (watermark
+          What a video costs in credits, by number of photos. The tiers also set how many photos a video can use:
+          from the lowest tier&rsquo;s minimum to the highest tier&rsquo;s maximum, so add a tier to allow longer
+          videos. Tiers must follow each other with no gaps or overlaps. The default tier prices one &ldquo;video&rdquo; on the buy-credits slider. Add-ons (watermark
           removal, link import), the signup grant and credits per euro are on the{" "}
           <Link href={Routes.adminConfig} className="underline underline-offset-4">
             Prices

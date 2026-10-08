@@ -312,8 +312,9 @@ model UsageLedger {
   @@map("usage_ledger")
 }
 
-// Video price tiers by clip count, managed by admins. Tiers must cover limits.minImages..maxImages
-// with no gaps or overlaps; exactly one is_default tier (used by the purchase slider: videos -> credits).
+// Video price tiers by clip count, managed by admins. Tiers are contiguous (no gaps or overlaps) and set
+// the allowed photos per video (lowest min_clips..highest max_clips); exactly one is_default tier
+// (used by the purchase slider: videos -> credits).
 model CreditTier {
   id         String   @id @default(uuid())
   name       String

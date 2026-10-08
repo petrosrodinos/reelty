@@ -14,9 +14,10 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Limits } from '@/core/queues/queues.constants';
+import { appConfig } from '@/shared/config/app';
 
 export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
-export const MAX_FILES_PER_CALL = 12;
+export const MAX_FILES_PER_CALL = appConfig.limits.maxImagesCeiling;
 
 export class UploadFileDto {
   @ApiProperty({ example: 'living-room.jpg' })
