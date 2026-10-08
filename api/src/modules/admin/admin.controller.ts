@@ -49,6 +49,12 @@ export class AdminController {
     return this.adminService.updateConfig(key, dto.value);
   }
 
+  @Get('users')
+  @ApiOperation({ summary: 'All users (id, email) for admin filters' })
+  listUsers() {
+    return this.adminService.listUsers();
+  }
+
   @Get('usage')
   @ApiOperation({ summary: 'Usage ledger across all users with credits and USD cost, plus totals' })
   @ApiQuery({ name: 'page', required: false, type: Number })

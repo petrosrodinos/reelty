@@ -60,4 +60,14 @@ export interface CostHistoryQuery {
   page?: number;
   limit?: number;
   kind?: CostLedgerKind;
+  user_id?: string;
+  /** ISO datetime, inclusive. */
+  from?: string;
+  /** ISO datetime, exclusive. */
+  to?: string;
+}
+
+export interface AdminUserOption {
+  id: string;
+  email: string;
 }

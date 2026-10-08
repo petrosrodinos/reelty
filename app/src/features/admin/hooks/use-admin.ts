@@ -3,10 +3,11 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getApiErrorMessage } from "@/config/constants/dropdowns/shared/api-error-message.options";
 import type { CostHistoryQuery } from "@/features/admin/interfaces/admin.interfaces";
-import { getAppConfig, getCostHistory, updateAppConfig } from "@/features/admin/services/admin.services";
+import { getAdminUsers, getAppConfig, getCostHistory, updateAppConfig } from "@/features/admin/services/admin.services";
 import { toast } from "@/hooks/use-toast";
 
 export const APP_CONFIG_QUERY_KEY = "admin-app-config";
+export const ADMIN_USERS_QUERY_KEY = "admin-users";
 export const COST_HISTORY_QUERY_KEY = "admin-cost-history";
 
 /** Provider prices and fallbacks (admin only). */
@@ -36,4 +37,9 @@ export const useCostHistory = (query: CostHistoryQuery = {}) => {
     placeholderData: keepPreviousData,
     staleTime: 15_000,
   });
+};
+
+/** Every user, for the admin filter dropdown. */
+export const useAdminUsers = () => {
+  return useQuery({ queryKey: [ADMIN_USERS_QUERY_KEY], queryFn: getAdminUsers, staleTime: 60_000 });
 };

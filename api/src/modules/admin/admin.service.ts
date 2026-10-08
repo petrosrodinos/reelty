@@ -27,6 +27,14 @@ export class AdminService {
     return this.appConfig.update(key, value);
   }
 
+  async listUsers() {
+    const users = await this.prisma.user.findMany({
+      orderBy: { email: 'asc' },
+      select: { id: true, email: true },
+    });
+    return users;
+  }
+
   getCostHistory(query: AdminUsageQueryType) {
     return this.usage.getCostHistory(query);
   }

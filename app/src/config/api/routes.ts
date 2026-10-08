@@ -33,6 +33,7 @@ export const ApiRoutes = {
     config: "/admin/config",
     configByKey: (key: string) => `/admin/config/${encodeURIComponent(key)}`,
     usage: "/admin/usage",
+    users: "/admin/users",
   },
   usage: {
     prefix: "/usage",

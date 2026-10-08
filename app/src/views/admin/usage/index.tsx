@@ -3,11 +3,12 @@
 import { useState, type FC } from "react";
 import { ReceiptTextIcon, WifiOffIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatePanel } from "@/components/ui/state-panel";
 import { CostLedgerKindFilterOptions } from "@/config/constants/dropdowns/admin/cost-ledger-kind-filter.options";
-import { useCostHistory } from "@/features/admin/hooks/use-admin";
+import { useAdminUsers, useCostHistory } from "@/features/admin/hooks/use-admin";
 import type { CostLedgerKind } from "@/features/admin/interfaces/admin.interfaces";
 import { AdminGuard } from "@/views/admin/components/admin-guard";
 import { AdminTabs } from "@/views/admin/components/admin-tabs";
@@ -33,16 +34,36 @@ const CostSkeleton: FC = () => (
 
 const AdminUsageContent: FC = () => {
   const [kind, setKind] = useState<CostLedgerKind | "all">("all");
+  const [userId, setUserId] = useState("all");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [page, setPage] = useState(1);
+
+  const { data: users } = useAdminUsers();
+  const userItems = [
+    { value: "all", label: "All users" },
+    ...(users ?? []).map((user) => ({ value: user.id, label: user.email })),
+  ];
 
   const { data, isPending, error, refetch, isFetching } = useCostHistory({
     page,
     kind: kind === "all" ? undefined : kind,
+    user_id: userId === "all" ? undefined : userId,
+    // Date inputs are local calendar days: from is the start of that day, to is the start of the day after.
+    from: fromDate ? new Date(`${fromDate}T00:00:00`).toISOString() : undefined,
+    to: toDate ? new Date(new Date(`${toDate}T00:00:00`).getTime() + 86_400_000).toISOString() : undefined,
   });
 
   const entries = data?.data ?? [];
   const pagination = data?.pagination;
-  const filtered = kind !== "all";
+  const filtered = kind !== "all" || userId !== "all" || Boolean(fromDate) || Boolean(toDate);
+  const clearFilters = () => {
+    setKind("all");
+    setUserId("all");
+    setFromDate("");
+    setToDate("");
+    setPage(1);
+  };
 
   return (
     <div className="page-container py-10 md:py-14">
@@ -77,6 +98,52 @@ const AdminUsageContent: FC = () => {
             ))}
           </SelectContent>
         </Select>
+        <Select
+          value={userId}
+          onValueChange={(value) => {
+            setUserId(value as string);
+            setPage(1);
+          }}
+          items={userItems}
+        >
+          <SelectTrigger aria-label="Filter by user" className="h-11 w-full sm:w-72">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {userItems.map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                {item.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Input
+          type="date"
+          aria-label="From date"
+          className="h-11 w-full sm:w-40"
+          value={fromDate}
+          max={toDate || undefined}
+          onChange={(event) => {
+            setFromDate(event.target.value);
+            setPage(1);
+          }}
+        />
+        <Input
+          type="date"
+          aria-label="To date"
+          className="h-11 w-full sm:w-40"
+          value={toDate}
+          min={fromDate || undefined}
+          onChange={(event) => {
+            setToDate(event.target.value);
+            setPage(1);
+          }}
+        />
+        {filtered ? (
+          <Button variant="ghost" onClick={clearFilters}>
+            Clear filters
+          </Button>
+        ) : null}
         {pagination ? (
           <p className="text-sm text-muted-foreground" aria-live="polite">
             {pagination.total} {pagination.total === 1 ? "entry" : "entries"}
@@ -107,8 +174,8 @@ const AdminUsageContent: FC = () => {
           }
         >
           {filtered ? (
-            <Button variant="outline" onClick={() => setKind("all")}>
-              Clear filter
+            <Button variant="outline" onClick={clearFilters}>
+              Clear filters
             </Button>
           ) : null}
         </StatePanel>
