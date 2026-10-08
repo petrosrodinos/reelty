@@ -30,6 +30,8 @@ export interface ApifyRunResult<T> {
 
 const TERMINAL_OK = 'SUCCEEDED';
 const TERMINAL_BAD = new Set(['FAILED', 'ABORTED', 'TIMED-OUT']);
+const USAGE_SETTLE_INTERVAL_MS = 3_000;
+const USAGE_SETTLE_MAX_READS = 5;
 
 /** Thin wrapper around apify-client: `start` + poll (no blocking `call`) with a hard timeout. */
 @Injectable()
@@ -79,6 +81,28 @@ export class ApifyService {
     }
 
     const { items } = await client.dataset(run.defaultDatasetId).listItems({ limit: opts.maxItems ?? 50 });
-    return { runId, items: items as T[], usageUsd: typeof run.usageTotalUsd === 'number' ? run.usageTotalUsd : null };
+    const usageUsd = await this.settledUsage(client, runId, run.usageTotalUsd);
+    return { runId, items: items as T[], usageUsd };
+  }
+
+  /**
+   * Apify finalizes `usageTotalUsd` (and pay-per-event charges) a little after the run reports SUCCEEDED,
+   * so the first read undercounts. Re-read until two consecutive values match; best effort, never throws.
+   */
+  private async settledUsage(client: ApifyClient, runId: string, initial: unknown): Promise<number | null> {
+    let last = typeof initial === 'number' ? initial : null;
+    for (let i = 0; i < USAGE_SETTLE_MAX_READS; i++) {
+      await new Promise((r) => setTimeout(r, USAGE_SETTLE_INTERVAL_MS));
+      try {
+        const latest = await client.run(runId).get();
+        const next = typeof latest?.usageTotalUsd === 'number' ? latest.usageTotalUsd : null;
+        if (next !== null && next === last) return next;
+        if (next !== null) last = next;
+      } catch (error) {
+        this.logger.warn(`Could not re-read usage for Apify run ${runId}: ${(error as Error).message}`);
+        break;
+      }
+    }
+    return last;
   }
 }
