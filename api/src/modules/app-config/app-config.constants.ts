@@ -16,18 +16,18 @@ export interface AppConfigDefault {
 
 /**
  * Used when a row is missing (e.g. before the migration seed ran). Mirrors the seed in
- * prisma/migrations/0002_app_config_and_cost. The USD rates are placeholders until set from real plan prices.
+ * prisma/migrations/0002_app_config_and_cost. Higgsfield figures come from its estimate endpoint.
  */
 export const APP_CONFIG_DEFAULTS: Record<AppConfigKey, AppConfigDefault> = {
   [AppConfigKeys.HIGGSFIELD_USD_PER_CREDIT]: {
-    value: 0.05,
+    value: 0.0627,
     unit: 'usd',
-    description: 'PLACEHOLDER: USD cost of one Higgsfield credit. Set from your plan price (plan price / credits in plan).',
+    description: 'USD cost of one Higgsfield credit (from the API estimate: $0.179 / 2.856 credits, after the 15% API discount).',
   },
   [AppConfigKeys.HIGGSFIELD_FALLBACK_CREDITS_PER_CLIP]: {
-    value: 7.5,
+    value: 2.856,
     unit: 'credits',
-    description: 'Credits per 5 s clip, used only when the cost preflight answers in an unexpected shape.',
+    description: 'Credits per 5 s Kling 2.5 turbo clip, used only when the estimate endpoint is unavailable.',
   },
   [AppConfigKeys.DEWATERMARK_CREDITS_PER_IMAGE]: {
     value: 1,

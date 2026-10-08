@@ -5,7 +5,7 @@ import { Toast as ToastPrimitive } from "@base-ui/react/toast"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { XIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
+import { XIcon,CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
 
 const toast = ToastPrimitive.createToastManager()
 
@@ -186,7 +186,11 @@ function ToastList() {
     <Toast key={toastItem.id} toast={toastItem}>
       <ToastContent>
         <ToastIcon type={toastItem.type} />
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
+        {/* Stop pointerdown so selecting text doesn't start a swipe-to-dismiss */}
+        <div
+          className="flex min-w-0 flex-1 cursor-text select-text flex-col gap-1"
+          onPointerDown={(event) => event.stopPropagation()}
+        >
           <ToastTitle />
           <ToastDescription />
         </div>

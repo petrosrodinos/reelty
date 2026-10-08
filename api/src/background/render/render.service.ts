@@ -168,7 +168,7 @@ export class RenderService {
         if (error instanceof ProviderRejectedError) {
           // this single photo cannot be used; the video is built without it
           await this.prisma.image.update({ where: { id: img.id }, data: { clip_status: 'failed' } });
-          await this.log(project.id, ctx, 'warning', 'PREPARING', `Image ${img.id} was rejected by the provider`);
+          await this.log(project.id, ctx, 'warning', 'PREPARING', `Image ${img.id} was rejected by the provider: ${(error as Error).message}`);
           return;
         }
         throw error;

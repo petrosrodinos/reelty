@@ -19,14 +19,8 @@ import {
   VideoGenerationProvider,
 } from '../video-generation.provider';
 import { HIGGSFIELD_CONFIG, HiggsfieldEndpoint } from './higgsfield.config';
-import {
-  looksLikeOutOfCredits,
-  parseBalance,
-  parseBatchResults,
-  parseCredits,
-  parseJobStates,
-  parseMediaId,
-} from './higgsfield.parsers';
+import { looksLikeOutOfCredits, parseEstimateCredits, parseJobState, parseRequestId } from './higgsfield.parsers';
+import { mapPool } from '@/background/common/pool';
 
 class HiggsfieldHttpError extends Error {
   constructor(
@@ -60,71 +54,69 @@ export class HiggsfieldProvider implements VideoGenerationProvider {
   // -- VideoGenerationProvider -------------------------------------------------------------------
 
   async getBalance(): Promise<number | null> {
-    try {
-      return parseBalance(await this.call(HIGGSFIELD_CONFIG.endpoints.balance));
-    } catch (error) {
-      if (error instanceof ProviderConfigError) throw error;
-      this.logger.warn(`Could not read Higgsfield balance: ${(error as Error).message}`);
-      return null; // unknown balance: do not block, submit errors still reveal exhausted credits
-    }
+    return null; // Higgsfield exposes no balance endpoint; submit errors (402) reveal exhausted credits
   }
 
+  /** Uploads the image to Higgsfield storage; the returned "media id" is its public URL. */
   async importImage(input: ImportImageInput): Promise<ImportImageResult> {
-    // Short-lived signed URL: handed to Higgsfield only, never stored or logged.
-    const url = await this.gcs.getSignedReadUrl(input.gcsPath, {
-      expiresSeconds: HIGGSFIELD_CONFIG.importUrlTtlSeconds,
-    });
+    const contentType = /\.png$/i.test(input.gcsPath) ? 'image/png' : /\.webp$/i.test(input.gcsPath) ? 'image/webp' : 'image/jpeg';
+    const data = await this.gcs.downloadToBuffer(input.gcsPath);
     let json: unknown;
     try {
-      json = await this.call(HIGGSFIELD_CONFIG.endpoints.importMedia, { url, type: 'image' });
+      json = await this.call(HIGGSFIELD_CONFIG.endpoints.uploadUrl, { content_type: contentType });
     } catch (error) {
-      if (error instanceof HiggsfieldHttpError) throw new ProviderRejectedError(`Higgsfield rejected the image (HTTP ${error.status})`);
+      if (error instanceof HiggsfieldHttpError) throw new ProviderRejectedError(`Higgsfield rejected the upload request (HTTP ${error.status}: ${error.bodyText.slice(0, 200)})`);
       throw error;
     }
-    const mediaId = parseMediaId(json);
-    if (!mediaId) throw new ProviderTransientError('Higgsfield import returned no media id');
-    return { mediaId };
+    const o = (json && typeof json === 'object' ? json : {}) as { public_url?: string; upload_url?: string; upload_headers?: Record<string, string> };
+    if (!o.public_url || !o.upload_url) throw new ProviderTransientError('Higgsfield upload URL response was incomplete');
+    let res: Response;
+    try {
+      // Presigned storage URL: never send our API credentials here.
+      res = await fetch(o.upload_url, {
+        method: 'PUT',
+        headers: { 'Content-Type': contentType, ...(o.upload_headers ?? {}) },
+        body: new Uint8Array(data),
+        signal: AbortSignal.timeout(HIGGSFIELD_CONFIG.requestTimeoutMs * 2),
+      });
+    } catch (error) {
+      throw new ProviderTransientError(`Higgsfield upload failed (${(error as Error).name})`);
+    }
+    if (!res.ok) throw new ProviderTransientError(`Higgsfield upload failed (HTTP ${res.status})`);
+    return { mediaId: o.public_url };
   }
 
+  /** Authoritative per-clip price from Higgsfield's estimate endpoint; the configured fallback if it is unavailable. */
   async getCost(query: CostQuery): Promise<ClipCost> {
-    const json = await this.call(HIGGSFIELD_CONFIG.endpoints.generateVideo, {
-      ...this.params(query.mediaId, query.prompt),
-      get_cost: true,
-    });
-    const credits = parseCredits(json);
-    if (credits === undefined) {
-      const fallback = await this.appConfig.getNumber(AppConfigKeys.HIGGSFIELD_FALLBACK_CREDITS_PER_CLIP);
-      this.logger.warn(`Cost preflight answered in an unexpected shape; using the configured ${fallback} credits per clip`);
-      return { creditsPerClip: fallback };
+    try {
+      const json = await this.call(HIGGSFIELD_CONFIG.endpoints.estimate, {
+        prompt: query.prompt,
+        image_url: query.mediaId,
+        duration: HIGGSFIELD_CONFIG.generation.duration,
+      });
+      const credits = parseEstimateCredits(json);
+      if (credits !== undefined) return { creditsPerClip: credits };
+    } catch (error) {
+      if (error instanceof ProviderConfigError) throw error;
+      this.logger.warn(`Higgsfield cost estimate failed: ${(error as Error).message}`);
     }
-    return { creditsPerClip: credits };
+    const fallback = await this.appConfig.getNumber(AppConfigKeys.HIGGSFIELD_FALLBACK_CREDITS_PER_CLIP);
+    return { creditsPerClip: fallback };
   }
 
   async submitClips(requests: ClipRequest[], hooks: SubmitHooks = {}): Promise<ClipSubmitResult[]> {
-    const results: ClipSubmitResult[] = [];
-    const size = HIGGSFIELD_CONFIG.maxBatchSize;
-    for (let i = 0; i < requests.length; i += size) {
-      const chunk = requests.slice(i, i + size);
-      const chunkResults = await this.submitBatch(chunk);
-      for (const r of chunkResults) {
-        if (hooks.onResult) await hooks.onResult(r);
-        results.push(r);
-      }
-    }
-    return results;
+    return mapPool(requests, HIGGSFIELD_CONFIG.concurrency, async (r) => {
+      const result = await this.submitOne(r);
+      if (hooks.onResult) await hooks.onResult(result);
+      return result;
+    });
   }
 
   async waitForJobs(jobIds: string[]): Promise<ClipJobState[]> {
-    const states: ClipJobState[] = [];
-    const size = HIGGSFIELD_CONFIG.maxWaitBatch;
-    for (let i = 0; i < jobIds.length; i += size) {
-      const chunk = jobIds.slice(i, i + size);
-      const json = await this.call(HIGGSFIELD_CONFIG.endpoints.jobsWait, {
-        job_ids: chunk,
-        timeout_seconds: HIGGSFIELD_CONFIG.waitTimeoutSeconds,
-      });
-      states.push(...parseJobStates(json));
-    }
+    const states = await mapPool(jobIds, HIGGSFIELD_CONFIG.concurrency, async (jobId) => {
+      const json = await this.call(HIGGSFIELD_CONFIG.endpoints.requestStatus(jobId));
+      return parseJobState(jobId, json);
+    });
     return states;
   }
 
@@ -145,48 +137,23 @@ export class HiggsfieldProvider implements VideoGenerationProvider {
 
   // -- internals ---------------------------------------------------------------------------------
 
-  private params(mediaId: string, prompt: string) {
-    const g = HIGGSFIELD_CONFIG.generation;
-    return {
-      model: g.model,
-      aspect_ratio: g.aspect_ratio,
-      duration: g.duration,
-      genre: g.genre,
-      sound: g.sound,
-      medias: [{ role: g.mediaRole, value: mediaId }],
-      prompt,
-    };
-  }
-
-  private async submitBatch(chunk: ClipRequest[]): Promise<ClipSubmitResult[]> {
-    let json: unknown;
+  private async submitOne(r: ClipRequest): Promise<ClipSubmitResult> {
     try {
-      json = await this.call(HIGGSFIELD_CONFIG.endpoints.generateVideoBatch, {
-        requests: chunk.map((c) => ({ index: c.index, params: this.params(c.mediaId, c.prompt) })),
+      const json = await this.call(HIGGSFIELD_CONFIG.endpoints.generateVideo, {
+        prompt: r.prompt,
+        image_url: r.mediaId,
+        duration: HIGGSFIELD_CONFIG.generation.duration,
       });
+      const jobId = parseRequestId(json);
+      if (jobId) return { index: r.index, imageId: r.imageId, ok: true, jobId };
+      return { index: r.index, imageId: r.imageId, ok: false, errorMessage: 'no request id returned' };
     } catch (error) {
-      if (error instanceof HiggsfieldHttpError && (error.status === 402 || looksLikeOutOfCredits(error.bodyText))) {
-        return chunk.map((c) => ({ index: c.index, imageId: c.imageId, ok: false, outOfCredits: true }));
-      }
       if (error instanceof HiggsfieldHttpError) {
-        return chunk.map((c) => ({ index: c.index, imageId: c.imageId, ok: false, errorMessage: `HTTP ${error.status}` }));
+        const outOfCredits = error.status === 402 || looksLikeOutOfCredits(error.bodyText);
+        return { index: r.index, imageId: r.imageId, ok: false, outOfCredits, errorMessage: `HTTP ${error.status}: ${error.bodyText.slice(0, 200)}` };
       }
       throw error;
     }
-
-    const parsed = parseBatchResults(json);
-    return chunk.map((c, position) => {
-      // match by the index we sent; fall back to response order
-      const item = parsed.find((p) => p.index === c.index) ?? (parsed.every((p) => p.index === undefined) ? parsed[position] : undefined);
-      if (item?.jobId) return { index: c.index, imageId: c.imageId, ok: true, jobId: item.jobId };
-      return {
-        index: c.index,
-        imageId: c.imageId,
-        ok: false,
-        outOfCredits: looksLikeOutOfCredits(item?.error),
-        errorMessage: item?.error ?? 'no job id returned',
-      };
-    });
   }
 
   private async call(endpoint: HiggsfieldEndpoint, body?: unknown): Promise<unknown> {
@@ -208,7 +175,7 @@ export class HiggsfieldProvider implements VideoGenerationProvider {
         method: endpoint.method,
         headers,
         body: body !== undefined ? JSON.stringify(body) : undefined,
-        signal: AbortSignal.timeout(HIGGSFIELD_CONFIG.requestTimeoutMs + HIGGSFIELD_CONFIG.waitTimeoutSeconds * 1000),
+        signal: AbortSignal.timeout(HIGGSFIELD_CONFIG.requestTimeoutMs),
       });
     } catch (error) {
       throw new ProviderTransientError(`Higgsfield request failed (${(error as Error).name})`);

@@ -107,3 +107,24 @@ export function parseJobStates(json: unknown): ClipJobState[] {
   }
   return out;
 }
+
+export function parseRequestId(json: unknown): string | undefined {
+  return firstString(unwrap(json), ['request_id', 'requestId', 'id']);
+}
+
+/** One `GET /requests/{id}/status` response: `{ status, video?: { url }, error? }`. */
+export function parseJobState(jobId: string, json: unknown): ClipJobState {
+  const o = unwrap(json);
+  const err = o.error;
+  return {
+    jobId,
+    status: mapJobStatus(firstString(o, ['status', 'state'])),
+    resultUrl: firstString(asRecord(o.video), ['url']) ?? firstString(o, ['result_url', 'url']),
+    errorMessage: typeof err === 'string' ? err : err && typeof err === 'object' ? firstString(asRecord(err), ['message']) : undefined,
+  };
+}
+
+/** `POST /estimate/...` -> `{ credits: "2.856", usd: "0.179" }` (numbers arrive as strings). */
+export function parseEstimateCredits(json: unknown): number | undefined {
+  return firstNumber(unwrap(json), ['credits']);
+}

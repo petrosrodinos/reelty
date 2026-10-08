@@ -21,6 +21,6 @@ export const appConfig = {
   higgsfield: {
     baseUrl: 'https://api.higgsfield.ai',
     /** Per-clip credit ceiling for the cost preflight. */
-    maxClipCredits: 15,
+    maxClipCredits: 6,
   },
 } as const;
