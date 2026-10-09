@@ -59,10 +59,10 @@ export const APP_CONFIG_DEFAULTS: Record<AppConfigKey, AppConfigDefault> = {
       'USD cost of one listing scrape, used only when Apify does not report the run usage.',
   },
   [AppConfigKeys.BILLING_CREDITS_PER_EUR]: {
-    value: 1,
+    value: 4,
     unit: 'credits',
     description:
-      'Whole credits a user gets for 1 EUR (e.g. 3 makes one credit cost €0.33). Price of a purchase = credits / this value, rounded to the cent.',
+      'Base rate: whole credits a user gets for 1 EUR (4 makes one credit cost €0.25). Bigger purchases can get a better rate from the volume pricing tiers. Price of a purchase = credits / rate, rounded to the cent.',
     integer: true,
     min: 1,
   },
@@ -73,20 +73,20 @@ export const APP_CONFIG_DEFAULTS: Record<AppConfigKey, AppConfigDefault> = {
       'USD per 1 EUR, snapshotted onto each purchase for the USD columns.',
   },
   [AppConfigKeys.BILLING_MAX_CREDITS_PER_PURCHASE]: {
-    value: 500,
+    value: 2000,
     unit: 'credits',
     description: 'Largest number of credits one checkout may buy.',
     integer: true,
     min: 1,
   },
   [AppConfigKeys.CREDITS_SIGNUP_GRANT]: {
-    value: 3,
+    value: 12,
     unit: 'credits',
     description: 'Free credits given once to every new account.',
     integer: true,
   },
   [AppConfigKeys.CREDITS_WATERMARK_REMOVAL]: {
-    value: 1,
+    value: 4,
     unit: 'credits',
     description:
       'Flat add-on per video when at least one photo had its watermark removed.',

@@ -9,6 +9,8 @@ import {
   getAdminPurchases,
   getAdminUsers,
   getAnalytics,
+  getCreditRates,
+  replaceCreditRates,
   getAppConfig,
   getCostHistory,
   getCreditTiers,
@@ -102,6 +104,28 @@ export const useReplaceCreditTiers = () => {
     },
     onError: (error) => {
       toast({ title: "Could not save the tiers", description: getApiErrorMessage(error), variant: "error" });
+    },
+  });
+};
+
+export const CREDIT_RATES_QUERY_KEY = "admin-credit-rates";
+
+/** Volume pricing tiers: better credits-per-euro rates for bigger purchases (admin only). */
+export const useCreditRates = () => {
+  return useQuery({ queryKey: [CREDIT_RATES_QUERY_KEY], queryFn: getCreditRates, staleTime: 30_000 });
+};
+
+export const useReplaceCreditRates = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: replaceCreditRates,
+    onSuccess: (tiers) => {
+      queryClient.setQueryData([CREDIT_RATES_QUERY_KEY], tiers);
+      queryClient.invalidateQueries({ queryKey: [CREDITS_QUERY_KEY] });
+      toast({ title: "Volume pricing saved", description: "It applies to purchases started from now on." });
+    },
+    onError: (error) => {
+      toast({ title: "Could not save volume pricing", description: getApiErrorMessage(error), variant: "error" });
     },
   });
 };

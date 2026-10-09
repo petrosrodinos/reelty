@@ -32,7 +32,6 @@ export class AppConfigService {
       return {
         key,
         value: row?.value ?? fallback.value,
-        // Unit and description are owned by the code; stored copies may predate a wording change.
         unit: fallback.unit,
         description: fallback.description,
         integer: !!fallback.integer,
@@ -66,17 +65,35 @@ export class AppConfigService {
         `This value must be ${min} or more.`,
       );
     }
-    const meta = { unit: fallback.unit, description: fallback.description };
+    if (key === AppConfigKeys.BILLING_CREDITS_PER_EUR) {
+      // Volume pricing tiers must beat the base rate, so the base stays below the lowest tier rate.
+      const lowest = await this.prisma.creditRateTier.findFirst({
+        orderBy: { credits_per_eur: 'asc' },
+        select: { credits_per_eur: true },
+      });
+      if (lowest && value >= lowest.credits_per_eur) {
+        throw new ApiException(
+          HttpStatus.BAD_REQUEST,
+          ErrorCodes.VALIDATION,
+          `The base rate must be below the lowest volume rate (${lowest.credits_per_eur} credits per €1).`,
+        );
+      }
+    }
     const row = await this.prisma.appConfig.upsert({
       where: { key },
-      update: { value, ...meta },
-      create: { key, value, ...meta },
+      update: { value },
+      create: {
+        key,
+        value,
+        unit: fallback.unit,
+        description: fallback.description,
+      },
     });
     return {
       key: row.key,
       value: row.value,
-      unit: row.unit,
-      description: row.description,
+      unit: fallback.unit,
+      description: fallback.description,
       integer: !!fallback.integer,
       min,
       stored: true,

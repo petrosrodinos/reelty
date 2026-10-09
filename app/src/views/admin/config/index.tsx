@@ -8,7 +8,9 @@ import { StatePanel } from "@/components/ui/state-panel";
 import {
   useAdminPurchases,
   useAppConfig,
+  useCreditRates,
   useCreditTiers,
+  useReplaceCreditRates,
   useUpdateAppConfig,
 } from "@/features/admin/hooks/use-admin";
 import { AdminGuard } from "@/views/admin/components/admin-guard";
@@ -28,6 +30,8 @@ const AdminConfigContent: FC = () => {
   const { data, isPending, error, refetch, isFetching } = useAppConfig();
   const update = useUpdateAppConfig();
   const tiers = useCreditTiers();
+  const creditRates = useCreditRates();
+  const replaceRates = useReplaceCreditRates();
   // Only the summary is needed: its average fee comes from the fees Stripe reported on each paid purchase.
   const purchases = useAdminPurchases({ limit: 1 });
   const feeSummary = purchases.data?.summary;
@@ -63,17 +67,30 @@ const AdminConfigContent: FC = () => {
         <StatePanel icon={<SettingsIcon className="size-6" />} title="No prices configured" />
       ) : (
         <>
-          {tiers.data ? (
+          {tiers.data && creditRates.data ? (
             <UnitEconomicsCalculator
-              key={rateItem?.updated_at ?? "default"}
+              // Remount after either save so the drafts restart from what is stored.
+              key={`${rateItem?.updated_at ?? "default"}-${creditRates.dataUpdatedAt}`}
               items={data}
               tiers={tiers.data}
+              rateTiers={creditRates.data}
               stripeFeePct={feeSummary?.purchases ? feeSummary.avg_fee_pct : null}
               feeSamples={feeSummary?.purchases ?? 0}
-              isSaving={update.isPending && update.variables?.key === CREDITS_PER_EUR_KEY}
-              onSaveCreditsPerEur={(value) => update.mutate({ key: CREDITS_PER_EUR_KEY, value })}
+              isSaving={(update.isPending && update.variables?.key === CREDITS_PER_EUR_KEY) || replaceRates.isPending}
+              onSave={({ creditsPerEur, rateTiers }) => {
+                // The API keeps the base below every tier rate, checking each against the other's stored value:
+                // a higher base needs the new tiers saved first, a lower base goes first.
+                const saveBase = (then?: () => void) =>
+                  creditsPerEur === undefined
+                    ? then?.()
+                    : update.mutate({ key: CREDITS_PER_EUR_KEY, value: creditsPerEur }, { onSuccess: then });
+                const saveTiers = (then?: () => void) =>
+                  rateTiers ? replaceRates.mutate(rateTiers, { onSuccess: then }) : then?.();
+                if (creditsPerEur !== undefined && creditsPerEur > (rateItem?.value ?? 0)) saveTiers(() => saveBase());
+                else saveBase(() => saveTiers());
+              }}
             />
-          ) : tiers.isPending ? (
+          ) : tiers.isPending || creditRates.isPending ? (
             <Skeleton className="mb-8 h-96 w-full rounded-lg" aria-label="Loading the calculator" />
           ) : null}
           <div className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline">

@@ -19,7 +19,8 @@ import { AppConfigEntity } from '@/modules/app-config/entities/app-config.entity
 import { UpdateAppConfigDto } from '@/modules/app-config/dto/update-app-config.dto';
 import { CostHistoryEntity, ProjectCostEntity } from '@/modules/usage/entities/usage.entity';
 import { AdminUsageQuerySchema, type AdminUsageQueryType } from '@/modules/usage/dto/usage-history-query.schema';
-import { CreditTierEntity } from '@/modules/credits/entities/credits.entity';
+import { CreditRateTierEntity, CreditTierEntity } from '@/modules/credits/entities/credits.entity';
+import { ReplaceCreditRateTiersDto } from '@/modules/credits/dto/credit-rate-tier.dto';
 import { ReplaceCreditTiersDto } from '@/modules/credits/dto/credit-tier.dto';
 import { GrantCreditsDto } from '@/modules/credits/dto/grant-credits.dto';
 import { AdminPurchasesEntity } from '@/modules/billing/entities/billing.entity';
@@ -114,6 +115,23 @@ export class AdminController {
   @ApiResponse({ status: 400, description: 'invalid_tiers' })
   replaceCreditTiers(@Body() dto: ReplaceCreditTiersDto) {
     return this.adminService.replaceCreditTiers(dto);
+  }
+
+  @Get('credit-rates')
+  @ApiOperation({ summary: 'Volume pricing tiers: better credits-per-euro rates for bigger purchases' })
+  @ApiResponse({ status: 200, type: [CreditRateTierEntity] })
+  listCreditRates() {
+    return this.adminService.listCreditRates();
+  }
+
+  @Put('credit-rates')
+  @ApiOperation({
+    summary: 'Replace the volume pricing tiers (rates must beat the base and rise with the amount; empty = base only)',
+  })
+  @ApiResponse({ status: 200, type: [CreditRateTierEntity] })
+  @ApiResponse({ status: 400, description: 'validation' })
+  replaceCreditRates(@Body() dto: ReplaceCreditRateTiersDto) {
+    return this.adminService.replaceCreditRates(dto);
   }
 
   @Get('purchases')

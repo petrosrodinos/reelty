@@ -1,5 +1,6 @@
 import {
   VideoAddonKeys,
+  type CreditRateTier,
   type CreditsPricing,
   type CreditTier,
   type VideoQuote,
@@ -61,6 +62,27 @@ export const PURCHASE_MAX_VIDEOS = 60;
 /** Credits per "video" on the purchase slider: the default tier's price. */
 export function creditsPerVideo(pricing: CreditsPricing): number {
   return (pricing.tiers.find((t) => t.is_default) ?? pricing.tiers[0])?.credits ?? 1;
+}
+
+type RateShape = Pick<CreditRateTier, "min_eur" | "credits_per_eur">;
+
+/** Credits a tier needs: the purchase must cost at least min_eur at the tier's own rate. */
+export const tierMinCredits = (tier: RateShape) => tier.min_eur * tier.credits_per_eur;
+
+/** Credits per €1 for `credits` credits: the best tier reached, else the base rate (mirrors the API's rateFor). */
+export function rateFor(credits: number, baseRate: number, tiers: RateShape[]): number {
+  const reached = tiers.filter((t) => credits >= tierMinCredits(t));
+  return reached.length ? Math.max(...reached.map((t) => t.credits_per_eur)) : baseRate;
+}
+
+/** The next tier `credits` have not reached yet, cheapest first; null when none is left. */
+export function nextRateTier<T extends RateShape>(credits: number, baseRate: number, tiers: T[]): T | null {
+  const current = rateFor(credits, baseRate, tiers);
+  return (
+    [...tiers]
+      .filter((t) => t.credits_per_eur > current && credits < tierMinCredits(t))
+      .sort((a, b) => tierMinCredits(a) - tierMinCredits(b))[0] ?? null
+  );
 }
 
 /** Price in euro cents, rounded like the API (BillingService.priceCents). */

@@ -3,7 +3,7 @@ import { ApiRoutes } from "@/config/api/routes";
 import type { AdminUserOption, AppConfigItem, CostHistory, CostHistoryQuery } from "@/features/admin/interfaces/admin.interfaces";
 import type { Analytics, AnalyticsRange } from "@/features/admin/interfaces/analytics.interfaces";
 import type { AdminPurchases, AdminPurchasesQuery } from "@/features/billing/interfaces/billing.interfaces";
-import type { CreditTier } from "@/features/credits/interfaces/credits.interfaces";
+import type { CreditRateTier, CreditTier } from "@/features/credits/interfaces/credits.interfaces";
 
 /** One row of the tier set sent to the API; rows without an id are created. */
 export type CreditTierInput = Pick<CreditTier, "name" | "min_clips" | "max_clips" | "credits" | "is_default"> & {
@@ -57,6 +57,19 @@ export const getCreditTiers = async (): Promise<CreditTier[]> => {
 /** Replaces the whole tier set; the API validates it as a whole. */
 export const replaceCreditTiers = async (tiers: CreditTierInput[]): Promise<CreditTier[]> => {
   const response = await axiosInstance.put<CreditTier[]>(ApiRoutes.admin.creditTiers, { tiers });
+  return response.data;
+};
+
+export type CreditRateTierInput = Pick<CreditRateTier, "min_eur" | "credits_per_eur">;
+
+export const getCreditRates = async (): Promise<CreditRateTier[]> => {
+  const response = await axiosInstance.get<CreditRateTier[]>(ApiRoutes.admin.creditRates);
+  return response.data;
+};
+
+/** Replaces the whole volume pricing set; the API validates it as a whole. */
+export const replaceCreditRates = async (tiers: CreditRateTierInput[]): Promise<CreditRateTier[]> => {
+  const response = await axiosInstance.put<CreditRateTier[]>(ApiRoutes.admin.creditRates, { tiers });
   return response.data;
 };
 

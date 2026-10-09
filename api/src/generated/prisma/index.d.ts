@@ -74,6 +74,11 @@ export type CreditTransaction = $Result.DefaultSelection<Prisma.$CreditTransacti
  */
 export type CreditPurchase = $Result.DefaultSelection<Prisma.$CreditPurchasePayload>
 /**
+ * Model CreditRateTier
+ * 
+ */
+export type CreditRateTier = $Result.DefaultSelection<Prisma.$CreditRateTierPayload>
+/**
  * Model AppConfig
  * 
  */
@@ -492,6 +497,16 @@ export class PrismaClient<
     * ```
     */
   get creditPurchase(): Prisma.CreditPurchaseDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.creditRateTier`: Exposes CRUD operations for the **CreditRateTier** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CreditRateTiers
+    * const creditRateTiers = await prisma.creditRateTier.findMany()
+    * ```
+    */
+  get creditRateTier(): Prisma.CreditRateTierDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.appConfig`: Exposes CRUD operations for the **AppConfig** model.
@@ -958,6 +973,7 @@ export namespace Prisma {
     CreditTier: 'CreditTier',
     CreditTransaction: 'CreditTransaction',
     CreditPurchase: 'CreditPurchase',
+    CreditRateTier: 'CreditRateTier',
     AppConfig: 'AppConfig',
     SystemFlag: 'SystemFlag'
   };
@@ -975,7 +991,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "refreshToken" | "emailVerificationToken" | "passwordResetToken" | "project" | "image" | "consent" | "jobEvent" | "usageLedger" | "creditTier" | "creditTransaction" | "creditPurchase" | "appConfig" | "systemFlag"
+      modelProps: "user" | "refreshToken" | "emailVerificationToken" | "passwordResetToken" | "project" | "image" | "consent" | "jobEvent" | "usageLedger" | "creditTier" | "creditTransaction" | "creditPurchase" | "creditRateTier" | "appConfig" | "systemFlag"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1867,6 +1883,80 @@ export namespace Prisma {
           }
         }
       }
+      CreditRateTier: {
+        payload: Prisma.$CreditRateTierPayload<ExtArgs>
+        fields: Prisma.CreditRateTierFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CreditRateTierFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CreditRateTierPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CreditRateTierFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CreditRateTierPayload>
+          }
+          findFirst: {
+            args: Prisma.CreditRateTierFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CreditRateTierPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CreditRateTierFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CreditRateTierPayload>
+          }
+          findMany: {
+            args: Prisma.CreditRateTierFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CreditRateTierPayload>[]
+          }
+          create: {
+            args: Prisma.CreditRateTierCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CreditRateTierPayload>
+          }
+          createMany: {
+            args: Prisma.CreditRateTierCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CreditRateTierCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CreditRateTierPayload>[]
+          }
+          delete: {
+            args: Prisma.CreditRateTierDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CreditRateTierPayload>
+          }
+          update: {
+            args: Prisma.CreditRateTierUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CreditRateTierPayload>
+          }
+          deleteMany: {
+            args: Prisma.CreditRateTierDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CreditRateTierUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.CreditRateTierUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CreditRateTierPayload>[]
+          }
+          upsert: {
+            args: Prisma.CreditRateTierUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CreditRateTierPayload>
+          }
+          aggregate: {
+            args: Prisma.CreditRateTierAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCreditRateTier>
+          }
+          groupBy: {
+            args: Prisma.CreditRateTierGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CreditRateTierGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CreditRateTierCountArgs<ExtArgs>
+            result: $Utils.Optional<CreditRateTierCountAggregateOutputType> | number
+          }
+        }
+      }
       AppConfig: {
         payload: Prisma.$AppConfigPayload<ExtArgs>
         fields: Prisma.AppConfigFieldRefs
@@ -2135,6 +2225,7 @@ export namespace Prisma {
     creditTier?: CreditTierOmit
     creditTransaction?: CreditTransactionOmit
     creditPurchase?: CreditPurchaseOmit
+    creditRateTier?: CreditRateTierOmit
     appConfig?: AppConfigOmit
     systemFlag?: SystemFlagOmit
   }
@@ -17080,6 +17171,1039 @@ export namespace Prisma {
 
 
   /**
+   * Model CreditRateTier
+   */
+
+  export type AggregateCreditRateTier = {
+    _count: CreditRateTierCountAggregateOutputType | null
+    _avg: CreditRateTierAvgAggregateOutputType | null
+    _sum: CreditRateTierSumAggregateOutputType | null
+    _min: CreditRateTierMinAggregateOutputType | null
+    _max: CreditRateTierMaxAggregateOutputType | null
+  }
+
+  export type CreditRateTierAvgAggregateOutputType = {
+    min_eur: number | null
+    credits_per_eur: number | null
+  }
+
+  export type CreditRateTierSumAggregateOutputType = {
+    min_eur: number | null
+    credits_per_eur: number | null
+  }
+
+  export type CreditRateTierMinAggregateOutputType = {
+    id: string | null
+    min_eur: number | null
+    credits_per_eur: number | null
+    created_at: Date | null
+    updated_at: Date | null
+  }
+
+  export type CreditRateTierMaxAggregateOutputType = {
+    id: string | null
+    min_eur: number | null
+    credits_per_eur: number | null
+    created_at: Date | null
+    updated_at: Date | null
+  }
+
+  export type CreditRateTierCountAggregateOutputType = {
+    id: number
+    min_eur: number
+    credits_per_eur: number
+    created_at: number
+    updated_at: number
+    _all: number
+  }
+
+
+  export type CreditRateTierAvgAggregateInputType = {
+    min_eur?: true
+    credits_per_eur?: true
+  }
+
+  export type CreditRateTierSumAggregateInputType = {
+    min_eur?: true
+    credits_per_eur?: true
+  }
+
+  export type CreditRateTierMinAggregateInputType = {
+    id?: true
+    min_eur?: true
+    credits_per_eur?: true
+    created_at?: true
+    updated_at?: true
+  }
+
+  export type CreditRateTierMaxAggregateInputType = {
+    id?: true
+    min_eur?: true
+    credits_per_eur?: true
+    created_at?: true
+    updated_at?: true
+  }
+
+  export type CreditRateTierCountAggregateInputType = {
+    id?: true
+    min_eur?: true
+    credits_per_eur?: true
+    created_at?: true
+    updated_at?: true
+    _all?: true
+  }
+
+  export type CreditRateTierAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CreditRateTier to aggregate.
+     */
+    where?: CreditRateTierWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CreditRateTiers to fetch.
+     */
+    orderBy?: CreditRateTierOrderByWithRelationInput | CreditRateTierOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CreditRateTierWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CreditRateTiers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CreditRateTiers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CreditRateTiers
+    **/
+    _count?: true | CreditRateTierCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: CreditRateTierAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CreditRateTierSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CreditRateTierMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CreditRateTierMaxAggregateInputType
+  }
+
+  export type GetCreditRateTierAggregateType<T extends CreditRateTierAggregateArgs> = {
+        [P in keyof T & keyof AggregateCreditRateTier]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCreditRateTier[P]>
+      : GetScalarType<T[P], AggregateCreditRateTier[P]>
+  }
+
+
+
+
+  export type CreditRateTierGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CreditRateTierWhereInput
+    orderBy?: CreditRateTierOrderByWithAggregationInput | CreditRateTierOrderByWithAggregationInput[]
+    by: CreditRateTierScalarFieldEnum[] | CreditRateTierScalarFieldEnum
+    having?: CreditRateTierScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CreditRateTierCountAggregateInputType | true
+    _avg?: CreditRateTierAvgAggregateInputType
+    _sum?: CreditRateTierSumAggregateInputType
+    _min?: CreditRateTierMinAggregateInputType
+    _max?: CreditRateTierMaxAggregateInputType
+  }
+
+  export type CreditRateTierGroupByOutputType = {
+    id: string
+    min_eur: number
+    credits_per_eur: number
+    created_at: Date
+    updated_at: Date
+    _count: CreditRateTierCountAggregateOutputType | null
+    _avg: CreditRateTierAvgAggregateOutputType | null
+    _sum: CreditRateTierSumAggregateOutputType | null
+    _min: CreditRateTierMinAggregateOutputType | null
+    _max: CreditRateTierMaxAggregateOutputType | null
+  }
+
+  type GetCreditRateTierGroupByPayload<T extends CreditRateTierGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CreditRateTierGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CreditRateTierGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CreditRateTierGroupByOutputType[P]>
+            : GetScalarType<T[P], CreditRateTierGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CreditRateTierSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    min_eur?: boolean
+    credits_per_eur?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }, ExtArgs["result"]["creditRateTier"]>
+
+  export type CreditRateTierSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    min_eur?: boolean
+    credits_per_eur?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }, ExtArgs["result"]["creditRateTier"]>
+
+  export type CreditRateTierSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    min_eur?: boolean
+    credits_per_eur?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }, ExtArgs["result"]["creditRateTier"]>
+
+  export type CreditRateTierSelectScalar = {
+    id?: boolean
+    min_eur?: boolean
+    credits_per_eur?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }
+
+  export type CreditRateTierOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "min_eur" | "credits_per_eur" | "created_at" | "updated_at", ExtArgs["result"]["creditRateTier"]>
+
+  export type $CreditRateTierPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CreditRateTier"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      min_eur: number
+      credits_per_eur: number
+      created_at: Date
+      updated_at: Date
+    }, ExtArgs["result"]["creditRateTier"]>
+    composites: {}
+  }
+
+  type CreditRateTierGetPayload<S extends boolean | null | undefined | CreditRateTierDefaultArgs> = $Result.GetResult<Prisma.$CreditRateTierPayload, S>
+
+  type CreditRateTierCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CreditRateTierFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CreditRateTierCountAggregateInputType | true
+    }
+
+  export interface CreditRateTierDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CreditRateTier'], meta: { name: 'CreditRateTier' } }
+    /**
+     * Find zero or one CreditRateTier that matches the filter.
+     * @param {CreditRateTierFindUniqueArgs} args - Arguments to find a CreditRateTier
+     * @example
+     * // Get one CreditRateTier
+     * const creditRateTier = await prisma.creditRateTier.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CreditRateTierFindUniqueArgs>(args: SelectSubset<T, CreditRateTierFindUniqueArgs<ExtArgs>>): Prisma__CreditRateTierClient<$Result.GetResult<Prisma.$CreditRateTierPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CreditRateTier that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CreditRateTierFindUniqueOrThrowArgs} args - Arguments to find a CreditRateTier
+     * @example
+     * // Get one CreditRateTier
+     * const creditRateTier = await prisma.creditRateTier.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CreditRateTierFindUniqueOrThrowArgs>(args: SelectSubset<T, CreditRateTierFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CreditRateTierClient<$Result.GetResult<Prisma.$CreditRateTierPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CreditRateTier that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CreditRateTierFindFirstArgs} args - Arguments to find a CreditRateTier
+     * @example
+     * // Get one CreditRateTier
+     * const creditRateTier = await prisma.creditRateTier.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CreditRateTierFindFirstArgs>(args?: SelectSubset<T, CreditRateTierFindFirstArgs<ExtArgs>>): Prisma__CreditRateTierClient<$Result.GetResult<Prisma.$CreditRateTierPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CreditRateTier that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CreditRateTierFindFirstOrThrowArgs} args - Arguments to find a CreditRateTier
+     * @example
+     * // Get one CreditRateTier
+     * const creditRateTier = await prisma.creditRateTier.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CreditRateTierFindFirstOrThrowArgs>(args?: SelectSubset<T, CreditRateTierFindFirstOrThrowArgs<ExtArgs>>): Prisma__CreditRateTierClient<$Result.GetResult<Prisma.$CreditRateTierPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CreditRateTiers that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CreditRateTierFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CreditRateTiers
+     * const creditRateTiers = await prisma.creditRateTier.findMany()
+     * 
+     * // Get first 10 CreditRateTiers
+     * const creditRateTiers = await prisma.creditRateTier.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const creditRateTierWithIdOnly = await prisma.creditRateTier.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CreditRateTierFindManyArgs>(args?: SelectSubset<T, CreditRateTierFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CreditRateTierPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CreditRateTier.
+     * @param {CreditRateTierCreateArgs} args - Arguments to create a CreditRateTier.
+     * @example
+     * // Create one CreditRateTier
+     * const CreditRateTier = await prisma.creditRateTier.create({
+     *   data: {
+     *     // ... data to create a CreditRateTier
+     *   }
+     * })
+     * 
+     */
+    create<T extends CreditRateTierCreateArgs>(args: SelectSubset<T, CreditRateTierCreateArgs<ExtArgs>>): Prisma__CreditRateTierClient<$Result.GetResult<Prisma.$CreditRateTierPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CreditRateTiers.
+     * @param {CreditRateTierCreateManyArgs} args - Arguments to create many CreditRateTiers.
+     * @example
+     * // Create many CreditRateTiers
+     * const creditRateTier = await prisma.creditRateTier.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CreditRateTierCreateManyArgs>(args?: SelectSubset<T, CreditRateTierCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CreditRateTiers and returns the data saved in the database.
+     * @param {CreditRateTierCreateManyAndReturnArgs} args - Arguments to create many CreditRateTiers.
+     * @example
+     * // Create many CreditRateTiers
+     * const creditRateTier = await prisma.creditRateTier.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CreditRateTiers and only return the `id`
+     * const creditRateTierWithIdOnly = await prisma.creditRateTier.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CreditRateTierCreateManyAndReturnArgs>(args?: SelectSubset<T, CreditRateTierCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CreditRateTierPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a CreditRateTier.
+     * @param {CreditRateTierDeleteArgs} args - Arguments to delete one CreditRateTier.
+     * @example
+     * // Delete one CreditRateTier
+     * const CreditRateTier = await prisma.creditRateTier.delete({
+     *   where: {
+     *     // ... filter to delete one CreditRateTier
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CreditRateTierDeleteArgs>(args: SelectSubset<T, CreditRateTierDeleteArgs<ExtArgs>>): Prisma__CreditRateTierClient<$Result.GetResult<Prisma.$CreditRateTierPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CreditRateTier.
+     * @param {CreditRateTierUpdateArgs} args - Arguments to update one CreditRateTier.
+     * @example
+     * // Update one CreditRateTier
+     * const creditRateTier = await prisma.creditRateTier.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CreditRateTierUpdateArgs>(args: SelectSubset<T, CreditRateTierUpdateArgs<ExtArgs>>): Prisma__CreditRateTierClient<$Result.GetResult<Prisma.$CreditRateTierPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CreditRateTiers.
+     * @param {CreditRateTierDeleteManyArgs} args - Arguments to filter CreditRateTiers to delete.
+     * @example
+     * // Delete a few CreditRateTiers
+     * const { count } = await prisma.creditRateTier.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CreditRateTierDeleteManyArgs>(args?: SelectSubset<T, CreditRateTierDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CreditRateTiers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CreditRateTierUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CreditRateTiers
+     * const creditRateTier = await prisma.creditRateTier.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CreditRateTierUpdateManyArgs>(args: SelectSubset<T, CreditRateTierUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CreditRateTiers and returns the data updated in the database.
+     * @param {CreditRateTierUpdateManyAndReturnArgs} args - Arguments to update many CreditRateTiers.
+     * @example
+     * // Update many CreditRateTiers
+     * const creditRateTier = await prisma.creditRateTier.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more CreditRateTiers and only return the `id`
+     * const creditRateTierWithIdOnly = await prisma.creditRateTier.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends CreditRateTierUpdateManyAndReturnArgs>(args: SelectSubset<T, CreditRateTierUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CreditRateTierPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one CreditRateTier.
+     * @param {CreditRateTierUpsertArgs} args - Arguments to update or create a CreditRateTier.
+     * @example
+     * // Update or create a CreditRateTier
+     * const creditRateTier = await prisma.creditRateTier.upsert({
+     *   create: {
+     *     // ... data to create a CreditRateTier
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CreditRateTier we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CreditRateTierUpsertArgs>(args: SelectSubset<T, CreditRateTierUpsertArgs<ExtArgs>>): Prisma__CreditRateTierClient<$Result.GetResult<Prisma.$CreditRateTierPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of CreditRateTiers.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CreditRateTierCountArgs} args - Arguments to filter CreditRateTiers to count.
+     * @example
+     * // Count the number of CreditRateTiers
+     * const count = await prisma.creditRateTier.count({
+     *   where: {
+     *     // ... the filter for the CreditRateTiers we want to count
+     *   }
+     * })
+    **/
+    count<T extends CreditRateTierCountArgs>(
+      args?: Subset<T, CreditRateTierCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CreditRateTierCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CreditRateTier.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CreditRateTierAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CreditRateTierAggregateArgs>(args: Subset<T, CreditRateTierAggregateArgs>): Prisma.PrismaPromise<GetCreditRateTierAggregateType<T>>
+
+    /**
+     * Group by CreditRateTier.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CreditRateTierGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CreditRateTierGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CreditRateTierGroupByArgs['orderBy'] }
+        : { orderBy?: CreditRateTierGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CreditRateTierGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCreditRateTierGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CreditRateTier model
+   */
+  readonly fields: CreditRateTierFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CreditRateTier.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CreditRateTierClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CreditRateTier model
+   */
+  interface CreditRateTierFieldRefs {
+    readonly id: FieldRef<"CreditRateTier", 'String'>
+    readonly min_eur: FieldRef<"CreditRateTier", 'Int'>
+    readonly credits_per_eur: FieldRef<"CreditRateTier", 'Int'>
+    readonly created_at: FieldRef<"CreditRateTier", 'DateTime'>
+    readonly updated_at: FieldRef<"CreditRateTier", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CreditRateTier findUnique
+   */
+  export type CreditRateTierFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CreditRateTier
+     */
+    select?: CreditRateTierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CreditRateTier
+     */
+    omit?: CreditRateTierOmit<ExtArgs> | null
+    /**
+     * Filter, which CreditRateTier to fetch.
+     */
+    where: CreditRateTierWhereUniqueInput
+  }
+
+  /**
+   * CreditRateTier findUniqueOrThrow
+   */
+  export type CreditRateTierFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CreditRateTier
+     */
+    select?: CreditRateTierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CreditRateTier
+     */
+    omit?: CreditRateTierOmit<ExtArgs> | null
+    /**
+     * Filter, which CreditRateTier to fetch.
+     */
+    where: CreditRateTierWhereUniqueInput
+  }
+
+  /**
+   * CreditRateTier findFirst
+   */
+  export type CreditRateTierFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CreditRateTier
+     */
+    select?: CreditRateTierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CreditRateTier
+     */
+    omit?: CreditRateTierOmit<ExtArgs> | null
+    /**
+     * Filter, which CreditRateTier to fetch.
+     */
+    where?: CreditRateTierWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CreditRateTiers to fetch.
+     */
+    orderBy?: CreditRateTierOrderByWithRelationInput | CreditRateTierOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CreditRateTiers.
+     */
+    cursor?: CreditRateTierWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CreditRateTiers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CreditRateTiers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CreditRateTiers.
+     */
+    distinct?: CreditRateTierScalarFieldEnum | CreditRateTierScalarFieldEnum[]
+  }
+
+  /**
+   * CreditRateTier findFirstOrThrow
+   */
+  export type CreditRateTierFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CreditRateTier
+     */
+    select?: CreditRateTierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CreditRateTier
+     */
+    omit?: CreditRateTierOmit<ExtArgs> | null
+    /**
+     * Filter, which CreditRateTier to fetch.
+     */
+    where?: CreditRateTierWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CreditRateTiers to fetch.
+     */
+    orderBy?: CreditRateTierOrderByWithRelationInput | CreditRateTierOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CreditRateTiers.
+     */
+    cursor?: CreditRateTierWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CreditRateTiers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CreditRateTiers.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CreditRateTiers.
+     */
+    distinct?: CreditRateTierScalarFieldEnum | CreditRateTierScalarFieldEnum[]
+  }
+
+  /**
+   * CreditRateTier findMany
+   */
+  export type CreditRateTierFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CreditRateTier
+     */
+    select?: CreditRateTierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CreditRateTier
+     */
+    omit?: CreditRateTierOmit<ExtArgs> | null
+    /**
+     * Filter, which CreditRateTiers to fetch.
+     */
+    where?: CreditRateTierWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CreditRateTiers to fetch.
+     */
+    orderBy?: CreditRateTierOrderByWithRelationInput | CreditRateTierOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CreditRateTiers.
+     */
+    cursor?: CreditRateTierWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CreditRateTiers from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CreditRateTiers.
+     */
+    skip?: number
+    distinct?: CreditRateTierScalarFieldEnum | CreditRateTierScalarFieldEnum[]
+  }
+
+  /**
+   * CreditRateTier create
+   */
+  export type CreditRateTierCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CreditRateTier
+     */
+    select?: CreditRateTierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CreditRateTier
+     */
+    omit?: CreditRateTierOmit<ExtArgs> | null
+    /**
+     * The data needed to create a CreditRateTier.
+     */
+    data: XOR<CreditRateTierCreateInput, CreditRateTierUncheckedCreateInput>
+  }
+
+  /**
+   * CreditRateTier createMany
+   */
+  export type CreditRateTierCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CreditRateTiers.
+     */
+    data: CreditRateTierCreateManyInput | CreditRateTierCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CreditRateTier createManyAndReturn
+   */
+  export type CreditRateTierCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CreditRateTier
+     */
+    select?: CreditRateTierSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CreditRateTier
+     */
+    omit?: CreditRateTierOmit<ExtArgs> | null
+    /**
+     * The data used to create many CreditRateTiers.
+     */
+    data: CreditRateTierCreateManyInput | CreditRateTierCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CreditRateTier update
+   */
+  export type CreditRateTierUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CreditRateTier
+     */
+    select?: CreditRateTierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CreditRateTier
+     */
+    omit?: CreditRateTierOmit<ExtArgs> | null
+    /**
+     * The data needed to update a CreditRateTier.
+     */
+    data: XOR<CreditRateTierUpdateInput, CreditRateTierUncheckedUpdateInput>
+    /**
+     * Choose, which CreditRateTier to update.
+     */
+    where: CreditRateTierWhereUniqueInput
+  }
+
+  /**
+   * CreditRateTier updateMany
+   */
+  export type CreditRateTierUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CreditRateTiers.
+     */
+    data: XOR<CreditRateTierUpdateManyMutationInput, CreditRateTierUncheckedUpdateManyInput>
+    /**
+     * Filter which CreditRateTiers to update
+     */
+    where?: CreditRateTierWhereInput
+    /**
+     * Limit how many CreditRateTiers to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CreditRateTier updateManyAndReturn
+   */
+  export type CreditRateTierUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CreditRateTier
+     */
+    select?: CreditRateTierSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CreditRateTier
+     */
+    omit?: CreditRateTierOmit<ExtArgs> | null
+    /**
+     * The data used to update CreditRateTiers.
+     */
+    data: XOR<CreditRateTierUpdateManyMutationInput, CreditRateTierUncheckedUpdateManyInput>
+    /**
+     * Filter which CreditRateTiers to update
+     */
+    where?: CreditRateTierWhereInput
+    /**
+     * Limit how many CreditRateTiers to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CreditRateTier upsert
+   */
+  export type CreditRateTierUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CreditRateTier
+     */
+    select?: CreditRateTierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CreditRateTier
+     */
+    omit?: CreditRateTierOmit<ExtArgs> | null
+    /**
+     * The filter to search for the CreditRateTier to update in case it exists.
+     */
+    where: CreditRateTierWhereUniqueInput
+    /**
+     * In case the CreditRateTier found by the `where` argument doesn't exist, create a new CreditRateTier with this data.
+     */
+    create: XOR<CreditRateTierCreateInput, CreditRateTierUncheckedCreateInput>
+    /**
+     * In case the CreditRateTier was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CreditRateTierUpdateInput, CreditRateTierUncheckedUpdateInput>
+  }
+
+  /**
+   * CreditRateTier delete
+   */
+  export type CreditRateTierDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CreditRateTier
+     */
+    select?: CreditRateTierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CreditRateTier
+     */
+    omit?: CreditRateTierOmit<ExtArgs> | null
+    /**
+     * Filter which CreditRateTier to delete.
+     */
+    where: CreditRateTierWhereUniqueInput
+  }
+
+  /**
+   * CreditRateTier deleteMany
+   */
+  export type CreditRateTierDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CreditRateTiers to delete
+     */
+    where?: CreditRateTierWhereInput
+    /**
+     * Limit how many CreditRateTiers to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CreditRateTier without action
+   */
+  export type CreditRateTierDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CreditRateTier
+     */
+    select?: CreditRateTierSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CreditRateTier
+     */
+    omit?: CreditRateTierOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model AppConfig
    */
 
@@ -19344,6 +20468,17 @@ export namespace Prisma {
   export type CreditPurchaseScalarFieldEnum = (typeof CreditPurchaseScalarFieldEnum)[keyof typeof CreditPurchaseScalarFieldEnum]
 
 
+  export const CreditRateTierScalarFieldEnum: {
+    id: 'id',
+    min_eur: 'min_eur',
+    credits_per_eur: 'credits_per_eur',
+    created_at: 'created_at',
+    updated_at: 'updated_at'
+  };
+
+  export type CreditRateTierScalarFieldEnum = (typeof CreditRateTierScalarFieldEnum)[keyof typeof CreditRateTierScalarFieldEnum]
+
+
   export const AppConfigScalarFieldEnum: {
     key: 'key',
     value: 'value',
@@ -20810,6 +21945,60 @@ export namespace Prisma {
     refunded_at?: DateTimeNullableWithAggregatesFilter<"CreditPurchase"> | Date | string | null
     created_at?: DateTimeWithAggregatesFilter<"CreditPurchase"> | Date | string
     updated_at?: DateTimeWithAggregatesFilter<"CreditPurchase"> | Date | string
+  }
+
+  export type CreditRateTierWhereInput = {
+    AND?: CreditRateTierWhereInput | CreditRateTierWhereInput[]
+    OR?: CreditRateTierWhereInput[]
+    NOT?: CreditRateTierWhereInput | CreditRateTierWhereInput[]
+    id?: StringFilter<"CreditRateTier"> | string
+    min_eur?: IntFilter<"CreditRateTier"> | number
+    credits_per_eur?: IntFilter<"CreditRateTier"> | number
+    created_at?: DateTimeFilter<"CreditRateTier"> | Date | string
+    updated_at?: DateTimeFilter<"CreditRateTier"> | Date | string
+  }
+
+  export type CreditRateTierOrderByWithRelationInput = {
+    id?: SortOrder
+    min_eur?: SortOrder
+    credits_per_eur?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type CreditRateTierWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    min_eur?: number
+    AND?: CreditRateTierWhereInput | CreditRateTierWhereInput[]
+    OR?: CreditRateTierWhereInput[]
+    NOT?: CreditRateTierWhereInput | CreditRateTierWhereInput[]
+    credits_per_eur?: IntFilter<"CreditRateTier"> | number
+    created_at?: DateTimeFilter<"CreditRateTier"> | Date | string
+    updated_at?: DateTimeFilter<"CreditRateTier"> | Date | string
+  }, "id" | "min_eur">
+
+  export type CreditRateTierOrderByWithAggregationInput = {
+    id?: SortOrder
+    min_eur?: SortOrder
+    credits_per_eur?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+    _count?: CreditRateTierCountOrderByAggregateInput
+    _avg?: CreditRateTierAvgOrderByAggregateInput
+    _max?: CreditRateTierMaxOrderByAggregateInput
+    _min?: CreditRateTierMinOrderByAggregateInput
+    _sum?: CreditRateTierSumOrderByAggregateInput
+  }
+
+  export type CreditRateTierScalarWhereWithAggregatesInput = {
+    AND?: CreditRateTierScalarWhereWithAggregatesInput | CreditRateTierScalarWhereWithAggregatesInput[]
+    OR?: CreditRateTierScalarWhereWithAggregatesInput[]
+    NOT?: CreditRateTierScalarWhereWithAggregatesInput | CreditRateTierScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CreditRateTier"> | string
+    min_eur?: IntWithAggregatesFilter<"CreditRateTier"> | number
+    credits_per_eur?: IntWithAggregatesFilter<"CreditRateTier"> | number
+    created_at?: DateTimeWithAggregatesFilter<"CreditRateTier"> | Date | string
+    updated_at?: DateTimeWithAggregatesFilter<"CreditRateTier"> | Date | string
   }
 
   export type AppConfigWhereInput = {
@@ -22297,6 +23486,62 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type CreditRateTierCreateInput = {
+    id?: string
+    min_eur: number
+    credits_per_eur: number
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type CreditRateTierUncheckedCreateInput = {
+    id?: string
+    min_eur: number
+    credits_per_eur: number
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type CreditRateTierUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    min_eur?: IntFieldUpdateOperationsInput | number
+    credits_per_eur?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CreditRateTierUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    min_eur?: IntFieldUpdateOperationsInput | number
+    credits_per_eur?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CreditRateTierCreateManyInput = {
+    id?: string
+    min_eur: number
+    credits_per_eur: number
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type CreditRateTierUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    min_eur?: IntFieldUpdateOperationsInput | number
+    credits_per_eur?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CreditRateTierUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    min_eur?: IntFieldUpdateOperationsInput | number
+    credits_per_eur?: IntFieldUpdateOperationsInput | number
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type AppConfigCreateInput = {
     key: string
     value: number
@@ -23641,6 +24886,40 @@ export namespace Prisma {
     _sum?: NestedFloatFilter<$PrismaModel>
     _min?: NestedFloatFilter<$PrismaModel>
     _max?: NestedFloatFilter<$PrismaModel>
+  }
+
+  export type CreditRateTierCountOrderByAggregateInput = {
+    id?: SortOrder
+    min_eur?: SortOrder
+    credits_per_eur?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type CreditRateTierAvgOrderByAggregateInput = {
+    min_eur?: SortOrder
+    credits_per_eur?: SortOrder
+  }
+
+  export type CreditRateTierMaxOrderByAggregateInput = {
+    id?: SortOrder
+    min_eur?: SortOrder
+    credits_per_eur?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type CreditRateTierMinOrderByAggregateInput = {
+    id?: SortOrder
+    min_eur?: SortOrder
+    credits_per_eur?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type CreditRateTierSumOrderByAggregateInput = {
+    min_eur?: SortOrder
+    credits_per_eur?: SortOrder
   }
 
   export type AppConfigCountOrderByAggregateInput = {

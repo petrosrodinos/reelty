@@ -10,7 +10,9 @@ import { SystemFlagsService } from '@/modules/system-flags/system-flags.service'
 import { BillingService } from '@/modules/billing/billing.service';
 import type { AdminPurchasesQueryType } from '@/modules/billing/dto/purchases-query.schema';
 import { CreditsService } from '@/modules/credits/credits.service';
+import { CreditRatesService } from '@/modules/credits/services/credit-rates.service';
 import { CreditTiersService } from '@/modules/credits/services/credit-tiers.service';
+import { ReplaceCreditRateTiersDto } from '@/modules/credits/dto/credit-rate-tier.dto';
 import { ReplaceCreditTiersDto } from '@/modules/credits/dto/credit-tier.dto';
 import { GrantCreditsDto } from '@/modules/credits/dto/grant-credits.dto';
 import { ErrorCodes } from '@/shared/config/error-codes';
@@ -27,6 +29,7 @@ export class AdminService {
     private readonly usage: UsageService,
     private readonly credits: CreditsService,
     private readonly tiers: CreditTiersService,
+    private readonly rates: CreditRatesService,
     private readonly billing: BillingService,
   ) {}
 
@@ -54,6 +57,14 @@ export class AdminService {
 
   replaceCreditTiers(dto: ReplaceCreditTiersDto) {
     return this.tiers.replaceAll(dto);
+  }
+
+  listCreditRates() {
+    return this.rates.listJson();
+  }
+
+  replaceCreditRates(dto: ReplaceCreditRateTiersDto) {
+    return this.rates.replaceAll(dto);
   }
 
   getPurchases(query: AdminPurchasesQueryType) {

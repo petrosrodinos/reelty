@@ -9,9 +9,12 @@ import { useCreateCheckout } from "@/features/billing/hooks/use-billing";
 import type { CreditsPricing } from "@/features/credits/interfaces/credits.interfaces";
 import {
   creditsPerVideo,
+  nextRateTier,
   priceCents,
   PURCHASE_MAX_VIDEOS as MAX_VIDEOS,
   PURCHASE_VIDEO_STEP as VIDEO_STEP,
+  rateFor,
+  tierMinCredits,
 } from "@/features/credits/utils/credit-pricing.utils";
 import { formatEurCents, pluralize } from "@/lib/format.utils";
 
@@ -25,10 +28,22 @@ export const BuyCreditsCard: FC<BuyCreditsCardProps> = ({ pricing }) => {
   const defaultTier = pricing.tiers.find((tier) => tier.is_default) ?? pricing.tiers[0];
   const maxByCredits = Math.floor(pricing.max_credits_per_purchase / Math.max(perVideo, 1) / VIDEO_STEP) * VIDEO_STEP;
   const maxVideos = Math.max(VIDEO_STEP, Math.min(MAX_VIDEOS, maxByCredits));
+  const baseRate = pricing.credits_per_eur;
 
   const [videos, setVideos] = useState(VIDEO_STEP);
   const credits = videos * perVideo;
-  const cents = priceCents(credits, pricing.credits_per_eur);
+  const rate = rateFor(credits, baseRate, pricing.rate_tiers);
+  const cents = priceCents(credits, rate);
+  const baseCents = priceCents(credits, baseRate);
+  // The next better rate, as the first slider stop that reaches it (customers pick videos, not credits).
+  const next = nextRateTier(credits, baseRate, pricing.rate_tiers);
+  const nextVideos = next
+    ? Math.ceil(tierMinCredits(next) / Math.max(perVideo, 1) / VIDEO_STEP) * VIDEO_STEP
+    : null;
+  // What that pack saves against the base price, in euros.
+  const nextCredits = (nextVideos ?? 0) * perVideo;
+  const nextSavingCents =
+    priceCents(nextCredits, baseRate) - priceCents(nextCredits, rateFor(nextCredits, baseRate, pricing.rate_tiers));
 
   return (
     <section aria-labelledby="buy-heading" className="rounded-lg border border-hairline bg-canvas p-5 sm:p-6">
@@ -59,11 +74,31 @@ export const BuyCreditsCard: FC<BuyCreditsCardProps> = ({ pricing }) => {
         <span>{VIDEO_STEP}</span>
         <span>{maxVideos}</span>
       </div>
+      {next && nextVideos !== null && nextVideos <= maxVideos ? (
+        <p className="mt-3 text-sm text-muted-foreground" aria-live="polite">
+          Buy {nextVideos}+ videos to get{" "}
+          <span className="font-medium text-ink">{next.credits_per_eur} credits per €1</span> (save{" "}
+          {formatEurCents(nextSavingCents)}).
+        </p>
+      ) : null}
 
       <div className="mt-6 flex flex-col gap-4 border-t border-hairline-soft pt-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-muted-foreground">Total</p>
-          <p className="text-2xl font-semibold tabular-nums">{formatEurCents(cents)}</p>
+          <p className="text-2xl font-semibold tabular-nums">
+            {formatEurCents(cents)}
+            {cents < baseCents ? (
+              <span className="ml-2 text-base font-normal text-muted-foreground line-through">
+                {formatEurCents(baseCents)}
+              </span>
+            ) : null}
+          </p>
+          <p className="text-sm text-muted-foreground tabular-nums">
+            {rate} credits per €1
+            {cents < baseCents ? (
+              <span className="font-medium text-success"> · you save {formatEurCents(baseCents - cents)}</span>
+            ) : null}
+          </p>
         </div>
         <Button
           size="lg"

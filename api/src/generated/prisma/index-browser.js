@@ -311,6 +311,14 @@ exports.Prisma.CreditPurchaseScalarFieldEnum = {
   updated_at: 'updated_at'
 };
 
+exports.Prisma.CreditRateTierScalarFieldEnum = {
+  id: 'id',
+  min_eur: 'min_eur',
+  credits_per_eur: 'credits_per_eur',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
 exports.Prisma.AppConfigScalarFieldEnum = {
   key: 'key',
   value: 'value',
@@ -444,6 +452,7 @@ exports.Prisma.ModelName = {
   CreditTier: 'CreditTier',
   CreditTransaction: 'CreditTransaction',
   CreditPurchase: 'CreditPurchase',
+  CreditRateTier: 'CreditRateTier',
   AppConfig: 'AppConfig',
   SystemFlag: 'SystemFlag'
 };

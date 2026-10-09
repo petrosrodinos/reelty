@@ -20,13 +20,23 @@ export class CreditTierEntity {
   @ApiProperty() updated_at: string;
 }
 
+export class CreditRateTierEntity {
+  @ApiProperty() id: string;
+  @ApiProperty({ example: 20, description: 'Smallest purchase in euros that gets this rate' })
+  min_eur: number;
+  @ApiProperty({ example: 4, description: 'Credits per €1 from this amount' })
+  credits_per_eur: number;
+  @ApiProperty() updated_at: string;
+}
+
 class AddonsEntity {
   @ApiProperty({ example: 1 }) watermark_removal: number;
   @ApiProperty({ example: 0 }) import_fetch: number;
 }
 
 export class CreditsPricingEntity {
-  @ApiProperty({ example: 1 }) credits_per_eur: number;
+  @ApiProperty({ example: 3, description: 'Base rate' }) credits_per_eur: number;
+  @ApiProperty({ type: [CreditRateTierEntity] }) rate_tiers: CreditRateTierEntity[];
   @ApiProperty({ example: 500 }) max_credits_per_purchase: number;
   @ApiProperty({ example: 3 }) signup_grant: number;
   @ApiProperty({ type: AddonsEntity }) addons: AddonsEntity;

@@ -15,6 +15,7 @@ import {
 import { AppConfigKeys } from '@/modules/app-config/app-config.constants';
 import { AppConfigService } from '@/modules/app-config/app-config.service';
 import { CreditsService } from '@/modules/credits/credits.service';
+import { CreditRatesService } from '@/modules/credits/services/credit-rates.service';
 import { ErrorCodes } from '@/shared/config/error-codes';
 import { ApiException } from '@/shared/errors/api-exception';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
@@ -89,6 +90,7 @@ export class BillingService {
     private readonly stripe: StripeService,
     private readonly appConfig: AppConfigService,
     private readonly credits: CreditsService,
+    private readonly rates: CreditRatesService,
   ) {}
 
   // ------------------------------------------------------------------ checkout
@@ -105,8 +107,9 @@ export class BillingService {
       );
     }
 
+    // Base rate or a better volume tier; stored on the purchase as credits_per_eur.
     const [creditsPerEur, maxCredits] = await Promise.all([
-      this.appConfig.getNumber(AppConfigKeys.BILLING_CREDITS_PER_EUR),
+      this.rates.rateFor(dto.credits),
       this.appConfig.getNumber(AppConfigKeys.BILLING_MAX_CREDITS_PER_PURCHASE),
     ]);
     if (dto.credits > maxCredits) {

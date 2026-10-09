@@ -11,6 +11,7 @@ import { AppConfigKeys } from '@/modules/app-config/app-config.constants';
 import { AppConfigService } from '@/modules/app-config/app-config.service';
 import { ErrorCodes } from '@/shared/config/error-codes';
 import { ApiException } from '@/shared/errors/api-exception';
+import { CreditRatesService } from './services/credit-rates.service';
 import { CreditTiersService } from './services/credit-tiers.service';
 import type { CreditTransactionsQueryType } from './dto/credit-transactions-query.schema';
 import type {
@@ -45,6 +46,7 @@ export class CreditsService {
     private readonly prisma: PrismaService,
     private readonly appConfig: AppConfigService,
     private readonly tiers: CreditTiersService,
+    private readonly rates: CreditRatesService,
     private readonly stripe: StripeService,
   ) {}
 
@@ -210,19 +212,26 @@ export class CreditsService {
   }
 
   async getPricing(): Promise<CreditsPricing> {
-    const [creditsPerEur, maxCredits, signup, watermark, importFetch, tiers] =
-      await Promise.all([
-        this.appConfig.getNumber(AppConfigKeys.BILLING_CREDITS_PER_EUR),
-        this.appConfig.getNumber(
-          AppConfigKeys.BILLING_MAX_CREDITS_PER_PURCHASE,
-        ),
-        this.appConfig.getNumber(AppConfigKeys.CREDITS_SIGNUP_GRANT),
-        this.appConfig.getNumber(AppConfigKeys.CREDITS_WATERMARK_REMOVAL),
-        this.appConfig.getNumber(AppConfigKeys.CREDITS_IMPORT_FETCH),
-        this.tiers.listJson(),
-      ]);
+    const [
+      creditsPerEur,
+      maxCredits,
+      signup,
+      watermark,
+      importFetch,
+      tiers,
+      rateTiers,
+    ] = await Promise.all([
+      this.appConfig.getNumber(AppConfigKeys.BILLING_CREDITS_PER_EUR),
+      this.appConfig.getNumber(AppConfigKeys.BILLING_MAX_CREDITS_PER_PURCHASE),
+      this.appConfig.getNumber(AppConfigKeys.CREDITS_SIGNUP_GRANT),
+      this.appConfig.getNumber(AppConfigKeys.CREDITS_WATERMARK_REMOVAL),
+      this.appConfig.getNumber(AppConfigKeys.CREDITS_IMPORT_FETCH),
+      this.tiers.listJson(),
+      this.rates.listJson(),
+    ]);
     return {
       credits_per_eur: creditsPerEur,
+      rate_tiers: rateTiers,
       max_credits_per_purchase: Math.floor(maxCredits),
       signup_grant: Math.floor(signup),
       addons: {

@@ -1,6 +1,6 @@
 import type { AppConfigItem } from "@/features/admin/interfaces/admin.interfaces";
-import type { CreditTier } from "@/features/credits/interfaces/credits.interfaces";
-import { priceCents } from "@/features/credits/utils/credit-pricing.utils";
+import type { CreditRateTier, CreditTier } from "@/features/credits/interfaces/credits.interfaces";
+import { priceCents, rateFor } from "@/features/credits/utils/credit-pricing.utils";
 
 /** The app_config values the calculator reads, keyed by what they mean. */
 export interface EconomicsRates {
@@ -36,6 +36,8 @@ export function ratesFromConfig(items: AppConfigItem[]): EconomicsRates {
 
 export interface PackEconomics {
   credits: number;
+  /** Credits per €1 this pack is priced at: the base rate or a better volume tier. */
+  rate: number;
   amountCents: number;
   feeCents: number;
   netCents: number;
@@ -48,22 +50,52 @@ export interface PackEconomics {
 }
 
 /**
- * One checkout of `credits` credits, priced like BillingService.priceCents. `stripeFeePct` is the real average
- * fee Stripe charged on past purchases (from their balance transactions); null when there are none yet.
+ * One checkout of `credits` credits, priced like the API: the base rate (rates.creditsPerEur) or the best volume
+ * tier reached. `stripeFeePct` is the real average fee Stripe charged on past purchases; null when there are none.
  */
-export function packEconomics(credits: number, rates: EconomicsRates, stripeFeePct: number | null): PackEconomics {
-  const amountCents = priceCents(credits, rates.creditsPerEur);
+export function packEconomics(
+  credits: number,
+  rates: EconomicsRates,
+  stripeFeePct: number | null,
+  rateTiers: Pick<CreditRateTier, "min_eur" | "credits_per_eur">[] = [],
+): PackEconomics {
+  const rate = rateFor(credits, rates.creditsPerEur, rateTiers);
+  const amountCents = priceCents(credits, rate);
   const feeCents = Math.round((amountCents * (stripeFeePct ?? 0)) / 100);
   const netCents = amountCents - feeCents;
   return {
     credits,
+    rate,
     amountCents,
     feeCents,
     netCents,
     netCentsPerCredit: credits > 0 ? netCents / credits : 0,
-    exactCents: rates.creditsPerEur > 0 && (credits * 100) % rates.creditsPerEur === 0,
-    wholeEuros: rates.creditsPerEur > 0 && credits % rates.creditsPerEur === 0,
+    exactCents: rate > 0 && (credits * 100) % rate === 0,
+    wholeEuros: rate > 0 && credits % rate === 0,
   };
+}
+
+/**
+ * Mirror of the API rule (rateTierProblems) plus the DTO's whole-number checks: every rate beats the base,
+ * amounts are unique and rates rise with them. Empty array means valid.
+ */
+export function rateTierProblems(tiers: { min_eur: number; credits_per_eur: number }[], baseRate: number): string[] {
+  const problems: string[] = [];
+  for (const t of tiers) {
+    if (!Number.isInteger(t.min_eur) || t.min_eur < 1) problems.push("Amounts must be whole euros, 1 or more.");
+    if (!Number.isInteger(t.credits_per_eur)) problems.push("Rates must be whole credits.");
+    else if (t.credits_per_eur <= baseRate)
+      problems.push(`Every rate must be more than the base ${baseRate} credits per €1.`);
+  }
+  const sorted = [...tiers].sort((a, b) => a.min_eur - b.min_eur);
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = sorted[i - 1];
+    const cur = sorted[i];
+    if (cur.min_eur === prev.min_eur) problems.push(`Two tiers start at €${cur.min_eur}.`);
+    else if (cur.credits_per_eur <= prev.credits_per_eur)
+      problems.push(`The rate from €${cur.min_eur} must be more than the ${prev.credits_per_eur} from €${prev.min_eur}.`);
+  }
+  return [...new Set(problems)];
 }
 
 export interface VideoAddonsInput {

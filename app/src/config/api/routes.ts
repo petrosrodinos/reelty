@@ -40,6 +40,7 @@ export const ApiRoutes = {
     users: "/admin/users",
     userCredits: (id: string) => `/admin/users/${id}/credits`,
     creditTiers: "/admin/credit-tiers",
+    creditRates: "/admin/credit-rates",
     purchases: "/admin/purchases",
   },
   usage: {

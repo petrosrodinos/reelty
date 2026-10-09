@@ -12,6 +12,14 @@ export interface CreditTier {
   updated_at: string;
 }
 
+/** Volume pricing: purchases of at least `min_eur` (at this rate) get `credits_per_eur` credits per €1. */
+export interface CreditRateTier {
+  id: string;
+  min_eur: number;
+  credits_per_eur: number;
+  updated_at: string;
+}
+
 export const VideoAddonKeys = {
   WATERMARK_REMOVAL: "watermark_removal",
   IMPORT_FETCH: "import_fetch",
@@ -19,7 +27,10 @@ export const VideoAddonKeys = {
 export type VideoAddonKey = (typeof VideoAddonKeys)[keyof typeof VideoAddonKeys];
 
 export interface CreditsPricing {
+  /** Base rate: whole credits per €1 for purchases below every rate tier. */
   credits_per_eur: number;
+  /** Better rates for bigger purchases, ascending by min_eur; empty when there are none. */
+  rate_tiers: CreditRateTier[];
   max_credits_per_purchase: number;
   signup_grant: number;
   addons: Record<VideoAddonKey, number>;
