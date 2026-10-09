@@ -3,6 +3,7 @@ import { ScrollToTop } from "@/components/layout/scroll-to-top";
 import { CookieNotice } from "@/components/layout/cookie-notice";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { AtAGlanceSection } from "@/views/landing/components/at-a-glance-section";
 import { CtaBand } from "@/views/landing/components/cta-band";
 import { FaqSection } from "@/views/landing/components/faq-section";
 import { LandingJsonLd } from "@/views/landing/components/landing-json-ld";
@@ -18,6 +19,7 @@ const LandingPage: FC = () => (
     <SiteHeader />
     <main id="main" className="flex-1">
       <HeroSection />
+      <AtAGlanceSection />
       <HowItWorksSection />
       <ReliabilitySection />
       <PricingSection />

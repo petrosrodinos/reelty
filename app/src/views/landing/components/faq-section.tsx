@@ -3,6 +3,22 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 export const faqs = [
   {
+    q: "How do I make a real estate listing video from photos?",
+    a: "Paste a listing link or upload 3 to 12 photos, choose and order the shots, and create the video. Reelty renders a 1920x1080 MP4 in the background and it appears in My Videos, usually within a few minutes for ten photos.",
+  },
+  {
+    q: "How much does a real estate listing video cost?",
+    a: "Industry price guides commonly quote about $300 to $1,500 per listing for a videographer. Reelty has no subscription: new accounts get free credits, and a video costs more credits the more photos it uses.",
+  },
+  {
+    q: "Can I make an Airbnb listing video?",
+    a: "Yes. Paste your public Airbnb listing link or upload your own photos, and Reelty generates a promo video you can download and use on your own website or social channels.",
+  },
+  {
+    q: "How many photos can I use?",
+    a: "Each video uses 3 to 12 photos, in the order you choose.",
+  },
+  {
     q: "Which photos can I use?",
     a: "Only photos you own or have permission to use. You confirm this before your first render, and we store that confirmation.",
   },

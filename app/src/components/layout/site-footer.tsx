@@ -14,6 +14,14 @@ const columns = [
     ],
   },
   {
+    title: "Guides",
+    links: [
+      { label: "Real estate listing video", href: Routes.guideListingVideo },
+      { label: "Airbnb listing video", href: Routes.guideAirbnbVideo },
+      { label: "Reelty vs videographer", href: Routes.guideVsVideographer },
+    ],
+  },
+  {
     title: "Legal",
     links: [
       { label: "Terms of Service", href: Routes.terms },
@@ -26,7 +34,7 @@ const columns = [
 export const SiteFooter: FC = () => (
   <footer className="dark bg-surface-dark text-on-dark-soft">
     <div className="page-container py-12 md:py-16">
-      <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
+      <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="sm:col-span-2 lg:col-span-1">
           <BrandLogo tone="dark" />
           <p className="mt-4 max-w-xs text-sm">
