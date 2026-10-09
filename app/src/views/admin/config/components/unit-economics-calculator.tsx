@@ -79,7 +79,6 @@ export const UnitEconomicsCalculator: FC<UnitEconomicsCalculatorProps> = ({
 
   const [baseDraft, setBaseDraft] = useState(String(saved.creditsPerEur));
   const [rateDraft, setRateDraft] = useState<DraftRate[]>(() => rateTiers.map(toDraft));
-  const [selectedVideos, setSelectedVideos] = useState<number | null>(null);
   const [watermarkRemoval, setWatermarkRemoval] = useState(false);
   const [imported, setImported] = useState(false);
 
@@ -115,9 +114,7 @@ export const UnitEconomicsCalculator: FC<UnitEconomicsCalculatorProps> = ({
     ]),
   ].sort((a, b) => a - b);
   const packs = packVideos.map((videos) => ({ videos, ...priceOf(videos) }));
-  const selected = packs.find((pack) => pack.videos === selectedVideos) ?? packs[0];
   const addons = { watermarkRemoval, imported };
-  const rows = tiers.map((tier) => tierEconomics(tier, selected.netCentsPerCredit, addons, rates));
 
   // Stepped rates can make a bigger pack cheaper than the one before it; customers would skip that range.
   const cliffs: { from: number; to: number; fromCents: number; toCents: number }[] = [];
@@ -321,24 +318,11 @@ export const UnitEconomicsCalculator: FC<UnitEconomicsCalculatorProps> = ({
           <TableBody>
             {packs.map((pack) => {
               const margin = defaultTier ? tierEconomics(defaultTier, pack.netCentsPerCredit, addons, rates) : null;
-              const isSelected = pack.videos === selected.videos;
               const negative = (margin?.marginCents ?? 0) < 0;
               return (
-                <TableRow
-                  key={pack.videos}
-                  data-state={isSelected ? "selected" : undefined}
-                  className="cursor-pointer"
-                  onClick={() => setSelectedVideos(pack.videos)}
-                >
+                <TableRow key={pack.videos}>
                   <TableCell>
-                    <button
-                      type="button"
-                      className="text-left font-medium outline-none focus-visible:underline"
-                      aria-pressed={isSelected}
-                      onClick={() => setSelectedVideos(pack.videos)}
-                    >
-                      {pluralize(pack.videos, "video")}
-                    </button>
+                    <span className="font-medium">{pluralize(pack.videos, "video")}</span>
                     <span className="block text-xs text-muted-foreground tabular-nums">
                       {pluralize(pack.credits, "credit")}
                     </span>
@@ -412,52 +396,6 @@ export const UnitEconomicsCalculator: FC<UnitEconomicsCalculatorProps> = ({
           </div>
         )}
       </div>
-
-      {rows.length ? (
-        <>
-          <p className="mt-8 font-medium text-ink">Margin per video size, {pluralize(selected.videos, "video")} pack</p>
-          <p className="text-xs text-muted-foreground">
-            Pick a pack above to compare. Costs use the provider prices below.
-          </p>
-          <Table className="mt-3">
-            <TableHeader>
-              <TableRow>
-                <TableHead>Video</TableHead>
-                <TableHead className="text-right">Credits</TableHead>
-                <TableHead className="text-right">Revenue</TableHead>
-                <TableHead className="text-right">Provider cost</TableHead>
-                <TableHead className="text-right">Margin</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((row) => {
-                const negative = row.marginCents < 0;
-                return (
-                  <TableRow key={row.tier.id}>
-                    <TableCell>
-                      <span className="font-medium">{row.tier.name}</span>
-                      <span className="block text-xs text-muted-foreground tabular-nums">
-                        cost at {pluralize(row.clips, "photo")}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">{row.credits}</TableCell>
-                    <TableCell className="text-right tabular-nums">{formatEurCents(row.revenueCents)}</TableCell>
-                    <TableCell className="text-right tabular-nums">{formatEurCents(row.costCents)}</TableCell>
-                    <TableCell className={cn("text-right tabular-nums", negative && "text-destructive")}>
-                      {formatEurCents(row.marginCents)}
-                      <span className={cn("block text-xs", negative ? "text-destructive" : "text-muted-foreground")}>
-                        {formatPercent(row.marginPct)}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </>
-      ) : (
-        <p className="mt-6 text-sm text-muted-foreground">Add credit tiers to see the margin per video.</p>
-      )}
 
       {baseDirty || tiersDirty ? (
         <div className="mt-6 flex flex-col gap-3 border-t border-hairline-soft pt-5 sm:flex-row sm:items-center sm:justify-between">
