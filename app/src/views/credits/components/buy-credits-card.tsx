@@ -51,8 +51,7 @@ export const BuyCreditsCard: FC<BuyCreditsCardProps> = ({ pricing }) => {
         Buy credits
       </h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Choose how many videos you want to make. Each one is priced as a {defaultTier?.name ?? "standard"} video
-        ({pluralize(perVideo, "credit")}); shorter videos cost less, longer ones more.
+        Choose how many videos you want to make. Shorter videos cost less, longer ones more.
       </p>
 
       <div className="mt-6 flex items-baseline justify-between gap-4">
@@ -76,9 +75,8 @@ export const BuyCreditsCard: FC<BuyCreditsCardProps> = ({ pricing }) => {
       </div>
       {next && nextVideos !== null && nextVideos <= maxVideos ? (
         <p className="mt-3 text-sm text-muted-foreground" aria-live="polite">
-          Buy {nextVideos}+ videos to get{" "}
-          <span className="font-medium text-ink">{next.credits_per_eur} credits per €1</span> (save{" "}
-          {formatEurCents(nextSavingCents)}).
+          Buy {nextVideos}+ videos and{" "}
+          <span className="font-medium text-ink">save {formatEurCents(nextSavingCents)}</span>.
         </p>
       ) : null}
 
@@ -93,12 +91,11 @@ export const BuyCreditsCard: FC<BuyCreditsCardProps> = ({ pricing }) => {
               </span>
             ) : null}
           </p>
-          <p className="text-sm text-muted-foreground tabular-nums">
-            {rate} credits per €1
-            {cents < baseCents ? (
-              <span className="font-medium text-success"> · you save {formatEurCents(baseCents - cents)}</span>
-            ) : null}
-          </p>
+          {cents < baseCents ? (
+            <p className="text-sm font-medium text-success tabular-nums">
+              You save {formatEurCents(baseCents - cents)}
+            </p>
+          ) : null}
         </div>
         <Button
           size="lg"
