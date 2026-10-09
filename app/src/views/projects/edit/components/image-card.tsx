@@ -256,7 +256,7 @@ const WatermarkControls: FC<WatermarkControlsProps> = ({ image, attemptsLeft, on
   if (image.wm_status === WatermarkStatuses.FAILED) {
     return (
       <div className="flex flex-col gap-2">
-        <p className="text-xs text-error">Could not remove the watermark. You can continue without it.</p>
+        <p className="text-xs text-error">Watermark removal is not available right now. You can continue without it.</p>
         <Button variant="outline" size="sm" className="w-full" onClick={onRemoveWatermark} disabled={attemptsLeft <= 0}>
           <RefreshCwIcon /> Retry ({attemptsLeft} left)
         </Button>

@@ -46,7 +46,7 @@ const FAILURE_MESSAGES: Record<FailureCause, string> = {
   not_configured: 'Watermark removal is not configured on this server (missing API key).',
   disabled: 'Watermark removal is switched off at the moment.',
   unauthorized: 'The watermark removal service rejected our credentials.',
-  credits_exhausted: 'The watermark removal service has run out of credits; the feature was switched off.',
+  credits_exhausted: 'The watermark removal service has run out of credits. Top up the provider account.',
   bad_request: 'The watermark removal service could not process this image.',
   invalid_response: 'The watermark removal service returned an unusable result.',
   unavailable: 'The watermark removal service is temporarily unavailable.',
@@ -162,7 +162,8 @@ export class ImageProcessService {
         case 'invalid_response':
           return this.fail(imageId, 'invalid_response', log);
         case 'credits_exhausted':
-          await this.flags.disable('dewatermark_enabled', 'Dewatermark credits are exhausted');
+          // Do not switch the feature off: it works again as soon as the provider is topped up.
+          this.logger.error('[ALERT] Dewatermark provider credits are exhausted. Top up the provider account.');
           return this.fail(imageId, 'credits_exhausted', log);
         default:
           break; // server / rate_limited / network: transient, retried via BullMQ
