@@ -1,6 +1,7 @@
 // Centralized API endpoints (paths are relative to the axios baseURL, see API_BASE_URL in axios.ts).
 
 export const ApiRoutes = {
+  contact: "/contact",
   auth: {
     register: "/auth/register",
     login: "/auth/login",

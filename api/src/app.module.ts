@@ -17,6 +17,7 @@ import { SoundtracksModule } from './modules/soundtracks/soundtracks.module';
 import { ImagesModule } from './modules/images/images.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { HealthModule } from './modules/health/health.module';
+import { ContactModule } from './modules/contact/contact.module';
 import { BackgroundModule } from './background/background.module';
 
 @Module({
@@ -38,6 +39,7 @@ import { BackgroundModule } from './background/background.module';
     ImagesModule,
     AdminModule,
     HealthModule,
+    ContactModule,
     BackgroundModule,
   ],
   providers: [

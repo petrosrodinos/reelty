@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from "react";
+import { PoweredBy } from "@/components/layout/powered-by";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -21,6 +22,9 @@ export const AuthShell: FC<AuthShellProps> = ({ title, description, children, fo
         {footer ? <p className="mt-6 text-center text-sm text-muted-foreground">{footer}</p> : null}
       </div>
     </main>
+    <footer className="page-container flex justify-end py-6 text-[0.8125rem] text-muted-foreground">
+      <PoweredBy className="hover:text-ink" />
+    </footer>
   </>
 );
 

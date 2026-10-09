@@ -1,6 +1,7 @@
 import type { FC, ReactNode } from "react";
 import Link from "next/link";
 import { AppHeader } from "@/components/layout/app-header";
+import { PoweredBy } from "@/components/layout/powered-by";
 import { OfflineBanner, VerificationBanner } from "@/components/layout/app-banners";
 import type { Me } from "@/features/auth/interfaces/auth.interfaces";
 import { Routes } from "@/routes/routes";
@@ -29,6 +30,10 @@ export const AppShell: FC<AppShellProps> = ({ me, children }) => (
           <Link href={Routes.privacy} className="hover:text-ink">
             Privacy
           </Link>
+          <Link href={Routes.contact} className="hover:text-ink">
+            Contact
+          </Link>
+          <PoweredBy className="self-end hover:text-ink sm:self-auto" />
         </span>
       </div>
     </footer>

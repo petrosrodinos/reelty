@@ -8,6 +8,7 @@ export const Routes = {
   verify: "/verify",
   terms: "/terms",
   privacy: "/privacy",
+  contact: "/contact",
   guideListingVideo: "/real-estate-listing-video",
   guideAirbnbVideo: "/airbnb-listing-video",
   guideVsVideographer: "/reelty-vs-videographer",

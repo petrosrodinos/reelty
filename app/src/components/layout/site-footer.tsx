@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import Link from "next/link";
 import { BrandLogo } from "@/components/layout/brand-logo";
+import { PoweredBy } from "@/components/layout/powered-by";
 import { Routes } from "@/routes/routes";
 
 const columns = [
@@ -26,6 +27,7 @@ const columns = [
     links: [
       { label: "Terms of Service", href: Routes.terms },
       { label: "Privacy Policy", href: Routes.privacy },
+      { label: "Contact us", href: Routes.contact },
     ],
   },
 ];
@@ -56,9 +58,10 @@ export const SiteFooter: FC = () => (
           </div>
         ))}
       </div>
-      <div className="mt-10 flex flex-col gap-2 border-t border-surface-dark-elevated pt-6 text-[0.8125rem] md:flex-row md:justify-between">
+      <div className="mt-10 flex flex-col gap-2 border-t border-surface-dark-elevated pt-6 text-[0.8125rem] md:flex-row md:items-center md:justify-between">
         <span>© {new Date().getFullYear()} Reelty. All rights reserved.</span>
         <span>Processors: Google Cloud · Apify · Dewatermark · Higgsfield · email provider</span>
+        <PoweredBy className="self-end text-on-dark-soft transition-colors hover:text-on-dark md:self-auto" />
       </div>
     </div>
   </footer>
