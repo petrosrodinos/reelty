@@ -47,6 +47,7 @@ export const ApiRoutes = {
   usage: {
     prefix: "/usage",
   },
+  pricing: "/pricing",
   credits: {
     prefix: "/credits",
     transactions: "/credits/transactions",
