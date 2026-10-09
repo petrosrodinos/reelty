@@ -28,8 +28,11 @@ import {
   type AdminPurchasesQueryType,
 } from '@/modules/billing/dto/purchases-query.schema';
 import { AdminService } from './admin.service';
+import { AnalyticsQuerySchema, type AnalyticsQueryType } from './dto/analytics-query.schema';
 import { UpdateFlagsDto } from './dto/update-flags.dto';
 import { AdminStatsEntity, FlagsEntity } from './entities/admin.entity';
+import { AnalyticsEntity } from './entities/analytics.entity';
+import { AnalyticsService } from './services/analytics.service';
 
 @ApiTags('admin')
 @ApiCookieAuth('reelty_at')
@@ -37,7 +40,20 @@ import { AdminStatsEntity, FlagsEntity } from './entities/admin.entity';
 @UseGuards(JwtGuard, RolesGuard)
 @Roles('ADMIN')
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(
+    private readonly adminService: AdminService,
+    private readonly analyticsService: AnalyticsService,
+  ) {}
+
+  @Get('analytics')
+  @ApiOperation({
+    summary: 'Revenue, Stripe fees, provider costs, profit, users and videos: totals plus a time series',
+  })
+  @ApiQuery({ name: 'range', required: false, enum: ['7d', '30d', '90d', '12m', 'all'] })
+  @ApiResponse({ status: 200, type: AnalyticsEntity })
+  getAnalytics(@Query(new ZodValidationPipe(AnalyticsQuerySchema)) query: AnalyticsQueryType) {
+    return this.analyticsService.getAnalytics(query);
+  }
 
   @Get('stats')
   @ApiOperation({ summary: 'Queue depths, recent failures and project counts' })

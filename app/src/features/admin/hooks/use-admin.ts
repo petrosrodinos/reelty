@@ -3,10 +3,12 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getApiErrorMessage } from "@/config/constants/dropdowns/shared/api-error-message.options";
 import type { CostHistoryQuery } from "@/features/admin/interfaces/admin.interfaces";
+import type { AnalyticsRange } from "@/features/admin/interfaces/analytics.interfaces";
 import {
   adjustUserCredits,
   getAdminPurchases,
   getAdminUsers,
+  getAnalytics,
   getAppConfig,
   getCostHistory,
   getCreditTiers,
@@ -22,6 +24,17 @@ export const ADMIN_USERS_QUERY_KEY = "admin-users";
 export const COST_HISTORY_QUERY_KEY = "admin-cost-history";
 export const CREDIT_TIERS_QUERY_KEY = "admin-credit-tiers";
 export const ADMIN_PURCHASES_QUERY_KEY = "admin-purchases";
+export const ANALYTICS_QUERY_KEY = "admin-analytics";
+
+/** Revenue, costs, profit, users and videos over a range (admin only). */
+export const useAnalytics = (range: AnalyticsRange) => {
+  return useQuery({
+    queryKey: [ANALYTICS_QUERY_KEY, range],
+    queryFn: () => getAnalytics(range),
+    placeholderData: keepPreviousData,
+    staleTime: 60_000,
+  });
+};
 
 /** Provider prices and fallbacks (admin only). */
 export const useAppConfig = () => {

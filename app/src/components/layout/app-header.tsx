@@ -47,12 +47,12 @@ export const AppHeader: FC<AppHeaderProps> = ({ me }) => {
     logout.mutate(undefined, { onSettled: () => router.replace(Routes.home) });
   };
 
-  const links = isAdminRole(me.role) ? [...navLinks, { label: "Admin", href: Routes.adminConfig }] : navLinks;
+  const links = isAdminRole(me.role) ? [...navLinks, { label: "Admin", href: Routes.adminAnalytics }] : navLinks;
 
   const isActive = (href: string) =>
     pathname === href ||
     (href === Routes.videos && pathname.startsWith("/projects")) ||
-    (href === Routes.adminConfig && pathname.startsWith("/admin"));
+    (href === Routes.adminAnalytics && pathname.startsWith("/admin"));
 
   return (
     <header className="sticky top-0 z-40 h-16 border-b border-hairline-soft bg-canvas">

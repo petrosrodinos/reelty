@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Routes } from "@/routes/routes";
 
 const tabs = [
+  { label: "Analytics", href: Routes.adminAnalytics },
   { label: "Prices", href: Routes.adminConfig },
   { label: "Credit tiers", href: Routes.adminCreditTiers },
   { label: "Purchases", href: Routes.adminPurchases },

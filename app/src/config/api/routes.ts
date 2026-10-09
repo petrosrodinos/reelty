@@ -33,6 +33,7 @@ export const ApiRoutes = {
     downloadUrl: (id: string) => `/images/${id}/download-url`,
   },
   admin: {
+    analytics: "/admin/analytics",
     config: "/admin/config",
     configByKey: (key: string) => `/admin/config/${encodeURIComponent(key)}`,
     usage: "/admin/usage",

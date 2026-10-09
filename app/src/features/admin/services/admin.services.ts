@@ -1,12 +1,18 @@
 import axiosInstance from "@/config/api/axios";
 import { ApiRoutes } from "@/config/api/routes";
 import type { AdminUserOption, AppConfigItem, CostHistory, CostHistoryQuery } from "@/features/admin/interfaces/admin.interfaces";
+import type { Analytics, AnalyticsRange } from "@/features/admin/interfaces/analytics.interfaces";
 import type { AdminPurchases, AdminPurchasesQuery } from "@/features/billing/interfaces/billing.interfaces";
 import type { CreditTier } from "@/features/credits/interfaces/credits.interfaces";
 
 /** One row of the tier set sent to the API; rows without an id are created. */
 export type CreditTierInput = Pick<CreditTier, "name" | "min_clips" | "max_clips" | "credits" | "is_default"> & {
   id?: string;
+};
+
+export const getAnalytics = async (range: AnalyticsRange): Promise<Analytics> => {
+  const response = await axiosInstance.get<Analytics>(ApiRoutes.admin.analytics, { params: { range } });
+  return response.data;
 };
 
 export const getAppConfig = async (): Promise<AppConfigItem[]> => {

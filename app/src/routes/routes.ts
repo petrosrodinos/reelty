@@ -12,6 +12,7 @@ export const Routes = {
   videos: "/videos",
   usage: "/usage",
   credits: "/credits",
+  adminAnalytics: "/admin/analytics",
   adminConfig: "/admin/config",
   adminUsage: "/admin/usage",
   adminCreditTiers: "/admin/credit-tiers",
