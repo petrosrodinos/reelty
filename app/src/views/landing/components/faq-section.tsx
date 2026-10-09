@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
-const faqs = [
+export const faqs = [
   {
     q: "Which photos can I use?",
     a: "Only photos you own or have permission to use. You confirm this before your first render, and we store that confirmation.",

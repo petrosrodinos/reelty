@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter, JetBrains_Mono } from "next/font/google";
+import { environments } from "@/config/environments";
 import { Providers } from "@/components/providers/providers";
 import "./globals.css";
 
@@ -30,6 +31,20 @@ export const metadata: Metadata = {
   description:
     "Turn listing photos into cinematic walkthrough videos. Paste a listing link or upload your photos, pick the shots and come back to a finished 1080p MP4.",
   applicationName: "Reelty",
+  metadataBase: new URL(environments.appUrl),
+  openGraph: {
+    type: "website",
+    siteName: "Reelty",
+    title: "Reelty — Property walkthrough videos",
+    description:
+      "Turn listing photos into cinematic walkthrough videos. Paste a listing link or upload photos and get a finished 1080p MP4.",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Reelty — Property walkthrough videos",
+    description: "Turn listing photos into cinematic walkthrough videos in minutes.",
+  },
 };
 
 export const viewport: Viewport = {
