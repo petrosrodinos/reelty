@@ -215,7 +215,7 @@ const WatermarkControls: FC<WatermarkControlsProps> = ({ image, attemptsLeft, on
   if (image.wm_status === WatermarkStatuses.DONE && image.has_processed) {
     return (
       <div className="flex flex-col gap-2">
-        <div role="group" aria-label="Which version the video uses" className="flex overflow-hidden rounded-md border border-hairline">
+        <div role="group" aria-label="Which version the video uses" className="flex overflow-hidden rounded-md border border-hairline *:leading-tight">
           <button
             type="button"
             onClick={() => onUseProcessed(true)}
@@ -239,12 +239,12 @@ const WatermarkControls: FC<WatermarkControlsProps> = ({ image, attemptsLeft, on
             Revert to original
           </button>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="flex-1" onClick={onPreview}>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" className="min-w-24 flex-1" onClick={onPreview}>
             <EyeIcon /> Compare
           </Button>
           {attemptsLeft > 0 ? (
-            <Button variant="outline" size="sm" className="flex-1" onClick={onRemoveWatermark}>
+            <Button variant="outline" size="sm" className="min-w-24 flex-1" onClick={onRemoveWatermark}>
               <RefreshCwIcon /> Retry ({attemptsLeft})
             </Button>
           ) : null}

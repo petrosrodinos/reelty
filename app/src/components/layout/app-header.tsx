@@ -79,7 +79,7 @@ export const AppHeader: FC<AppHeaderProps> = ({ me }) => {
             href={Routes.credits}
             title="Buy credits"
             className={cn(
-              "hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-[0.8125rem] font-medium outline-none transition-colors hover:text-ink focus-visible:ring-3 focus-visible:ring-ring/50 sm:inline-flex",
+              "inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1.5 text-xs font-medium outline-none transition-colors hover:text-ink focus-visible:ring-3 focus-visible:ring-ring/50 sm:gap-1.5 sm:px-3 sm:text-[0.8125rem]",
               outOfCredits ? "bg-notice-warn text-ink" : "bg-surface-card text-muted-foreground",
             )}
           >
@@ -107,7 +107,6 @@ export const AppHeader: FC<AppHeaderProps> = ({ me }) => {
                     <ShieldCheckIcon className="size-3.5" aria-hidden="true" />
                     {me.email_verified ? "Email verified" : "Email not verified"}
                   </span>
-                  <span className="text-[0.8125rem] font-normal text-muted-foreground sm:hidden">{creditsLabel}</span>
                 </DropdownMenuLabel>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />

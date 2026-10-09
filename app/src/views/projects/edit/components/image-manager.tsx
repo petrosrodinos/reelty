@@ -173,6 +173,7 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
         </div>
         <Button
           variant="outline"
+          className="max-sm:w-full"
           onClick={openPicker}
           disabled={uploader.isUploading}
         >
@@ -218,7 +219,7 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={images.map((image) => image.id)} strategy={rectSortingStrategy}>
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-2 xl:grid-cols-3">
+          <ul className="grid grid-cols-1 gap-3 min-[26rem]:grid-cols-2 sm:grid-cols-3 md:gap-4 lg:grid-cols-2 xl:grid-cols-3">
             {images.map((image, index) => (
               <ImageCard
                 key={image.id}

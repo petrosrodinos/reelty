@@ -108,7 +108,7 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
           </p>
           <h1 className="text-display-lg mt-2">Prepare your photos</h1>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-start">
           <SaveIndicator state={saveState} onRetry={retrySave} />
           <Button variant="ghost" onClick={() => setDiscarding(true)}>
             <Trash2Icon /> Discard
