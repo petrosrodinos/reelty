@@ -18,7 +18,7 @@ export const PricingTable: FC<PricingTableProps> = ({ pricing }) => {
         What a video costs
       </h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Credits are taken when you create a video, and returned automatically if it fails.
+        Credits are taken when you create a video.
       </p>
       <Table className="mt-4">
         <TableHeader>
