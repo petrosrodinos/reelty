@@ -7,7 +7,7 @@ import { Routes } from "@/routes/routes";
 const perks = [
   "Short to long videos, priced by photo count",
   "Website, Airbnb or upload intake",
-  "2 watermark removals per photo",
+  "Watermark removals per photo",
   "Videos kept until you delete them",
 ];
 
