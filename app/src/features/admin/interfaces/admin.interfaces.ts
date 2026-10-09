@@ -5,6 +5,10 @@ export interface AppConfigItem {
   value: number;
   unit: "usd" | "credits" | "ratio";
   description: string | null;
+  /** Only whole numbers are accepted. */
+  integer: boolean;
+  /** Smallest accepted value. */
+  min: number;
   /** False when no row exists yet and the built-in default is in use. */
   stored: boolean;
   updated_at: string | null;

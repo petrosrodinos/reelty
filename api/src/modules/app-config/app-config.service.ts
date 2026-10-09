@@ -8,7 +8,10 @@ import {
   AppConfigKeys,
   isAppConfigKey,
 } from './app-config.constants';
-import type { AppConfigItem, CostFigures } from './interfaces/app-config.interface';
+import type {
+  AppConfigItem,
+  CostFigures,
+} from './interfaces/app-config.interface';
 
 /** Operator-editable prices (`app_config` table), with built-in defaults for rows that do not exist yet. */
 @Injectable()
@@ -29,8 +32,11 @@ export class AppConfigService {
       return {
         key,
         value: row?.value ?? fallback.value,
-        unit: row?.unit ?? fallback.unit,
-        description: row?.description ?? fallback.description,
+        // Unit and description are owned by the code; stored copies may predate a wording change.
+        unit: fallback.unit,
+        description: fallback.description,
+        integer: !!fallback.integer,
+        min: fallback.min ?? 0,
         stored: !!row,
         updated_at: row?.updated_at.toISOString() ?? null,
       };
@@ -38,18 +44,41 @@ export class AppConfigService {
   }
 
   async update(key: string, value: number): Promise<AppConfigItem> {
-    if (!isAppConfigKey(key)) throw new ApiException(HttpStatus.NOT_FOUND, ErrorCodes.NOT_FOUND, 'Unknown config key');
+    if (!isAppConfigKey(key))
+      throw new ApiException(
+        HttpStatus.NOT_FOUND,
+        ErrorCodes.NOT_FOUND,
+        'Unknown config key',
+      );
     const fallback = APP_CONFIG_DEFAULTS[key];
+    const min = fallback.min ?? 0;
+    if (fallback.integer && !Number.isInteger(value)) {
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        ErrorCodes.VALIDATION,
+        'This value must be a whole number.',
+      );
+    }
+    if (value < min) {
+      throw new ApiException(
+        HttpStatus.BAD_REQUEST,
+        ErrorCodes.VALIDATION,
+        `This value must be ${min} or more.`,
+      );
+    }
+    const meta = { unit: fallback.unit, description: fallback.description };
     const row = await this.prisma.appConfig.upsert({
       where: { key },
-      update: { value },
-      create: { key, value, unit: fallback.unit, description: fallback.description },
+      update: { value, ...meta },
+      create: { key, value, ...meta },
     });
     return {
       key: row.key,
       value: row.value,
       unit: row.unit,
       description: row.description,
+      integer: !!fallback.integer,
+      min,
       stored: true,
       updated_at: row.updated_at.toISOString(),
     };
@@ -75,8 +104,11 @@ export class AppConfigService {
 
   /** Apify reports real USD usage; the configured per-run price is used only when it does not. */
   async apifyCost(reportedUsd: number | null): Promise<CostFigures> {
-    if (reportedUsd !== null) return { credits: null, cost_usd: reportedUsd, estimated: false };
-    const fallback = await this.getNumber(AppConfigKeys.APIFY_FALLBACK_USD_PER_RUN);
+    if (reportedUsd !== null)
+      return { credits: null, cost_usd: reportedUsd, estimated: false };
+    const fallback = await this.getNumber(
+      AppConfigKeys.APIFY_FALLBACK_USD_PER_RUN,
+    );
     return { credits: null, cost_usd: fallback, estimated: true };
   }
 }

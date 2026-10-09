@@ -19,7 +19,10 @@ interface ConfigRowProps {
 export const ConfigRow: FC<ConfigRowProps> = ({ item, isSaving, onSave }) => {
   const [draft, setDraft] = useState(String(item.value));
   const parsed = Number(draft);
-  const valid = draft.trim() !== "" && Number.isFinite(parsed) && parsed >= 0;
+  const valid =
+    draft.trim() !== "" && Number.isFinite(parsed) && parsed >= item.min && (!item.integer || Number.isInteger(parsed));
+  const prefix = item.unit === "usd" ? "$" : null;
+  const suffix = item.unit === "credits" ? "credits" : null;
   const dirty = valid && parsed !== item.value;
   const inputId = `config-${item.key}`;
 
@@ -46,27 +49,33 @@ export const ConfigRow: FC<ConfigRowProps> = ({ item, isSaving, onSave }) => {
 
       <div className="flex items-center gap-3">
         <div className="relative w-40">
-          {item.unit === "usd" ? (
+          {prefix ? (
             <span className="pointer-events-none absolute inset-y-0 left-3 grid place-items-center text-sm text-muted-foreground">
-              $
+              {prefix}
             </span>
           ) : null}
           <Input
             id={inputId}
             type="number"
-            inputMode="decimal"
-            min={0}
-            step="any"
+            inputMode={item.integer ? "numeric" : "decimal"}
+            min={item.min}
+            step={item.integer ? 1 : "any"}
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             aria-invalid={!valid}
+            aria-describedby={!valid ? `${inputId}-error` : undefined}
             disabled={isSaving}
-            className={item.unit === "usd" ? "h-11 pl-7 tabular-nums" : "h-11 pr-16 tabular-nums"}
+            className={prefix ? "h-11 pl-7 tabular-nums" : suffix ? "h-11 pr-16 tabular-nums" : "h-11 tabular-nums"}
           />
-          {item.unit === "credits" ? (
+          {suffix ? (
             <span className="pointer-events-none absolute inset-y-0 right-3 grid place-items-center text-sm text-muted-foreground">
-              credits
+              {suffix}
             </span>
+          ) : null}
+          {!valid ? (
+            <p id={`${inputId}-error`} className="absolute top-full mt-1 text-xs text-destructive">
+              {item.integer ? `Whole number, ${item.min} or more` : `${item.min} or more`}
+            </p>
           ) : null}
         </div>
         <Button type="submit" disabled={!dirty || isSaving} className="h-11">

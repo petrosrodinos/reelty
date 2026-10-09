@@ -54,6 +54,10 @@ export function quoteVideo(pricing: CreditsPricing, input: QuoteInput): VideoQuo
   };
 }
 
+/** The purchase slider moves in whole packs of this many videos. A UI choice only; the API accepts any credit count. */
+export const PURCHASE_VIDEO_STEP = 3;
+export const PURCHASE_MAX_VIDEOS = 60;
+
 /** Credits per "video" on the purchase slider: the default tier's price. */
 export function creditsPerVideo(pricing: CreditsPricing): number {
   return (pricing.tiers.find((t) => t.is_default) ?? pricing.tiers[0])?.credits ?? 1;

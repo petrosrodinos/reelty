@@ -7,12 +7,13 @@ import { Slider } from "@/components/ui/slider";
 import { Spinner } from "@/components/ui/spinner";
 import { useCreateCheckout } from "@/features/billing/hooks/use-billing";
 import type { CreditsPricing } from "@/features/credits/interfaces/credits.interfaces";
-import { creditsPerVideo, priceCents } from "@/features/credits/utils/credit-pricing.utils";
+import {
+  creditsPerVideo,
+  priceCents,
+  PURCHASE_MAX_VIDEOS as MAX_VIDEOS,
+  PURCHASE_VIDEO_STEP as VIDEO_STEP,
+} from "@/features/credits/utils/credit-pricing.utils";
 import { formatEurCents, pluralize } from "@/lib/format.utils";
-
-/** The slider moves in whole packs of 3 videos. This is a UI choice only; the API accepts any credit count. */
-const VIDEO_STEP = 3;
-const MAX_VIDEOS = 60;
 
 interface BuyCreditsCardProps {
   pricing: CreditsPricing;

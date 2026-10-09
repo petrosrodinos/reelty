@@ -3,6 +3,10 @@ export interface AppConfigItem {
   value: number;
   unit: string;
   description: string | null;
+  /** Only whole numbers are accepted. */
+  integer: boolean;
+  /** Smallest accepted value. */
+  min: number;
   /** False when the row does not exist yet and the built-in default is being used. */
   stored: boolean;
   updated_at: string | null;

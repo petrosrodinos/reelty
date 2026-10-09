@@ -18,6 +18,10 @@ export interface AppConfigDefault {
   value: number;
   unit: 'usd' | 'credits' | 'ratio';
   description: string;
+  /** Whole numbers only (our own credits are never fractional). */
+  integer?: boolean;
+  /** Smallest accepted value; 0 when omitted. */
+  min?: number;
 }
 
 /**
@@ -28,12 +32,14 @@ export const APP_CONFIG_DEFAULTS: Record<AppConfigKey, AppConfigDefault> = {
   [AppConfigKeys.HIGGSFIELD_USD_PER_CREDIT]: {
     value: 0.0627,
     unit: 'usd',
-    description: 'USD cost of one Higgsfield credit (from the API estimate: $0.179 / 2.856 credits, after the 15% API discount).',
+    description:
+      'USD cost of one Higgsfield credit (from the API estimate: $0.179 / 2.856 credits, after the 15% API discount).',
   },
   [AppConfigKeys.HIGGSFIELD_FALLBACK_CREDITS_PER_CLIP]: {
     value: 2.856,
     unit: 'credits',
-    description: 'Credits per 5 s Kling 2.5 turbo clip, used only when the estimate endpoint is unavailable.',
+    description:
+      'Credits per 5 s Kling 2.5 turbo clip, used only when the estimate endpoint is unavailable.',
   },
   [AppConfigKeys.DEWATERMARK_CREDITS_PER_IMAGE]: {
     value: 1,
@@ -43,43 +49,57 @@ export const APP_CONFIG_DEFAULTS: Record<AppConfigKey, AppConfigDefault> = {
   [AppConfigKeys.DEWATERMARK_USD_PER_CREDIT]: {
     value: 0.1,
     unit: 'usd',
-    description: 'USD cost of one dewatermark credit. Set from your plan price.',
+    description:
+      'USD cost of one dewatermark credit. Set from your plan price.',
   },
   [AppConfigKeys.APIFY_FALLBACK_USD_PER_RUN]: {
     value: 0.005,
     unit: 'usd',
-    description: 'USD cost of one listing scrape, used only when Apify does not report the run usage.',
+    description:
+      'USD cost of one listing scrape, used only when Apify does not report the run usage.',
   },
   [AppConfigKeys.BILLING_CREDITS_PER_EUR]: {
     value: 1,
     unit: 'credits',
-    description: 'Credits a user gets for 1 EUR. Price of a purchase = credits / this value.',
+    description:
+      'Whole credits a user gets for 1 EUR (e.g. 3 makes one credit cost €0.33). Price of a purchase = credits / this value, rounded to the cent.',
+    integer: true,
+    min: 1,
   },
   [AppConfigKeys.BILLING_USD_PER_EUR]: {
     value: 1.08,
     unit: 'ratio',
-    description: 'USD per 1 EUR, snapshotted onto each purchase for the USD columns.',
+    description:
+      'USD per 1 EUR, snapshotted onto each purchase for the USD columns.',
   },
   [AppConfigKeys.BILLING_MAX_CREDITS_PER_PURCHASE]: {
     value: 500,
     unit: 'credits',
     description: 'Largest number of credits one checkout may buy.',
+    integer: true,
+    min: 1,
   },
   [AppConfigKeys.CREDITS_SIGNUP_GRANT]: {
     value: 3,
     unit: 'credits',
     description: 'Free credits given once to every new account.',
+    integer: true,
   },
   [AppConfigKeys.CREDITS_WATERMARK_REMOVAL]: {
     value: 1,
     unit: 'credits',
-    description: 'Flat add-on per video when at least one photo had its watermark removed.',
+    description:
+      'Flat add-on per video when at least one photo had its watermark removed.',
+    integer: true,
   },
   [AppConfigKeys.CREDITS_IMPORT_FETCH]: {
     value: 0,
     unit: 'credits',
-    description: 'Flat add-on per video imported from an Airbnb or website link.',
+    description:
+      'Flat add-on per video imported from an Airbnb or website link.',
+    integer: true,
   },
 };
 
-export const isAppConfigKey = (key: string): key is AppConfigKey => key in APP_CONFIG_DEFAULTS;
+export const isAppConfigKey = (key: string): key is AppConfigKey =>
+  key in APP_CONFIG_DEFAULTS;
