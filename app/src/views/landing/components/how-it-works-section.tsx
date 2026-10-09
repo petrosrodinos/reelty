@@ -1,4 +1,5 @@
 import type { FC } from "react";
+import Image from "next/image";
 import { ClockIcon, ImagesIcon, Link2Icon } from "lucide-react";
 
 const steps = [
@@ -36,6 +37,14 @@ export const HowItWorksSection: FC = () => (
           </article>
         ))}
       </div>
+      <Image
+        src="/screens/new-video.png"
+        alt="The Reelty New video page with tabs for a website link, an Airbnb link or uploaded photos"
+        width={740}
+        height={530}
+        sizes="(min-width: 768px) 740px, 100vw"
+        className="mx-auto mt-10 h-auto w-full max-w-3xl rounded-lg border border-hairline shadow-sm md:mt-12"
+      />
     </div>
   </section>
 );

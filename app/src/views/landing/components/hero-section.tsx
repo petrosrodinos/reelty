@@ -82,9 +82,9 @@ export const HeroSection: FC = () => (
     <div className="page-container grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
       <div>
         <span className="inline-flex rounded-full bg-brand px-3 py-1 text-eyebrow text-ink">Beta</span>
-        <h1 className="text-display-xl mt-5">Turn listing photos into cinematic walkthroughs.</h1>
+        <h1 className="text-display-xl mt-5">Turn property photos into proffessional videos.</h1>
         <p className="mt-6 max-w-xl text-lg text-body-strong md:text-xl">
-          Paste a listing link or upload your photos. Pick the shots, press create, and come back to a finished 1080p video. No
+          Paste your property link or upload your photos. Pick the images, press create, and come back to a proffessional video. No
           editing skills needed.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">

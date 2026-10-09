@@ -94,7 +94,7 @@ export const AppHeader: FC<AppHeaderProps> = ({ me }) => {
           <DropdownMenu>
             <DropdownMenuTrigger
               aria-label="Account menu"
-              className="grid size-10 place-items-center rounded-full border border-hairline bg-surface-strong text-sm font-medium text-ink outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="hidden size-10 place-items-center rounded-full md:grid border border-hairline bg-surface-strong text-sm font-medium text-ink outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
             >
               {getInitial(me.email)}
             </DropdownMenuTrigger>
@@ -132,6 +132,14 @@ export const AppHeader: FC<AppHeaderProps> = ({ me }) => {
               <SheetHeader className="h-16 justify-center border-b border-hairline-soft px-4">
                 <SheetTitle className="font-display text-2xl">Menu</SheetTitle>
               </SheetHeader>
+              <div className="flex flex-col gap-0.5 border-b border-hairline-soft px-7 py-4">
+                {me.full_name ? <span className="break-words text-sm font-medium text-ink">{me.full_name}</span> : null}
+                <span className="break-all text-sm font-medium text-ink">{me.email}</span>
+                <span className="flex items-center gap-1.5 text-[0.8125rem] text-muted-foreground">
+                  <ShieldCheckIcon className="size-3.5" aria-hidden="true" />
+                  {me.email_verified ? "Email verified" : "Email not verified"}
+                </span>
+              </div>
               <nav aria-label="Mobile" className="flex flex-col gap-1 p-4">
                 {links.map((link) => (
                   <Link
@@ -154,6 +162,11 @@ export const AppHeader: FC<AppHeaderProps> = ({ me }) => {
                 >
                   {creditsLabel} · Buy credits
                 </Link>
+                {!me.email_verified ? (
+                  <Button className="mt-3 h-12" onClick={() => resend.mutate()} variant="outline">
+                    <MailIcon /> Resend verification
+                  </Button>
+                ) : null}
                 <Button className="mt-3 h-12" onClick={handleLogout} variant="outline">
                   <LogOutIcon /> Log out
                 </Button>

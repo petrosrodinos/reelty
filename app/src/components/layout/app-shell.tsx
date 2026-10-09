@@ -21,9 +21,9 @@ export const AppShell: FC<AppShellProps> = ({ me, children }) => (
       {children}
     </main>
     <footer className="border-t border-hairline-soft bg-canvas">
-      <div className="page-container flex flex-col gap-2 py-6 text-[0.8125rem] text-muted-foreground sm:flex-row sm:justify-between">
-        <span>Videos are AI-generated from your photos and may differ from the real property.</span>
-        <span className="flex gap-4">
+      <div className="page-container flex flex-col gap-3 py-6 text-[0.8125rem] text-muted-foreground sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+        <span className="sm:max-w-md">Videos are AI-generated from your photos and may differ from the real property.</span>
+        <span className="flex flex-wrap gap-x-4 gap-y-1 sm:justify-end">
           <Link href={Routes.terms} className="hover:text-ink">
             Terms
           </Link>
@@ -33,7 +33,7 @@ export const AppShell: FC<AppShellProps> = ({ me, children }) => (
           <Link href={Routes.contact} className="hover:text-ink">
             Contact
           </Link>
-          <PoweredBy className="self-end hover:text-ink sm:self-auto" />
+          <PoweredBy className="hover:text-ink" />
         </span>
       </div>
     </footer>
