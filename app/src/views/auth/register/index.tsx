@@ -28,12 +28,12 @@ const RegisterPage: FC = () => {
 
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { email: "", password: "", accept_terms: false },
+    defaultValues: { full_name: "", email: "", password: "", accept_terms: false },
   });
 
   const onSubmit = (values: RegisterFormData) => {
     register.mutate(
-      { email: values.email, password: values.password },
+      { full_name: values.full_name, email: values.email, password: values.password },
       { onSuccess: () => router.push(Routes.verify) },
     );
   };
@@ -50,6 +50,19 @@ const RegisterPage: FC = () => {
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
+          <FormField
+            control={form.control}
+            name="full_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Full name</FormLabel>
+                <FormControl>
+                  <Input type="text" autoComplete="name" placeholder="Jane Doe" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="email"

@@ -17,6 +17,7 @@ export interface CreditBalance {
 export interface Me {
   id: string;
   email: string;
+  full_name: string | null;
   role: UserRole;
   email_verified: boolean;
   created_at: string;
@@ -37,6 +38,7 @@ export interface LoginDto {
 }
 
 export interface RegisterDto {
+  full_name: string;
   email: string;
   password: string;
 }

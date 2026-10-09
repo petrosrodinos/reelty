@@ -101,6 +101,7 @@ export const AppHeader: FC<AppHeaderProps> = ({ me }) => {
             <DropdownMenuContent align="end" className="w-64">
               <DropdownMenuGroup>
                 <DropdownMenuLabel className="flex flex-col gap-0.5 px-2 py-2">
+                  {me.full_name ? <span className="break-words text-sm font-medium text-ink">{me.full_name}</span> : null}
                   <span className="break-all text-sm font-medium text-ink">{me.email}</span>
                   <span className="flex items-center gap-1.5 text-[0.8125rem] font-normal text-muted-foreground">
                     <ShieldCheckIcon className="size-3.5" aria-hidden="true" />

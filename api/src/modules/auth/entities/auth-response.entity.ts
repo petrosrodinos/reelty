@@ -12,6 +12,9 @@ export class MeEntity {
   @ApiProperty()
   email: string;
 
+  @ApiProperty({ type: String, nullable: true })
+  full_name: string | null;
+
   @ApiProperty({ enum: ['USER', 'ADMIN', 'SUPER_ADMIN', 'SUPPORT'] })
   role: string;
 

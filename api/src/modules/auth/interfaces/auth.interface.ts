@@ -2,6 +2,7 @@
 export interface Me {
   id: string;
   email: string;
+  full_name: string | null;
   role: string;
   email_verified: boolean;
   created_at: string;

@@ -20,6 +20,7 @@ export const loginSchema = z.object({
 export type LoginFormData = z.infer<typeof loginSchema>;
 
 export const registerSchema = z.object({
+  full_name: z.string().trim().min(1, "Enter your full name.").max(100, "Use at most 100 characters."),
   email: emailField,
   password: newPasswordField,
   accept_terms: z.boolean().refine((value) => value, "Please accept the terms to continue."),

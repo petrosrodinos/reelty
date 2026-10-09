@@ -79,6 +79,7 @@ export class AuthService implements OnModuleInit {
         const created = await tx.user.create({
           data: {
             email: dto.email,
+            full_name: dto.full_name,
             password_hash: passwordHash,
             email_verified_at: REQUIRE_EMAIL_VERIFICATION ? null : new Date(),
           },
@@ -350,6 +351,7 @@ export class AuthService implements OnModuleInit {
   private async buildMe(user: {
     id: string;
     email: string;
+    full_name: string | null;
     role: string;
     email_verified_at: Date | null;
     created_at: Date;
@@ -358,6 +360,7 @@ export class AuthService implements OnModuleInit {
     return {
       id: user.id,
       email: user.email,
+      full_name: user.full_name,
       role: user.role,
       email_verified: user.email_verified_at !== null,
       created_at: user.created_at.toISOString(),
