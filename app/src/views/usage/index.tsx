@@ -6,6 +6,7 @@ import { CoinsIcon, ReceiptTextIcon, WifiOffIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { StatePanel } from "@/components/ui/state-panel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreditTxKindFilterOptions } from "@/config/constants/dropdowns/credits/credit-tx-kind-filter.options";
 import { usePurchases } from "@/features/billing/hooks/use-billing";
 import { useCreditTransactions } from "@/features/credits/hooks/use-credits";
@@ -41,18 +42,14 @@ const Pager: FC<PagerProps> = ({ pagination, isFetching, onPage }) =>
     </nav>
   ) : null;
 
-const Section: FC<{ title: string; description: string; aside?: ReactNode; children: ReactNode }> = ({
-  title,
+const Section: FC<{ description: string; aside?: ReactNode; children: ReactNode }> = ({
   description,
   aside,
   children,
 }) => (
   <section className="flex flex-col gap-5">
     <div className="flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <h2 className="text-display-sm">{title}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-      </div>
+      <p className="text-sm text-muted-foreground">{description}</p>
       {aside}
     </div>
     {children}
@@ -65,7 +62,7 @@ const PurchasesSection: FC = () => {
   const purchases = data?.data ?? [];
 
   return (
-    <Section title="Purchases" description="Credits you bought, with the amount paid in euro.">
+    <Section description="Credits you bought, with the amount paid in euro.">
       {isPending ? (
         <UsageSkeleton rows={3} />
       ) : error ? (
@@ -102,7 +99,6 @@ const HistorySection: FC = () => {
 
   return (
     <Section
-      title="Credit history"
       description="Every credit added to or taken from your balance, newest first."
       aside={
         <Select
@@ -182,10 +178,22 @@ const UsagePage: FC = () => {
         </Button>
       </div>
 
-      <div className="flex flex-col gap-12">
-        <PurchasesSection />
-        <HistorySection />
-      </div>
+      <Tabs defaultValue="purchases" className="gap-6">
+        <TabsList variant="line" className="h-10">
+          <TabsTrigger value="purchases" className="flex-none px-3 text-base">
+            Purchases
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex-none px-3 text-base">
+            Credit history
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="purchases">
+          <PurchasesSection />
+        </TabsContent>
+        <TabsContent value="history">
+          <HistorySection />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
