@@ -34,7 +34,7 @@ const RegisterPage: FC = () => {
   const onSubmit = (values: RegisterFormData) => {
     register.mutate(
       { full_name: values.full_name, email: values.email, password: values.password },
-      { onSuccess: () => router.push(Routes.verify) },
+      { onSuccess: () => router.push(Routes.new) },
     );
   };
 

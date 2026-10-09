@@ -19,10 +19,6 @@ export const faqs = [
     a: "Each video uses 3 to 12 photos, in the order you choose.",
   },
   {
-    q: "Which photos can I use?",
-    a: "Only photos you own or have permission to use. You confirm this before your first render, and we store that confirmation.",
-  },
-  {
     q: "Can you remove watermarks?",
     a: "You can run watermark removal on your own images. Removing someone else's watermark may infringe their rights, so our terms place that responsibility on you.",
   },

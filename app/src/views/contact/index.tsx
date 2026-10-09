@@ -1,6 +1,6 @@
 "use client";
 
-import type { FC } from "react";
+import { useEffect, type FC } from "react";
 import { MailCheckIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,15 +11,22 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import { useMe } from "@/features/auth/hooks/use-auth";
 import { useSendContactMessage } from "@/features/contact/hooks/use-contact";
 import { contactSchema, type ContactFormData } from "@/features/contact/validation-schemas/contact.schema";
 
 const ContactPage: FC = () => {
   const contact = useSendContactMessage();
+  const { data: me } = useMe({ requireSessionHint: true });
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
     defaultValues: { name: "", email: "", message: "" },
   });
+
+  // Prefill the signed-in user's email without overwriting something they already typed.
+  useEffect(() => {
+    if (me?.email && !form.getFieldState("email").isDirty) form.setValue("email", me.email);
+  }, [me?.email, form]);
 
   const onSubmit = (values: ContactFormData) => contact.mutate(values, { onSuccess: () => form.reset() });
 
