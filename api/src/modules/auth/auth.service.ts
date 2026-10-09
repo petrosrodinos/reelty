@@ -4,7 +4,7 @@ import * as argon2 from 'argon2';
 import { randomUUID } from 'crypto';
 import { CreditTxKind } from 'generated/prisma';
 import { EmailKinds } from '@/core/queues/queues.constants';
-import { QueuesService } from '@/core/queues/queues.service';
+import { NotifyService } from '@/background/notify/notify.service';
 import { PrismaService } from '@/core/databases/prisma/prisma.service';
 import { AuthTtl } from '@/shared/constants/auth.constants';
 import { ErrorCodes } from '@/shared/config/error-codes';
@@ -48,7 +48,7 @@ export class AuthService implements OnModuleInit {
     private readonly config: ConfigService,
     private readonly tokens: TokenService,
     private readonly credits: CreditsService,
-    private readonly queues: QueuesService,
+    private readonly notify: NotifyService,
     private readonly rateLimit: RateLimitService,
   ) {}
 
@@ -411,13 +411,13 @@ export class AuthService implements OnModuleInit {
     }
   }
 
-  /** The raw token travels in the job payload only (Redis must stay private). Never logged. */
+  /** Sent inline (no queue) for now. The raw token is never logged. */
   private async enqueueEmail(
     kind: typeof EmailKinds.VERIFY_EMAIL | typeof EmailKinds.RESET_PASSWORD,
     userId: string,
     token: string,
-    nonce: string,
+    _nonce?: string,
   ) {
-    await this.queues.enqueueEmail({ kind, userId, token }, nonce);
+    await this.notify.send({ kind, userId, token });
   }
 }

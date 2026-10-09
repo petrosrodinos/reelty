@@ -13,6 +13,6 @@ import { NotifyService } from './notify.service';
     BackgroundCommonModule,
   ],
   providers: [NotifyProcessor, NotifyService, NotifyQueueService],
-  exports: [NotifyQueueService],
+  exports: [NotifyQueueService, NotifyService],
 })
 export class NotifyBackgroundModule {}

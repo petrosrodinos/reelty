@@ -8,7 +8,7 @@ export const appConfig = {
     wmMaxAttempts: 2,
   },
   email: {
-    from: 'Reelty <hello@reelty.app>',
+    from: 'Reelty <info@logiqdev.com>',
   },
   /** 'auto' = higgsfield when HIGGSFIELD_API_KEY is set, else local. Or force 'local' | 'higgsfield'. */
   videoProvider: 'auto' as 'auto' | 'local' | 'higgsfield',
