@@ -9,15 +9,17 @@ import ConfirmationDialog from "@/components/ui/confirmation-dialog";
 import { StatePanel } from "@/components/ui/state-panel";
 import { ApiError } from "@/config/api/axios";
 import { useMe } from "@/features/auth/hooks/use-auth";
+import { useCheckoutReturn } from "@/features/billing/hooks/use-checkout-return";
 import { useDeleteProject, useProject, useSubmitProject } from "@/features/projects/hooks/use-projects";
 import { EditableStatuses, ProjectStatuses } from "@/features/projects/interfaces/projects.interfaces";
 import { useUsage } from "@/features/usage/hooks/use-usage";
 import { useCredits, useVideoLimits } from "@/features/credits/hooks/use-credits";
-import { quoteVideo } from "@/features/credits/utils/credit-pricing.utils";
+import { maxAffordableClips, quoteVideo } from "@/features/credits/utils/credit-pricing.utils";
 import { WatermarkStatuses } from "@/features/images/interfaces/images.interfaces";
 import { Routes } from "@/routes/routes";
 import { EditSkeleton } from "@/views/projects/edit/components/edit-skeleton";
 import { FetchingView, ScrapeFailedView } from "@/views/projects/edit/components/fetching-view";
+import { BuyCreditsDialog } from "@/views/projects/edit/components/buy-credits-dialog";
 import { ImageManager } from "@/views/projects/edit/components/image-manager";
 import { MobileCreateBar } from "@/views/projects/edit/components/mobile-create-bar";
 import { SaveIndicator } from "@/views/projects/edit/components/save-indicator";
@@ -45,6 +47,7 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
   const deleteProject = useDeleteProject();
   const { form, saveState, flush, retrySave } = useVideoDetailsAutosave(project);
   const [discarding, setDiscarding] = useState(false);
+  const [buying, setBuying] = useState(false);
 
   const images = project.images ?? [];
   const quote = credits
@@ -55,6 +58,29 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
       })
     : undefined;
   const blockers = getCreateBlockers({ project, me, usage, quote, limits });
+  // The watermark add-on is charged once per video, as soon as any photo is dewatermarked.
+  const hasDewatermarked = images.some((image) => image.wm_status === WatermarkStatuses.DONE);
+  const watermarkNeedsCredits =
+    !!credits &&
+    !hasDewatermarked &&
+    credits.pricing.addons.watermark_removal > 0 &&
+    me.credits.balance <
+      quoteVideo(credits.pricing, {
+        clips: images.length,
+        dewatermarked: true,
+        imported: project.source_type !== "upload",
+      }).total;
+  const affordablePhotos = credits
+    ? maxAffordableClips(
+        credits.pricing,
+        me.credits.balance,
+        {
+          dewatermarked: images.some((image) => image.wm_status === WatermarkStatuses.DONE),
+          imported: project.source_type !== "upload",
+        },
+        limits.maxImages,
+      )
+    : undefined;
 
   const handleSubmit = async () => {
     if (blockers.length > 0 || submit.isPending) return;
@@ -91,13 +117,19 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
       </div>
 
       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <ImageManager project={project} />
+        <ImageManager
+          project={project}
+          affordablePhotos={affordablePhotos}
+          watermarkNeedsCredits={watermarkNeedsCredits}
+          onBuyCredits={() => setBuying(true)}
+        />
         <aside className="flex flex-col gap-5 lg:self-stretch" aria-label="Video details and summary">
           <VideoDetailsForm project={project} form={form} />
           <SummaryPanel
             blockers={blockers}
             quote={quote}
             needsCredits={!!quote && me.credits.balance < quote.total}
+            onBuyCredits={() => setBuying(true)}
             isSubmitting={submit.isPending}
             submitError={submit.error}
             onSubmit={handleSubmit}
@@ -106,6 +138,13 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
       </div>
 
       <MobileCreateBar blockers={blockers} isSubmitting={submit.isPending} onSubmit={handleSubmit} />
+
+      <BuyCreditsDialog
+        open={buying}
+        onClose={() => setBuying(false)}
+        projectId={project.id}
+        balance={me.credits.balance}
+      />
 
       <ConfirmationDialog
         isOpen={discarding}
@@ -126,6 +165,8 @@ const EditProjectPage: FC<{ id: string }> = ({ id }) => {
   const { data: project, error, isPending, refetch, isFetching } = useProject(id);
   const { data: me } = useMe();
   const createdRef = useRef(false);
+  // Stripe returns here after a purchase started from the buy-credits modal.
+  useCheckoutReturn(Routes.edit(id));
 
   const isScrapeFailure =
     !!project &&

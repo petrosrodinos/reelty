@@ -14,6 +14,8 @@ export interface CreateCheckoutDto {
   credits: number;
   /** Slider value, stored for reference. */
   videos_selected?: number;
+  /** Project whose edit page Stripe sends the buyer back to; omitted means the credits page. */
+  return_project_id?: string;
 }
 
 export interface CheckoutResponse {

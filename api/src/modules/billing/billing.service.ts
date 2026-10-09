@@ -149,14 +149,18 @@ export class BillingService {
     const appUrl = (
       this.config.get<string>('APP_URL') ?? 'http://localhost:3001'
     ).replace(/\/+$/, '');
+    // Buyers coming from a project's editor return there so they keep their progress.
+    const returnPath = dto.return_project_id
+      ? `/projects/${dto.return_project_id}/edit`
+      : '/credits';
     try {
       const session = await this.stripe.createCheckoutSession({
         purchaseId: purchase.id,
         customerId,
         credits: dto.credits,
         amountCents,
-        successUrl: `${appUrl}/credits?status=success&purchase=${purchase.id}`,
-        cancelUrl: `${appUrl}/credits?status=cancelled`,
+        successUrl: `${appUrl}${returnPath}?status=success&purchase=${purchase.id}`,
+        cancelUrl: `${appUrl}${returnPath}?status=cancelled`,
       });
       await this.prisma.creditPurchase.update({
         where: { id: purchase.id },

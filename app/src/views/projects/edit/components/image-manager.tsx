@@ -35,9 +35,15 @@ import { UploadTile } from "@/views/projects/edit/components/upload-tile";
 
 interface ImageManagerProps {
   project: Project;
+  /** Photos the current balance pays for; undefined while pricing loads. */
+  affordablePhotos?: number;
+  /** The balance cannot pay the watermark-removal add-on: removing opens the buy-credits modal instead. */
+  watermarkNeedsCredits: boolean;
+  /** Opens the buy-credits modal (owned by the editor so the summary panel can open it too). */
+  onBuyCredits: () => void;
 }
 
-export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
+export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos, watermarkNeedsCredits, onBuyCredits }) => {
   const projectId = project.id;
   const serverImages = useMemo(() => [...(project.images ?? [])].sort((a, b) => a.position - b.position), [project.images]);
   const total = serverImages.length;
@@ -91,14 +97,43 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
   };
 
   const startWatermarkRemoval = (image: ProjectImage) => {
+    if (watermarkNeedsCredits) {
+      onBuyCredits();
+      return;
+    }
     removeWatermark.mutate({ id: image.id, dto: {} });
   };
 
-  const handleFiles = async (files: File[]) => {
-    const remaining = limits.maxImages - total;
+  // Credits cap the photo count below the tier maximum; at the cap, uploading means buying credits first.
+  const cap = Math.min(limits.maxImages, affordablePhotos ?? limits.maxImages);
+  const creditLimited = cap < limits.maxImages;
+  const needsCredits = creditLimited && total >= cap;
+  // The native picker has no max count; with a single slot left, single-select is the only enforceable limit.
+  const singleSlot = cap - total === 1;
+
+  const openPicker = () => {
+    if (needsCredits) onBuyCredits();
+    else headerInputRef.current?.click();
+  };
+
+  const handleFiles = async (picked: File[]) => {
+    if (needsCredits) {
+      onBuyCredits();
+      return;
+    }
+    const remaining = cap - total;
     if (remaining <= 0) {
       toast({ title: "Maximum reached", description: `A video can use up to ${limits.maxImages} photos. Remove one to add another.`, variant: "warning" });
       return;
+    }
+    let files = picked;
+    if (creditLimited && files.length > remaining) {
+      toast({
+        title: "Not enough credits for all of them",
+        description: `Your credits cover ${remaining} more ${remaining === 1 ? "photo" : "photos"}, so only the first ${remaining} were added. Buy credits to add more.`,
+        variant: "warning",
+      });
+      files = files.slice(0, remaining);
     }
     const { valid, rejected, warnings } = await prepareUploadBatch(files, remaining, limits.maxImages);
     try {
@@ -114,7 +149,11 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
     ? `Add at least ${limits.minImages} photos to continue.`
     : over
       ? `Remove ${total - limits.maxImages} to continue (max ${limits.maxImages}).`
-      : "Drag the handle to reorder, or use the arrows. The video follows this order.";
+      : creditLimited
+        ? needsCredits
+          ? "Your credits cover no more photos. Buy credits to add more."
+          : `Your credits cover ${cap - total} more ${cap - total === 1 ? "photo" : "photos"}. Buy credits to add more.`
+        : "Drag the handle to reorder, or use the arrows. The video follows this order.";
 
   const previewImage = images.find((image) => image.id === previewId) ?? null;
   const previewPosition = previewImage ? images.indexOf(previewImage) + 1 : 0;
@@ -134,8 +173,8 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
         </div>
         <Button
           variant="outline"
-          onClick={() => headerInputRef.current?.click()}
-          disabled={uploader.isUploading || total >= limits.maxImages}
+          onClick={openPicker}
+          disabled={uploader.isUploading}
         >
           <UploadIcon /> Upload photos
         </Button>
@@ -143,7 +182,7 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
           ref={headerInputRef}
           type="file"
           accept={ACCEPT_ATTRIBUTE}
-          multiple
+          multiple={!singleSlot}
           className="sr-only"
           tabIndex={-1}
           aria-hidden="true"
@@ -199,6 +238,9 @@ export const ImageManager: FC<ImageManagerProps> = ({ project }) => {
               full={total >= limits.maxImages}
               busy={uploader.isUploading}
               maxImages={limits.maxImages}
+              single={singleSlot}
+              needsCredits={needsCredits}
+              onBuyCredits={onBuyCredits}
             />
           </ul>
         </SortableContext>

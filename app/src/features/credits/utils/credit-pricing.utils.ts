@@ -55,6 +55,19 @@ export function quoteVideo(pricing: CreditsPricing, input: QuoteInput): VideoQuo
   };
 }
 
+/** Most photos a video can have that `balance` credits still pay for (0 when even the cheapest tier is out of reach). */
+export function maxAffordableClips(
+  pricing: CreditsPricing,
+  balance: number,
+  input: Omit<QuoteInput, "clips">,
+  maxImages: number,
+): number {
+  for (let clips = maxImages; clips >= 1; clips--) {
+    if (quoteVideo(pricing, { ...input, clips }).total <= balance) return clips;
+  }
+  return 0;
+}
+
 /** The purchase slider moves in whole packs of this many videos. A UI choice only; the API accepts any credit count. */
 export const PURCHASE_VIDEO_STEP = 3;
 export const PURCHASE_MAX_VIDEOS = 60;

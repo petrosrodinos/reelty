@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, IsOptional, Min } from 'class-validator';
+import { IsInt, IsOptional, IsUUID, Min } from 'class-validator';
 
 export class CreateCheckoutDto {
   @ApiProperty({
@@ -18,4 +18,12 @@ export class CreateCheckoutDto {
   @IsInt()
   @Min(1)
   videos_selected?: number;
+
+  @ApiPropertyOptional({
+    description:
+      'Project to send the buyer back to after paying (its edit page) instead of the credits page',
+  })
+  @IsOptional()
+  @IsUUID()
+  return_project_id?: string;
 }

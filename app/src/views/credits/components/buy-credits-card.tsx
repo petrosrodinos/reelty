@@ -20,9 +20,13 @@ import { formatEurCents, pluralize } from "@/lib/format.utils";
 
 interface BuyCreditsCardProps {
   pricing: CreditsPricing;
+  /** Project to return to after paying (its edit page); omitted means the credits page. */
+  returnProjectId?: string;
+  /** Short version for the buy-credits modal: no card chrome, no heading or intro (the dialog supplies them). */
+  compact?: boolean;
 }
 
-export const BuyCreditsCard: FC<BuyCreditsCardProps> = ({ pricing }) => {
+export const BuyCreditsCard: FC<BuyCreditsCardProps> = ({ pricing, returnProjectId, compact = false }) => {
   const checkout = useCreateCheckout();
   const perVideo = creditsPerVideo(pricing);
   const defaultTier = pricing.tiers.find((tier) => tier.is_default) ?? pricing.tiers[0];
@@ -46,15 +50,22 @@ export const BuyCreditsCard: FC<BuyCreditsCardProps> = ({ pricing }) => {
     priceCents(nextCredits, baseRate) - priceCents(nextCredits, rateFor(nextCredits, baseRate, pricing.rate_tiers));
 
   return (
-    <section aria-labelledby="buy-heading" className="rounded-lg border border-hairline bg-canvas p-5 sm:p-6">
-      <h2 id="buy-heading" className="text-lg font-medium text-ink">
-        Buy credits
-      </h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Choose how many videos you want to make. Shorter videos cost less, longer ones more.
-      </p>
+    <section
+      aria-labelledby={compact ? undefined : "buy-heading"}
+      className={compact ? undefined : "rounded-lg border border-hairline bg-canvas p-5 sm:p-6"}
+    >
+      {compact ? null : (
+        <>
+          <h2 id="buy-heading" className="text-lg font-medium text-ink">
+            Buy credits
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Choose how many videos you want to make. Shorter videos cost less, longer ones more.
+          </p>
+        </>
+      )}
 
-      <div className="mt-6 flex items-baseline justify-between gap-4">
+      <div className={compact ? "flex items-baseline justify-between gap-4" : "mt-6 flex items-baseline justify-between gap-4"}>
         <p className="text-display-sm tabular-nums">{pluralize(videos, "video")}</p>
         <p className="text-sm text-muted-foreground tabular-nums">{pluralize(credits, "credit")}</p>
       </div>
@@ -99,7 +110,7 @@ export const BuyCreditsCard: FC<BuyCreditsCardProps> = ({ pricing }) => {
         </div>
         <Button
           size="lg"
-          onClick={() => checkout.mutate({ credits, videos_selected: videos })}
+          onClick={() => checkout.mutate({ credits, videos_selected: videos, return_project_id: returnProjectId })}
           disabled={!pricing.payments_enabled || checkout.isPending || cents < 50}
         >
           {checkout.isPending ? <Spinner /> : <CreditCardIcon />}

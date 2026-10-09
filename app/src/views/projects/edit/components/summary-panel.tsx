@@ -1,7 +1,6 @@
 "use client";
 
 import type { FC } from "react";
-import Link from "next/link";
 import { ClockIcon, CoinsIcon, InfoIcon } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -13,13 +12,14 @@ import { useResendVerification } from "@/features/auth/hooks/use-auth";
 import type { VideoQuote } from "@/features/credits/interfaces/credits.interfaces";
 import { getDropdownOptionLabel } from "@/lib/dropdown-option-label.utils";
 import { pluralize } from "@/lib/format.utils";
-import { Routes } from "@/routes/routes";
 
 interface SummaryPanelProps {
   blockers: string[];
   quote: VideoQuote | undefined;
   /** The balance does not cover the quote: show a buy link next to the reason. */
   needsCredits: boolean;
+  /** Opens the buy-credits modal over the editor. */
+  onBuyCredits: () => void;
   isSubmitting: boolean;
   submitError: unknown;
   onSubmit: () => void;
@@ -29,6 +29,7 @@ export const SummaryPanel: FC<SummaryPanelProps> = ({
   blockers,
   quote,
   needsCredits,
+  onBuyCredits,
   isSubmitting,
   submitError,
   onSubmit,
@@ -71,9 +72,9 @@ export const SummaryPanel: FC<SummaryPanelProps> = ({
               {needsCredits ? (
                 <>
                   {" "}
-                  <Link href={Routes.credits} className="font-medium text-ink underline underline-offset-4">
+                  <button type="button" onClick={onBuyCredits} className="font-medium text-ink underline underline-offset-4">
                     Buy credits
-                  </Link>
+                  </button>
                 </>
               ) : null}
             </span>
@@ -91,7 +92,7 @@ export const SummaryPanel: FC<SummaryPanelProps> = ({
           <AlertDescription className="text-[#7a2a2a]">
             <span className="block">{getApiErrorMessage(submitError)}</span>
             {submitError instanceof ApiError && submitError.code === "insufficient_credits" ? (
-              <Button variant="outline" size="sm" className="mt-2" render={<Link href={Routes.credits} />} nativeButton={false}>
+              <Button variant="outline" size="sm" className="mt-2" onClick={onBuyCredits}>
                 Buy credits
               </Button>
             ) : null}
