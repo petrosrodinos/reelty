@@ -1,6 +1,8 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import type { SystemFlag } from 'generated/prisma';
-import { CreditTxKind, ProjectStatus } from 'generated/prisma';
+import { AuthRole, CreditTxKind, ProjectStatus } from 'generated/prisma';
+import { GcsObjectsService } from '@/integrations/storage/gcs/services/gcs-objects.service';
+import { StoragePaths } from '@/integrations/storage/gcs/storage-paths';
 import { PrismaService } from '@/core/databases/prisma/prisma.service';
 import { QueuesService } from '@/core/queues/queues.service';
 import { AppConfigService } from '@/modules/app-config/app-config.service';
@@ -21,6 +23,8 @@ import { UpdateFlagsDto } from './dto/update-flags.dto';
 
 @Injectable()
 export class AdminService {
+  private readonly logger = new Logger(AdminService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly queues: QueuesService,
@@ -31,6 +35,7 @@ export class AdminService {
     private readonly tiers: CreditTiersService,
     private readonly rates: CreditRatesService,
     private readonly billing: BillingService,
+    private readonly gcs: GcsObjectsService,
   ) {}
 
   listConfig() {
@@ -44,9 +49,73 @@ export class AdminService {
   async listUsers() {
     const users = await this.prisma.user.findMany({
       orderBy: { email: 'asc' },
-      select: { id: true, email: true, credit_balance: true },
+      select: {
+        id: true,
+        email: true,
+        credit_balance: true,
+        full_name: true,
+        role: true,
+        email_verified_at: true,
+        created_at: true,
+        _count: { select: { projects: true } },
+      },
     });
-    return users;
+    return users.map(({ _count, ...user }) => ({
+      ...user,
+      email_verified_at: user.email_verified_at?.toISOString() ?? null,
+      created_at: user.created_at.toISOString(),
+      projects_count: _count.projects,
+    }));
+  }
+
+  /**
+   * Permanently deletes a user and everything they own: stored files (the whole `users/<id>/` prefix in the
+   * bucket) first, then the database rows, which cascade (projects, images, purchases, credits, usage, tokens).
+   * Storage goes first so a storage failure leaves the account intact and the call can simply be retried.
+   */
+  async deleteUser(adminId: string, userId: string): Promise<void> {
+    if (userId === adminId) {
+      throw new ApiException(HttpStatus.BAD_REQUEST, ErrorCodes.FORBIDDEN, 'You cannot delete your own account here.');
+    }
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true, role: true } });
+    if (!user) throw new ApiException(HttpStatus.NOT_FOUND, ErrorCodes.NOT_FOUND, 'User not found.');
+    if (user.role !== AuthRole.USER) {
+      throw new ApiException(HttpStatus.FORBIDDEN, ErrorCodes.FORBIDDEN, 'Staff accounts cannot be deleted here.');
+    }
+
+    const projects = await this.prisma.project.findMany({
+      where: { user_id: userId },
+      select: { id: true, status: true, images: { select: { id: true } } },
+    });
+    if (projects.some((p) => p.status === ProjectStatus.QUEUED || p.status === ProjectStatus.CREATING)) {
+      throw new ApiException(
+        HttpStatus.CONFLICT,
+        ErrorCodes.RENDER_IN_PROGRESS,
+        'This user has a video being created. Try again once it has finished.',
+      );
+    }
+
+    await Promise.all(
+      projects.map((p) =>
+        this.queues.removeProjectJobs(
+          p.id,
+          p.images.map((i) => i.id),
+        ),
+      ),
+    );
+
+    try {
+      await this.gcs.deletePrefix(StoragePaths.userPrefix(userId));
+    } catch (error) {
+      this.logger.error(`Failed to delete storage for user ${userId}: ${(error as Error).message}`);
+      throw new ApiException(
+        HttpStatus.BAD_GATEWAY,
+        ErrorCodes.STORAGE_ERROR,
+        'Could not delete the stored files. Nothing was deleted, please try again.',
+      );
+    }
+
+    await this.prisma.user.delete({ where: { id: userId } });
   }
 
   // ------------------------------------------------------------------ credits

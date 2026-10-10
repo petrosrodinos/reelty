@@ -10,6 +10,7 @@ const tabs = [
   { label: "Analytics", href: Routes.adminAnalytics },
   { label: "Prices", href: Routes.adminConfig },
   { label: "Credit tiers", href: Routes.adminCreditTiers },
+  { label: "Users", href: Routes.adminUsers },
   { label: "Purchases", href: Routes.adminPurchases },
   { label: "Cost ledger", href: Routes.adminUsage },
 ];

@@ -6,6 +6,7 @@ import type { CostHistoryQuery } from "@/features/admin/interfaces/admin.interfa
 import type { AnalyticsRange } from "@/features/admin/interfaces/analytics.interfaces";
 import {
   adjustUserCredits,
+  deleteAdminUser,
   getAdminPurchases,
   getAdminUsers,
   getAnalytics,
@@ -71,6 +72,24 @@ export const useCostHistory = (query: CostHistoryQuery = {}) => {
 /** Every user, for the admin filter dropdown. */
 export const useAdminUsers = () => {
   return useQuery({ queryKey: [ADMIN_USERS_QUERY_KEY], queryFn: getAdminUsers, staleTime: 60_000 });
+};
+
+/** Permanently delete a user and all their data, including files in cloud storage (admin only). */
+export const useDeleteAdminUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteAdminUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [ADMIN_USERS_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_PURCHASES_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [COST_HISTORY_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [ANALYTICS_QUERY_KEY] });
+      toast({ title: "User deleted", description: "The account and all its data were removed." });
+    },
+    onError: (error) => {
+      toast({ title: "Could not delete the user", description: getApiErrorMessage(error), variant: "error" });
+    },
+  });
 };
 
 /** Add or remove credits for one user (admin only). */

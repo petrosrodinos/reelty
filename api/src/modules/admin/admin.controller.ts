@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -13,6 +15,7 @@ import {
 import { ApiCookieAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '@/shared/guards/jwt.guard';
 import { RolesGuard } from '@/shared/guards/roles.guard';
+import { CurrentUser } from '@/shared/decorators/current-user.decorator';
 import { Roles } from '@/shared/decorators/roles.decorator';
 import { ZodValidationPipe } from '@/shared/pipes/zod.validation.pipe';
 import { AppConfigEntity } from '@/modules/app-config/entities/app-config.entity';
@@ -89,6 +92,19 @@ export class AdminController {
   @ApiOperation({ summary: 'All users (id, email, credit balance) for admin filters' })
   listUsers() {
     return this.adminService.listUsers();
+  }
+
+  @Delete('users/:id')
+  @HttpCode(204)
+  @ApiOperation({
+    summary: 'Permanently delete a user and all their data: files in Google Cloud Storage, projects, purchases, credits',
+  })
+  @ApiResponse({ status: 204, description: 'Deleted' })
+  @ApiResponse({ status: 404, description: 'not_found' })
+  @ApiResponse({ status: 409, description: 'render_in_progress' })
+  @ApiResponse({ status: 502, description: 'storage_error (nothing was deleted)' })
+  deleteUser(@CurrentUser('id') adminId: string, @Param('id', ParseUUIDPipe) id: string) {
+    return this.adminService.deleteUser(adminId, id);
   }
 
   @Post('users/:id/credits')

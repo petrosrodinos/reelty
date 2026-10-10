@@ -37,6 +37,10 @@ export const getAdminUsers = async (): Promise<AdminUserOption[]> => {
   return response.data;
 };
 
+export const deleteAdminUser = async (userId: string): Promise<void> => {
+  await axiosInstance.delete(ApiRoutes.admin.userById(userId));
+};
+
 export const adjustUserCredits = async (input: {
   userId: string;
   credits: number;

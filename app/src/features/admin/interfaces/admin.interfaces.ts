@@ -75,4 +75,9 @@ export interface AdminUserOption {
   id: string;
   email: string;
   credit_balance: number;
+  full_name: string | null;
+  role: "USER" | "ADMIN" | "SUPER_ADMIN" | "SUPPORT";
+  email_verified_at: string | null;
+  created_at: string;
+  projects_count: number;
 }
