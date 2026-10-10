@@ -153,8 +153,6 @@ export function rejectReason(raw: string): string | null {
   const tokens = safeDecode(u.pathname).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
   if (tokens.some((t) => HINT_TOKENS.has(t))) return 'hint';
 
-  const size = inferSizeFromUrl(u);
-  if (size && Math.min(size.width, size.height) < 600) return 'small';
   return null;
 }
 
@@ -165,7 +163,6 @@ export interface CandidateOptions {
 /**
  * Filters and de-duplicates scraped image URLs (spec §10.1):
  *  - http(s) only; drops SVG/GIF/ICO, tracking pixels, icons/logos/avatars/flags/sprites, map tiles;
- *  - drops renditions with an inferred shortest side below 600 px;
  *  - collapses size variants of the same photo (`-300x200` suffixes, `w=`/`im_w=` params) keeping the largest;
  *  - keeps first-seen order and caps the list (30).
  */

@@ -69,6 +69,7 @@ export class ProjectSerializer {
     ]);
 
     const longest = Math.max(image.width ?? 0, image.height ?? 0);
+    const shortest = Math.min(image.width ?? 0, image.height ?? 0);
 
     return {
       id: image.id,
@@ -83,7 +84,7 @@ export class ProjectSerializer {
       wm_max_attempts: this.wmMaxAttempts,
       has_processed: !!image.gcs_processed_path,
       is_duplicate: !!image.content_hash && (hashCounts.get(image.content_hash) ?? 0) > 1,
-      low_resolution: longest > 0 && longest < Limits.MIN_SIDE_WARN,
+      low_resolution: longest > 0 && (longest < Limits.MIN_SIDE_WARN || shortest < Limits.MIN_SIDE_REJECT),
       clip_status: image.clip_status,
       skipped: project.skipped_image_ids.includes(image.id),
       thumb_url: thumbUrl,

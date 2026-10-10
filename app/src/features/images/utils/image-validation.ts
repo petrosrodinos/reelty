@@ -27,7 +27,7 @@ function readDimensions(file: File): Promise<{ width: number; height: number } |
   });
 }
 
-/** Client-side pre-validation (spec FR-INTAKE-4): type, size, min 640 px (reject), under 1024 px (warn). */
+/** Client-side pre-validation (spec FR-INTAKE-4): type, size, under 640 px short side or 1024 px long side (warn, never reject). */
 export async function checkImageFile(file: File): Promise<ImageFileCheck> {
   if (!(ACCEPTED_IMAGE_TYPES as readonly string[]).includes(file.type)) {
     return { file, ok: false, message: "Only JPG, PNG or WebP photos are supported." };
@@ -47,8 +47,9 @@ export async function checkImageFile(file: File): Promise<ImageFileCheck> {
   if (shortest < VideoLimits.minShortestSidePx) {
     return {
       file,
-      ok: false,
-      message: `Too small (${shortest} px on the short side, minimum ${VideoLimits.minShortestSidePx}).`,
+      ok: true,
+      warning: true,
+      message: `Low resolution (${shortest} px on the short side, ${VideoLimits.minShortestSidePx}+ recommended). It may look blurry in the video.`,
     };
   }
   if (longest < VideoLimits.recommendedLongestSidePx) {

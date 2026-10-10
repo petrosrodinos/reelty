@@ -10,7 +10,7 @@ import { SystemFlagsService } from '../common/system-flags.service';
 import { AppConfigService } from '@/modules/app-config/app-config.service';
 import { WorkerConfigService } from '../common/worker-config.service';
 import { safeDownloadBuffer } from '../common/safe-http';
-import { ImageTooSmallError, makeThumbnail, normalizeToJpeg, sha256Hex, sniffImageType } from '../common/image.utils';
+import { makeThumbnail, normalizeToJpeg, sha256Hex, sniffImageType } from '../common/image.utils';
 import {
   AirbnbItem,
   airbnbImageUrls,
@@ -174,13 +174,11 @@ export class ScrapeService {
         maxRedirects: 3,
       });
       if (!sniffImageType(dl.buffer)) return null;
-      const norm = await normalizeToJpeg(dl.buffer, { minShortSide: Limits.MIN_SIDE_REJECT });
+      const norm = await normalizeToJpeg(dl.buffer);
       const thumb = await makeThumbnail(norm.data);
       return { original: norm.data, thumb, width: norm.width, height: norm.height, hash: sha256Hex(norm.data) };
     } catch (error) {
-      if (!(error instanceof ImageTooSmallError)) {
-        this.logger.debug(`Skipping image (${(error as Error).message})`);
-      }
+      this.logger.debug(`Skipping image (${(error as Error).message})`);
       return null;
     }
   }
