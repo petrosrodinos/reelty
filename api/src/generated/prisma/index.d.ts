@@ -15771,7 +15771,11 @@ export namespace Prisma {
     card_brand: string | null
     card_country: string | null
     receipt_url: string | null
+    failure_code: string | null
+    failure_decline: string | null
+    failure_message: string | null
     paid_at: Date | null
+    failed_at: Date | null
     refunded_at: Date | null
     created_at: Date | null
     updated_at: Date | null
@@ -15803,7 +15807,11 @@ export namespace Prisma {
     card_brand: string | null
     card_country: string | null
     receipt_url: string | null
+    failure_code: string | null
+    failure_decline: string | null
+    failure_message: string | null
     paid_at: Date | null
+    failed_at: Date | null
     refunded_at: Date | null
     created_at: Date | null
     updated_at: Date | null
@@ -15835,7 +15843,11 @@ export namespace Prisma {
     card_brand: number
     card_country: number
     receipt_url: number
+    failure_code: number
+    failure_decline: number
+    failure_message: number
     paid_at: number
+    failed_at: number
     refunded_at: number
     created_at: number
     updated_at: number
@@ -15901,7 +15913,11 @@ export namespace Prisma {
     card_brand?: true
     card_country?: true
     receipt_url?: true
+    failure_code?: true
+    failure_decline?: true
+    failure_message?: true
     paid_at?: true
+    failed_at?: true
     refunded_at?: true
     created_at?: true
     updated_at?: true
@@ -15933,7 +15949,11 @@ export namespace Prisma {
     card_brand?: true
     card_country?: true
     receipt_url?: true
+    failure_code?: true
+    failure_decline?: true
+    failure_message?: true
     paid_at?: true
+    failed_at?: true
     refunded_at?: true
     created_at?: true
     updated_at?: true
@@ -15965,7 +15985,11 @@ export namespace Prisma {
     card_brand?: true
     card_country?: true
     receipt_url?: true
+    failure_code?: true
+    failure_decline?: true
+    failure_message?: true
     paid_at?: true
+    failed_at?: true
     refunded_at?: true
     created_at?: true
     updated_at?: true
@@ -16084,7 +16108,11 @@ export namespace Prisma {
     card_brand: string | null
     card_country: string | null
     receipt_url: string | null
+    failure_code: string | null
+    failure_decline: string | null
+    failure_message: string | null
     paid_at: Date | null
+    failed_at: Date | null
     refunded_at: Date | null
     created_at: Date
     updated_at: Date
@@ -16135,7 +16163,11 @@ export namespace Prisma {
     card_brand?: boolean
     card_country?: boolean
     receipt_url?: boolean
+    failure_code?: boolean
+    failure_decline?: boolean
+    failure_message?: boolean
     paid_at?: boolean
+    failed_at?: boolean
     refunded_at?: boolean
     created_at?: boolean
     updated_at?: boolean
@@ -16170,7 +16202,11 @@ export namespace Prisma {
     card_brand?: boolean
     card_country?: boolean
     receipt_url?: boolean
+    failure_code?: boolean
+    failure_decline?: boolean
+    failure_message?: boolean
     paid_at?: boolean
+    failed_at?: boolean
     refunded_at?: boolean
     created_at?: boolean
     updated_at?: boolean
@@ -16203,7 +16239,11 @@ export namespace Prisma {
     card_brand?: boolean
     card_country?: boolean
     receipt_url?: boolean
+    failure_code?: boolean
+    failure_decline?: boolean
+    failure_message?: boolean
     paid_at?: boolean
+    failed_at?: boolean
     refunded_at?: boolean
     created_at?: boolean
     updated_at?: boolean
@@ -16236,13 +16276,17 @@ export namespace Prisma {
     card_brand?: boolean
     card_country?: boolean
     receipt_url?: boolean
+    failure_code?: boolean
+    failure_decline?: boolean
+    failure_message?: boolean
     paid_at?: boolean
+    failed_at?: boolean
     refunded_at?: boolean
     created_at?: boolean
     updated_at?: boolean
   }
 
-  export type CreditPurchaseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "status" | "credits" | "videos_selected" | "credits_per_eur" | "currency" | "amount_eur_cents" | "stripe_fee_eur_cents" | "net_eur_cents" | "stripe_fee_pct" | "usd_per_eur" | "amount_usd_cents" | "stripe_fee_usd_cents" | "net_usd_cents" | "refunded_eur_cents" | "refunded_credits" | "stripe_checkout_session_id" | "stripe_payment_intent_id" | "stripe_charge_id" | "stripe_balance_transaction_id" | "payment_method_type" | "card_brand" | "card_country" | "receipt_url" | "paid_at" | "refunded_at" | "created_at" | "updated_at", ExtArgs["result"]["creditPurchase"]>
+  export type CreditPurchaseOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "status" | "credits" | "videos_selected" | "credits_per_eur" | "currency" | "amount_eur_cents" | "stripe_fee_eur_cents" | "net_eur_cents" | "stripe_fee_pct" | "usd_per_eur" | "amount_usd_cents" | "stripe_fee_usd_cents" | "net_usd_cents" | "refunded_eur_cents" | "refunded_credits" | "stripe_checkout_session_id" | "stripe_payment_intent_id" | "stripe_charge_id" | "stripe_balance_transaction_id" | "payment_method_type" | "card_brand" | "card_country" | "receipt_url" | "failure_code" | "failure_decline" | "failure_message" | "paid_at" | "failed_at" | "refunded_at" | "created_at" | "updated_at", ExtArgs["result"]["creditPurchase"]>
   export type CreditPurchaseInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     transactions?: boolean | CreditPurchase$transactionsArgs<ExtArgs>
@@ -16287,7 +16331,11 @@ export namespace Prisma {
       card_brand: string | null
       card_country: string | null
       receipt_url: string | null
+      failure_code: string | null
+      failure_decline: string | null
+      failure_message: string | null
       paid_at: Date | null
+      failed_at: Date | null
       refunded_at: Date | null
       created_at: Date
       updated_at: Date
@@ -16741,7 +16789,11 @@ export namespace Prisma {
     readonly card_brand: FieldRef<"CreditPurchase", 'String'>
     readonly card_country: FieldRef<"CreditPurchase", 'String'>
     readonly receipt_url: FieldRef<"CreditPurchase", 'String'>
+    readonly failure_code: FieldRef<"CreditPurchase", 'String'>
+    readonly failure_decline: FieldRef<"CreditPurchase", 'String'>
+    readonly failure_message: FieldRef<"CreditPurchase", 'String'>
     readonly paid_at: FieldRef<"CreditPurchase", 'DateTime'>
+    readonly failed_at: FieldRef<"CreditPurchase", 'DateTime'>
     readonly refunded_at: FieldRef<"CreditPurchase", 'DateTime'>
     readonly created_at: FieldRef<"CreditPurchase", 'DateTime'>
     readonly updated_at: FieldRef<"CreditPurchase", 'DateTime'>
@@ -20473,7 +20525,11 @@ export namespace Prisma {
     card_brand: 'card_brand',
     card_country: 'card_country',
     receipt_url: 'receipt_url',
+    failure_code: 'failure_code',
+    failure_decline: 'failure_decline',
+    failure_message: 'failure_message',
     paid_at: 'paid_at',
+    failed_at: 'failed_at',
     refunded_at: 'refunded_at',
     created_at: 'created_at',
     updated_at: 'updated_at'
@@ -21815,7 +21871,11 @@ export namespace Prisma {
     card_brand?: StringNullableFilter<"CreditPurchase"> | string | null
     card_country?: StringNullableFilter<"CreditPurchase"> | string | null
     receipt_url?: StringNullableFilter<"CreditPurchase"> | string | null
+    failure_code?: StringNullableFilter<"CreditPurchase"> | string | null
+    failure_decline?: StringNullableFilter<"CreditPurchase"> | string | null
+    failure_message?: StringNullableFilter<"CreditPurchase"> | string | null
     paid_at?: DateTimeNullableFilter<"CreditPurchase"> | Date | string | null
+    failed_at?: DateTimeNullableFilter<"CreditPurchase"> | Date | string | null
     refunded_at?: DateTimeNullableFilter<"CreditPurchase"> | Date | string | null
     created_at?: DateTimeFilter<"CreditPurchase"> | Date | string
     updated_at?: DateTimeFilter<"CreditPurchase"> | Date | string
@@ -21849,7 +21909,11 @@ export namespace Prisma {
     card_brand?: SortOrderInput | SortOrder
     card_country?: SortOrderInput | SortOrder
     receipt_url?: SortOrderInput | SortOrder
+    failure_code?: SortOrderInput | SortOrder
+    failure_decline?: SortOrderInput | SortOrder
+    failure_message?: SortOrderInput | SortOrder
     paid_at?: SortOrderInput | SortOrder
+    failed_at?: SortOrderInput | SortOrder
     refunded_at?: SortOrderInput | SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -21886,7 +21950,11 @@ export namespace Prisma {
     card_brand?: StringNullableFilter<"CreditPurchase"> | string | null
     card_country?: StringNullableFilter<"CreditPurchase"> | string | null
     receipt_url?: StringNullableFilter<"CreditPurchase"> | string | null
+    failure_code?: StringNullableFilter<"CreditPurchase"> | string | null
+    failure_decline?: StringNullableFilter<"CreditPurchase"> | string | null
+    failure_message?: StringNullableFilter<"CreditPurchase"> | string | null
     paid_at?: DateTimeNullableFilter<"CreditPurchase"> | Date | string | null
+    failed_at?: DateTimeNullableFilter<"CreditPurchase"> | Date | string | null
     refunded_at?: DateTimeNullableFilter<"CreditPurchase"> | Date | string | null
     created_at?: DateTimeFilter<"CreditPurchase"> | Date | string
     updated_at?: DateTimeFilter<"CreditPurchase"> | Date | string
@@ -21920,7 +21988,11 @@ export namespace Prisma {
     card_brand?: SortOrderInput | SortOrder
     card_country?: SortOrderInput | SortOrder
     receipt_url?: SortOrderInput | SortOrder
+    failure_code?: SortOrderInput | SortOrder
+    failure_decline?: SortOrderInput | SortOrder
+    failure_message?: SortOrderInput | SortOrder
     paid_at?: SortOrderInput | SortOrder
+    failed_at?: SortOrderInput | SortOrder
     refunded_at?: SortOrderInput | SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -21960,7 +22032,11 @@ export namespace Prisma {
     card_brand?: StringNullableWithAggregatesFilter<"CreditPurchase"> | string | null
     card_country?: StringNullableWithAggregatesFilter<"CreditPurchase"> | string | null
     receipt_url?: StringNullableWithAggregatesFilter<"CreditPurchase"> | string | null
+    failure_code?: StringNullableWithAggregatesFilter<"CreditPurchase"> | string | null
+    failure_decline?: StringNullableWithAggregatesFilter<"CreditPurchase"> | string | null
+    failure_message?: StringNullableWithAggregatesFilter<"CreditPurchase"> | string | null
     paid_at?: DateTimeNullableWithAggregatesFilter<"CreditPurchase"> | Date | string | null
+    failed_at?: DateTimeNullableWithAggregatesFilter<"CreditPurchase"> | Date | string | null
     refunded_at?: DateTimeNullableWithAggregatesFilter<"CreditPurchase"> | Date | string | null
     created_at?: DateTimeWithAggregatesFilter<"CreditPurchase"> | Date | string
     updated_at?: DateTimeWithAggregatesFilter<"CreditPurchase"> | Date | string
@@ -23310,7 +23386,11 @@ export namespace Prisma {
     card_brand?: string | null
     card_country?: string | null
     receipt_url?: string | null
+    failure_code?: string | null
+    failure_decline?: string | null
+    failure_message?: string | null
     paid_at?: Date | string | null
+    failed_at?: Date | string | null
     refunded_at?: Date | string | null
     created_at?: Date | string
     updated_at?: Date | string
@@ -23344,7 +23424,11 @@ export namespace Prisma {
     card_brand?: string | null
     card_country?: string | null
     receipt_url?: string | null
+    failure_code?: string | null
+    failure_decline?: string | null
+    failure_message?: string | null
     paid_at?: Date | string | null
+    failed_at?: Date | string | null
     refunded_at?: Date | string | null
     created_at?: Date | string
     updated_at?: Date | string
@@ -23376,7 +23460,11 @@ export namespace Prisma {
     card_brand?: NullableStringFieldUpdateOperationsInput | string | null
     card_country?: NullableStringFieldUpdateOperationsInput | string | null
     receipt_url?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_code?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_decline?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_message?: NullableStringFieldUpdateOperationsInput | string | null
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     refunded_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23410,7 +23498,11 @@ export namespace Prisma {
     card_brand?: NullableStringFieldUpdateOperationsInput | string | null
     card_country?: NullableStringFieldUpdateOperationsInput | string | null
     receipt_url?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_code?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_decline?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_message?: NullableStringFieldUpdateOperationsInput | string | null
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     refunded_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23443,7 +23535,11 @@ export namespace Prisma {
     card_brand?: string | null
     card_country?: string | null
     receipt_url?: string | null
+    failure_code?: string | null
+    failure_decline?: string | null
+    failure_message?: string | null
     paid_at?: Date | string | null
+    failed_at?: Date | string | null
     refunded_at?: Date | string | null
     created_at?: Date | string
     updated_at?: Date | string
@@ -23474,7 +23570,11 @@ export namespace Prisma {
     card_brand?: NullableStringFieldUpdateOperationsInput | string | null
     card_country?: NullableStringFieldUpdateOperationsInput | string | null
     receipt_url?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_code?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_decline?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_message?: NullableStringFieldUpdateOperationsInput | string | null
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     refunded_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23506,7 +23606,11 @@ export namespace Prisma {
     card_brand?: NullableStringFieldUpdateOperationsInput | string | null
     card_country?: NullableStringFieldUpdateOperationsInput | string | null
     receipt_url?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_code?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_decline?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_message?: NullableStringFieldUpdateOperationsInput | string | null
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     refunded_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24789,7 +24893,11 @@ export namespace Prisma {
     card_brand?: SortOrder
     card_country?: SortOrder
     receipt_url?: SortOrder
+    failure_code?: SortOrder
+    failure_decline?: SortOrder
+    failure_message?: SortOrder
     paid_at?: SortOrder
+    failed_at?: SortOrder
     refunded_at?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -24837,7 +24945,11 @@ export namespace Prisma {
     card_brand?: SortOrder
     card_country?: SortOrder
     receipt_url?: SortOrder
+    failure_code?: SortOrder
+    failure_decline?: SortOrder
+    failure_message?: SortOrder
     paid_at?: SortOrder
+    failed_at?: SortOrder
     refunded_at?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -24869,7 +24981,11 @@ export namespace Prisma {
     card_brand?: SortOrder
     card_country?: SortOrder
     receipt_url?: SortOrder
+    failure_code?: SortOrder
+    failure_decline?: SortOrder
+    failure_message?: SortOrder
     paid_at?: SortOrder
+    failed_at?: SortOrder
     refunded_at?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
@@ -26611,7 +26727,11 @@ export namespace Prisma {
     card_brand?: string | null
     card_country?: string | null
     receipt_url?: string | null
+    failure_code?: string | null
+    failure_decline?: string | null
+    failure_message?: string | null
     paid_at?: Date | string | null
+    failed_at?: Date | string | null
     refunded_at?: Date | string | null
     created_at?: Date | string
     updated_at?: Date | string
@@ -26643,7 +26763,11 @@ export namespace Prisma {
     card_brand?: string | null
     card_country?: string | null
     receipt_url?: string | null
+    failure_code?: string | null
+    failure_decline?: string | null
+    failure_message?: string | null
     paid_at?: Date | string | null
+    failed_at?: Date | string | null
     refunded_at?: Date | string | null
     created_at?: Date | string
     updated_at?: Date | string
@@ -26937,7 +27061,11 @@ export namespace Prisma {
     card_brand?: StringNullableFilter<"CreditPurchase"> | string | null
     card_country?: StringNullableFilter<"CreditPurchase"> | string | null
     receipt_url?: StringNullableFilter<"CreditPurchase"> | string | null
+    failure_code?: StringNullableFilter<"CreditPurchase"> | string | null
+    failure_decline?: StringNullableFilter<"CreditPurchase"> | string | null
+    failure_message?: StringNullableFilter<"CreditPurchase"> | string | null
     paid_at?: DateTimeNullableFilter<"CreditPurchase"> | Date | string | null
+    failed_at?: DateTimeNullableFilter<"CreditPurchase"> | Date | string | null
     refunded_at?: DateTimeNullableFilter<"CreditPurchase"> | Date | string | null
     created_at?: DateTimeFilter<"CreditPurchase"> | Date | string
     updated_at?: DateTimeFilter<"CreditPurchase"> | Date | string
@@ -28649,7 +28777,11 @@ export namespace Prisma {
     card_brand?: string | null
     card_country?: string | null
     receipt_url?: string | null
+    failure_code?: string | null
+    failure_decline?: string | null
+    failure_message?: string | null
     paid_at?: Date | string | null
+    failed_at?: Date | string | null
     refunded_at?: Date | string | null
     created_at?: Date | string
     updated_at?: Date | string
@@ -28682,7 +28814,11 @@ export namespace Prisma {
     card_brand?: string | null
     card_country?: string | null
     receipt_url?: string | null
+    failure_code?: string | null
+    failure_decline?: string | null
+    failure_message?: string | null
     paid_at?: Date | string | null
+    failed_at?: Date | string | null
     refunded_at?: Date | string | null
     created_at?: Date | string
     updated_at?: Date | string
@@ -28867,7 +29003,11 @@ export namespace Prisma {
     card_brand?: NullableStringFieldUpdateOperationsInput | string | null
     card_country?: NullableStringFieldUpdateOperationsInput | string | null
     receipt_url?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_code?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_decline?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_message?: NullableStringFieldUpdateOperationsInput | string | null
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     refunded_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28900,7 +29040,11 @@ export namespace Prisma {
     card_brand?: NullableStringFieldUpdateOperationsInput | string | null
     card_country?: NullableStringFieldUpdateOperationsInput | string | null
     receipt_url?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_code?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_decline?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_message?: NullableStringFieldUpdateOperationsInput | string | null
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     refunded_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29167,7 +29311,11 @@ export namespace Prisma {
     card_brand?: string | null
     card_country?: string | null
     receipt_url?: string | null
+    failure_code?: string | null
+    failure_decline?: string | null
+    failure_message?: string | null
     paid_at?: Date | string | null
+    failed_at?: Date | string | null
     refunded_at?: Date | string | null
     created_at?: Date | string
     updated_at?: Date | string
@@ -29484,7 +29632,11 @@ export namespace Prisma {
     card_brand?: NullableStringFieldUpdateOperationsInput | string | null
     card_country?: NullableStringFieldUpdateOperationsInput | string | null
     receipt_url?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_code?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_decline?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_message?: NullableStringFieldUpdateOperationsInput | string | null
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     refunded_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29516,7 +29668,11 @@ export namespace Prisma {
     card_brand?: NullableStringFieldUpdateOperationsInput | string | null
     card_country?: NullableStringFieldUpdateOperationsInput | string | null
     receipt_url?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_code?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_decline?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_message?: NullableStringFieldUpdateOperationsInput | string | null
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     refunded_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29548,7 +29704,11 @@ export namespace Prisma {
     card_brand?: NullableStringFieldUpdateOperationsInput | string | null
     card_country?: NullableStringFieldUpdateOperationsInput | string | null
     receipt_url?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_code?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_decline?: NullableStringFieldUpdateOperationsInput | string | null
+    failure_message?: NullableStringFieldUpdateOperationsInput | string | null
     paid_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    failed_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     refunded_at?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string

@@ -27,7 +27,14 @@ export class PurchaseEntity {
   @ApiProperty({ example: 1500 }) amount_eur_cents: number;
   @ApiProperty({ example: 0 }) refunded_eur_cents: number;
   @ApiProperty({ nullable: true, type: String }) receipt_url: string | null;
+  @ApiProperty({
+    nullable: true,
+    type: String,
+    example: 'Your card was declined.',
+  })
+  failure_message: string | null;
   @ApiProperty({ nullable: true, type: String }) paid_at: string | null;
+  @ApiProperty({ nullable: true, type: String }) failed_at: string | null;
   @ApiProperty() created_at: string;
 }
 
@@ -73,6 +80,10 @@ export class AdminPurchaseEntity extends PurchaseEntity {
     | null;
   @ApiProperty({ nullable: true, type: String }) card_brand: string | null;
   @ApiProperty({ nullable: true, type: String }) card_country: string | null;
+  @ApiProperty({ nullable: true, type: String, example: 'card_declined' })
+  failure_code: string | null;
+  @ApiProperty({ nullable: true, type: String, example: 'insufficient_funds' })
+  failure_decline: string | null;
 }
 
 export class PurchasesSummaryEntity {

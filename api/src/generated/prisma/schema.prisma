@@ -381,7 +381,12 @@ model CreditPurchase {
   card_country                  String?
   receipt_url                   String?
 
+  failure_code    String? // Stripe error code of the latest failed attempt (e.g. card_declined); cleared once paid
+  failure_decline String? // Stripe decline_code (e.g. insufficient_funds)
+  failure_message String? // customer-facing reason from Stripe
+
   paid_at     DateTime?
+  failed_at   DateTime?
   refunded_at DateTime?
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt

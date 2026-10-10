@@ -24,14 +24,15 @@ export const PurchasesTable: FC<PurchasesTableProps> = ({ purchases }) => (
     </TableHeader>
     <TableBody>
       {purchases.map((purchase) => {
-        const at = purchase.paid_at ?? purchase.created_at;
+        const at = purchase.paid_at ?? purchase.failed_at ?? purchase.created_at;
+        const failed = purchase.status === PurchaseStatuses.FAILED;
         return (
           <TableRow key={purchase.id}>
             <TableCell className="whitespace-nowrap">
               <span className="block">{formatProjectDate(at)}</span>
               <span className="block text-xs text-muted-foreground">{format(parseISO(at), "HH:mm")}</span>
             </TableCell>
-            <TableCell className="text-right tabular-nums">+{purchase.credits}</TableCell>
+            <TableCell className="text-right tabular-nums">{failed ? purchase.credits : `+${purchase.credits}`}</TableCell>
             <TableCell className="text-right whitespace-nowrap tabular-nums">
               {formatEurCents(purchase.amount_eur_cents)}
               {purchase.refunded_eur_cents > 0 ? (
@@ -41,9 +42,12 @@ export const PurchasesTable: FC<PurchasesTableProps> = ({ purchases }) => (
               ) : null}
             </TableCell>
             <TableCell>
-              <Badge variant={purchase.status === PurchaseStatuses.PAID ? "secondary" : "outline"}>
+              <Badge variant={failed ? "destructive" : purchase.status === PurchaseStatuses.PAID ? "secondary" : "outline"}>
                 {getDropdownOptionLabel(PurchaseStatusFormOptions, purchase.status)}
               </Badge>
+              {failed && purchase.failure_message ? (
+                <span className="mt-1 block max-w-64 text-xs text-muted-foreground">{purchase.failure_message}</span>
+              ) : null}
             </TableCell>
             <TableCell className="text-right">
               {purchase.receipt_url ? (

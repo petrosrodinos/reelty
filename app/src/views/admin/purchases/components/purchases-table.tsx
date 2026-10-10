@@ -36,7 +36,8 @@ export const AdminPurchasesTable: FC<AdminPurchasesTableProps> = ({ purchases })
     </TableHeader>
     <TableBody>
       {purchases.map((p) => {
-        const at = p.paid_at ?? p.created_at;
+        const at = p.paid_at ?? p.failed_at ?? p.created_at;
+        const failed = p.status === PurchaseStatuses.FAILED;
         return (
           <TableRow key={p.id}>
             <TableCell className="whitespace-nowrap">
@@ -62,9 +63,15 @@ export const AdminPurchasesTable: FC<AdminPurchasesTableProps> = ({ purchases })
               <Money eur={p.net_eur_cents} usd={p.net_usd_cents} />
             </TableCell>
             <TableCell>
-              <Badge variant={p.status === PurchaseStatuses.PAID ? "secondary" : "outline"}>
+              <Badge variant={failed ? "destructive" : p.status === PurchaseStatuses.PAID ? "secondary" : "outline"}>
                 {getDropdownOptionLabel(PurchaseStatusFormOptions, p.status)}
               </Badge>
+              {failed && (p.failure_message || p.failure_code) ? (
+                <span className="mt-1 block max-w-56 text-xs text-muted-foreground">
+                  {p.failure_message ?? p.failure_code}
+                  {p.failure_decline ? ` (${p.failure_decline})` : ""}
+                </span>
+              ) : null}
               {p.refunded_eur_cents > 0 ? (
                 <span className="mt-1 block text-xs text-muted-foreground">
                   {formatEurCents(p.refunded_eur_cents)} back

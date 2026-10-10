@@ -256,6 +256,9 @@ export class BillingService {
       case 'checkout.session.async_payment_failed':
         await this.closePending(event.data.object, PurchaseStatus.failed);
         break;
+      case 'payment_intent.payment_failed':
+        await this.recordPaymentFailure(event.data.object);
+        break;
       case 'charge.updated':
         await this.backfillFees(event.data.object);
         break;
@@ -307,6 +310,11 @@ export class BillingService {
         data: {
           status: PurchaseStatus.paid,
           paid_at: new Date(),
+          // A retry after a declined attempt succeeded: drop the stale failure.
+          failure_code: null,
+          failure_decline: null,
+          failure_message: null,
+          failed_at: null,
           amount_eur_cents: amountCents,
           stripe_checkout_session_id: session.id,
           stripe_payment_intent_id: intentId,
@@ -364,7 +372,49 @@ export class BillingService {
     if (!purchaseId) return;
     await this.prisma.creditPurchase.updateMany({
       where: { id: purchaseId, status: PurchaseStatus.pending },
-      data: { status },
+      data: {
+        status,
+        ...(status === PurchaseStatus.failed ? { failed_at: new Date() } : {}),
+      },
+    });
+  }
+
+  /**
+   * A payment attempt was declined or errored. The Checkout Session stays open so the buyer can retry; the
+   * purchase is marked failed with Stripe's reason, and fulfil() flips it to paid if a retry succeeds.
+   * Settled purchases are left alone (a late failure event must not undo a payment).
+   */
+  private async recordPaymentFailure(
+    intent: Stripe.PaymentIntent,
+  ): Promise<void> {
+    const purchaseId = intent.metadata?.purchase_id;
+    const purchase = await this.prisma.creditPurchase.findFirst({
+      where: {
+        OR: [
+          { stripe_payment_intent_id: intent.id },
+          ...(purchaseId ? [{ id: purchaseId }] : []),
+        ],
+      },
+    });
+    if (!purchase || SETTLED_STATUSES.includes(purchase.status)) return;
+
+    const error = intent.last_payment_error;
+    await this.prisma.creditPurchase.updateMany({
+      where: {
+        id: purchase.id,
+        status: { in: [PurchaseStatus.pending, PurchaseStatus.failed] },
+      },
+      data: {
+        status: PurchaseStatus.failed,
+        failed_at: new Date(),
+        stripe_payment_intent_id: intent.id,
+        failure_code: error?.code ?? null,
+        failure_decline: error?.decline_code ?? null,
+        failure_message: error?.message ?? null,
+        ...(error?.payment_method?.type
+          ? { payment_method_type: error.payment_method.type }
+          : {}),
+      },
     });
   }
 
@@ -470,7 +520,8 @@ export class BillingService {
   ): Promise<PurchasesResponse> {
     const where: Prisma.CreditPurchaseWhereInput = {
       user_id: userId,
-      status: { in: SETTLED_STATUSES },
+      // Failed attempts are shown too so buyers can see why a payment didn't go through.
+      status: { in: [...SETTLED_STATUSES, PurchaseStatus.failed] },
     };
     const [rows, total] = await Promise.all([
       this.prisma.creditPurchase.findMany({
@@ -536,6 +587,8 @@ export class BillingService {
           payment_method_type: r.payment_method_type,
           card_brand: r.card_brand,
           card_country: r.card_country,
+          failure_code: r.failure_code,
+          failure_decline: r.failure_decline,
         }),
       ),
       pagination: this.paginate(total, query.page, query.limit),
@@ -593,7 +646,9 @@ export class BillingService {
       amount_eur_cents: r.amount_eur_cents,
       refunded_eur_cents: r.refunded_eur_cents,
       receipt_url: r.receipt_url,
+      failure_message: r.failure_message,
       paid_at: r.paid_at?.toISOString() ?? null,
+      failed_at: r.failed_at?.toISOString() ?? null,
       created_at: r.created_at.toISOString(),
     };
   }

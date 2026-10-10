@@ -306,7 +306,11 @@ exports.Prisma.CreditPurchaseScalarFieldEnum = {
   card_brand: 'card_brand',
   card_country: 'card_country',
   receipt_url: 'receipt_url',
+  failure_code: 'failure_code',
+  failure_decline: 'failure_decline',
+  failure_message: 'failure_message',
   paid_at: 'paid_at',
+  failed_at: 'failed_at',
   refunded_at: 'refunded_at',
   created_at: 'created_at',
   updated_at: 'updated_at'

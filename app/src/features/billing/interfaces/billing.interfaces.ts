@@ -34,7 +34,10 @@ export interface Purchase {
   amount_eur_cents: number;
   refunded_eur_cents: number;
   receipt_url: string | null;
+  /** Stripe's customer-facing reason when the payment failed. */
+  failure_message: string | null;
   paid_at: string | null;
+  failed_at: string | null;
   created_at: string;
 }
 
@@ -68,6 +71,8 @@ export interface AdminPurchase extends Purchase {
   payment_method_type: string | null;
   card_brand: string | null;
   card_country: string | null;
+  failure_code: string | null;
+  failure_decline: string | null;
 }
 
 /** Totals over settled purchases (paid / refunded) in the filtered set. */

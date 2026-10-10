@@ -90,8 +90,10 @@ export class ImagesService {
 
     await this.discardStalePendingUploads(project);
 
+    // Only confirmed photos count: abandoned pending slots from failed attempts must not block a retry.
+    // The cap is enforced again in `confirm`.
     const existing = await this.prisma.image.count({
-      where: { project_id: project.id, removed: false },
+      where: { project_id: project.id, ...READY },
     });
     if (existing + dto.files.length > maxImages) {
       throw new ApiException(
@@ -180,6 +182,18 @@ export class ImagesService {
       } else {
         toProcess.push(row);
       }
+    }
+
+    const { maxImages } = await this.tiers.imageLimits();
+    const readyCount = await this.prisma.image.count({ where: { project_id: project.id, ...READY } });
+    const capacity = Math.max(0, maxImages - readyCount);
+    for (const image of toProcess.splice(capacity)) {
+      await this.discardUpload(image);
+      rejected.push({
+        image_id: image.id,
+        code: ErrorCodes.TOO_MANY_IMAGES,
+        message: `A video can use at most ${maxImages} photos.`,
+      });
     }
 
     const outcomes = await mapWithConcurrency(toProcess, CONFIRM_CONCURRENCY, (image) =>
