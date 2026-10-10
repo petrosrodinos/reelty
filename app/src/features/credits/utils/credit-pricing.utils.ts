@@ -70,7 +70,7 @@ export function maxAffordableClips(
 
 /** The purchase slider moves in whole packs of this many videos. A UI choice only; the API accepts any credit count. */
 export const PURCHASE_VIDEO_STEP = 3;
-export const PURCHASE_MAX_VIDEOS = 60;
+export const PURCHASE_MAX_VIDEOS = 99;
 
 /** Credits per "video" on the purchase slider: the default tier's price. */
 export function creditsPerVideo(pricing: CreditsPricing): number {

@@ -52,10 +52,10 @@ export const useRegister = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: register,
-    onSuccess: () => {
+    onSuccess: (data) => {
       trackEvent(AnalyticsEvents.SIGN_UP, { method: "email" });
       queryClient.invalidateQueries({ queryKey: [ME_QUERY_KEY] });
-      toast({ title: "Check your email", description: "If this email can be registered, we sent a verification link." });
+      toast({ title: "Account created", description: data.message });
     },
     onError: (error) => {
       toast({ title: "Could not create your account", description: getApiErrorMessage(error), variant: "error" });

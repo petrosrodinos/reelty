@@ -18,6 +18,27 @@ import { AdminTabs } from "@/views/admin/components/admin-tabs";
 import { ConfigRow } from "@/views/admin/config/components/config-row";
 import { CREDITS_PER_EUR_KEY, UnitEconomicsCalculator } from "@/views/admin/config/components/unit-economics-calculator";
 
+/** Sections of the price list, matched on the key prefix. Keys outside every group land in "Other". */
+const CONFIG_GROUPS = [
+  {
+    title: "Provider costs",
+    description: "What Higgsfield, watermark removal and listing import cost us.",
+    prefixes: ["higgsfield.", "dewatermark.", "apify."],
+  },
+  {
+    title: "Billing",
+    description: "How euros turn into credits and the limits on a single purchase.",
+    prefixes: ["billing."],
+  },
+  {
+    title: "Credits",
+    description: "Free credits and what each add-on costs customers.",
+    prefixes: ["credits."],
+  },
+];
+
+const OTHER_GROUP = { title: "Other", description: "", prefixes: [] as string[] };
+
 const ConfigSkeleton: FC = () => (
   <div className="flex flex-col gap-px overflow-hidden rounded-lg border border-hairline" aria-busy="true" aria-label="Loading prices">
     {Array.from({ length: 5 }).map((_, index) => (
@@ -93,15 +114,33 @@ const AdminConfigContent: FC = () => {
           ) : tiers.isPending || creditRates.isPending ? (
             <Skeleton className="mb-8 h-96 w-full rounded-lg" aria-label="Loading the calculator" />
           ) : null}
-          <div className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline">
-            {data.map((item) => (
-              <ConfigRow
-                key={`${item.key}-${item.updated_at ?? "default"}`}
-                item={item}
-                isSaving={update.isPending && update.variables?.key === item.key}
-                onSave={(value) => update.mutate({ key: item.key, value })}
-              />
-            ))}
+          <div className="flex flex-col gap-10">
+            {[...CONFIG_GROUPS, OTHER_GROUP].map((group) => {
+              const items = data.filter((item) =>
+                group === OTHER_GROUP
+                  ? !CONFIG_GROUPS.some((known) => known.prefixes.some((prefix) => item.key.startsWith(prefix)))
+                  : group.prefixes.some((prefix) => item.key.startsWith(prefix)),
+              );
+              if (items.length === 0) return null;
+              return (
+                <section key={group.title} aria-labelledby={`config-group-${group.title}`}>
+                  <h2 id={`config-group-${group.title}`} className="text-lg font-medium text-ink">
+                    {group.title}
+                  </h2>
+                  <p className="mb-3 mt-1 text-sm text-muted-foreground">{group.description}</p>
+                  <div className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline">
+                    {items.map((item) => (
+                      <ConfigRow
+                        key={`${item.key}-${item.updated_at ?? "default"}`}
+                        item={item}
+                        isSaving={update.isPending && update.variables?.key === item.key}
+                        onSave={(value) => update.mutate({ key: item.key, value })}
+                      />
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
           </div>
         </>
       )}
