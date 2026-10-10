@@ -8,11 +8,14 @@ declare global {
   }
 }
 
-/** Sends a custom event to PostHog (page views are captured automatically by PostHog). A no-op unless PostHog is configured and the visitor accepted cookies. */
+/**
+ * Sends a custom event to PostHog and Google Analytics. Each destination is skipped when it is not configured or not
+ * loaded yet; nothing is sent unless the visitor accepted cookies.
+ */
 export function trackEvent(name: string, params?: Record<string, unknown>) {
-  if (typeof window === "undefined" || !posthog.__loaded) return;
-  if (readConsent() !== "granted") return;
-  posthog.capture(name, params);
+  if (typeof window === "undefined" || readConsent() !== "granted") return;
+  if (posthog.__loaded) posthog.capture(name, params);
+  if (typeof window.gtag === "function") window.gtag("event", name, params);
 }
 
 /** Removes GA cookies (_ga, _ga_<ID>) from this host and its parent domains after consent is withdrawn. */
@@ -32,7 +35,7 @@ export function clearAnalyticsCookies() {
   }
 }
 
-/** Custom event names sent to PostHog. */
+/** Custom event names sent to PostHog and GA4 (recommended GA4 names are used where one exists). */
 export const AnalyticsEvents = {
   SIGN_UP: "sign_up",
   LOGIN: "login",
