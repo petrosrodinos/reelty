@@ -13,7 +13,7 @@ export const CtaBand: FC = () => (
         <Button
           size="lg"
           className="mt-8 bg-canvas text-ink hover:bg-surface-card"
-          render={<Link href={Routes.register} />}
+          render={<Link href={Routes.register} data-track="cta_click" data-track-location="cta_band" />}
           nativeButton={false}
         >
           Try Reelty

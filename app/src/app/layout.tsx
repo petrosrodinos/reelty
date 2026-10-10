@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter, JetBrains_Mono } from "next/font/google";
 import { environments } from "@/config/environments";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
+import { PostHogAnalytics } from "@/components/analytics/posthog-analytics";
 import { CookieNotice } from "@/components/layout/cookie-notice";
 import { Providers } from "@/components/providers/providers";
 import "./globals.css";
@@ -68,7 +69,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <PostHogAnalytics />
+        </Providers>
         <CookieNotice />
         <GoogleAnalytics />
       </body>

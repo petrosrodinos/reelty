@@ -8,6 +8,7 @@ import {
 } from 'generated/prisma';
 import Stripe = require('stripe');
 import { PrismaService } from '@/core/databases/prisma/prisma.service';
+import { PosthogService } from '@/integrations/posthog/posthog.service';
 import {
   type ChargeFigures,
   StripeService,
@@ -91,6 +92,7 @@ export class BillingService {
     private readonly appConfig: AppConfigService,
     private readonly credits: CreditsService,
     private readonly rates: CreditRatesService,
+    private readonly posthog: PosthogService,
   ) {}
 
   // ------------------------------------------------------------------ checkout
@@ -290,7 +292,7 @@ export class BillingService {
     );
     const amountCents = session.amount_total ?? purchase.amount_eur_cents;
 
-    await this.prisma.$transaction(async (tx) => {
+    const credited = await this.prisma.$transaction(async (tx) => {
       const flipped = await tx.creditPurchase.updateMany({
         where: {
           id: purchase.id,
@@ -312,7 +314,7 @@ export class BillingService {
           ...purchaseFigures(amountCents, figures?.feeCents ?? null, usdPerEur),
         },
       });
-      if (flipped.count === 0) return;
+      if (flipped.count === 0) return false;
       await this.credits.apply(
         tx,
         purchase.user_id,
@@ -323,7 +325,23 @@ export class BillingService {
           note: `Bought ${purchase.credits} credits`,
         },
       );
+      return true;
     });
+
+    if (credited) {
+      // Authoritative revenue event: the browser never learns the paid amount. $insert_id dedupes webhook retries.
+      this.posthog.capture({
+        distinctId: purchase.user_id,
+        event: 'purchase_completed',
+        properties: {
+          $insert_id: `purchase_${purchase.id}`,
+          purchase_id: purchase.id,
+          credits: purchase.credits,
+          revenue: amountCents / 100,
+          currency: 'EUR',
+        },
+      });
+    }
   }
 
   private chargeData(figures: ChargeFigures | null) {

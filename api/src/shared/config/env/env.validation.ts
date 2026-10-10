@@ -35,6 +35,10 @@ const EnvSchema = z.object({
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
 
+  // PostHog (server-side purchase events; empty = disabled)
+  POSTHOG_KEY: z.string().optional(),
+  POSTHOG_HOST: z.string().url().optional(),
+
   // ffmpeg (workers)
   FFMPEG_PATH: z.string().optional(),
   FFPROBE_PATH: z.string().optional(),

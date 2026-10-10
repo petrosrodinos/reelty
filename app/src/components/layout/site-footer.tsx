@@ -66,7 +66,7 @@ export const SiteFooter: FC = () => (
       </div>
       <div className="mt-10 flex flex-col gap-2 border-t border-surface-dark-elevated pt-6 text-[0.8125rem] md:flex-row md:items-center md:justify-between">
         <span>© {new Date().getFullYear()} Reelty. All rights reserved.</span>
-        <span>Processors: Google Cloud · Apify · Dewatermark · Higgsfield · email provider</span>
+        <span>Processors: Google Cloud · Apify · Dewatermark · Higgsfield · Stripe · Google Analytics · PostHog · email provider</span>
         <PoweredBy className="self-end text-on-dark-soft transition-colors hover:text-on-dark md:self-auto" />
       </div>
     </div>

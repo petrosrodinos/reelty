@@ -22,6 +22,7 @@ import {
 } from "@/features/images/services/images.services";
 import { PROJECT_QUERY_KEY, PROJECTS_QUERY_KEY } from "@/features/projects/hooks/use-projects";
 import type { Project } from "@/features/projects/interfaces/projects.interfaces";
+import { AnalyticsEvents, trackEvent } from "@/lib/analytics.utils";
 import { toast } from "@/hooks/use-toast";
 import { triggerDownload } from "@/lib/download.utils";
 import { pluralize } from "@/lib/format.utils";
@@ -130,6 +131,7 @@ export const useRemoveWatermark = (projectId: string) => {
   return useMutation({
     mutationFn: removeWatermark,
     onSuccess: (updated) => {
+      trackEvent(AnalyticsEvents.WATERMARK_REMOVAL_STARTED);
       queryClient.setQueryData<Project>(key, (current) => {
         const next = patchProjectImages(current, (images) => images.map((image) => (image.id === updated.id ? updated : image)));
         return next ? { ...next, watermark_consent: true } : next;
@@ -271,6 +273,7 @@ export const useImageUploader = () => {
       return summary;
     },
     onSuccess: (summary) => {
+      if (summary.uploaded > 0) trackEvent(AnalyticsEvents.PHOTOS_UPLOADED, { count: summary.uploaded });
       queryClient.invalidateQueries({ queryKey: [PROJECT_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
       const problems = summary.rejected + summary.failed;

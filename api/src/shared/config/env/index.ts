@@ -23,6 +23,8 @@ export default () => ({
   HIGGSFIELD_API_KEY: str(process.env.HIGGSFIELD_API_KEY),
   STRIPE_SECRET_KEY: str(process.env.STRIPE_SECRET_KEY),
   STRIPE_WEBHOOK_SECRET: str(process.env.STRIPE_WEBHOOK_SECRET),
+  POSTHOG_KEY: str(process.env.POSTHOG_KEY),
+  POSTHOG_HOST: str(process.env.POSTHOG_HOST),
   FFMPEG_PATH: str(process.env.FFMPEG_PATH),
   FFPROBE_PATH: str(process.env.FFPROBE_PATH),
   FFMPEG_FONT_PATH: str(process.env.FFMPEG_FONT_PATH),

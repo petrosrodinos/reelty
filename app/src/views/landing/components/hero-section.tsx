@@ -88,7 +88,7 @@ export const HeroSection: FC = () => (
           editing skills needed.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Button size="lg" render={<Link href={Routes.register} />} nativeButton={false}>
+          <Button size="lg" render={<Link href={Routes.register} data-track="cta_click" data-track-location="hero" />} nativeButton={false}>
             Create your first video
           </Button>
           <Button size="lg" variant="outline" render={<Link href={Routes.homeSection("how")} />} nativeButton={false}>

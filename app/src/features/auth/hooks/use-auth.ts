@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ApiError, CSRF_COOKIE, readCookie } from "@/config/api/axios";
+import { AnalyticsEvents, trackEvent } from "@/lib/analytics.utils";
 import { toast } from "@/hooks/use-toast";
 import { getApiErrorMessage } from "@/config/constants/dropdowns/shared/api-error-message.options";
 import {
@@ -37,6 +38,7 @@ export const useLogin = () => {
     mutationFn: login,
     onSuccess: (me) => {
       queryClient.setQueryData([ME_QUERY_KEY], me);
+      trackEvent(AnalyticsEvents.LOGIN, { method: "email" });
       queryClient.invalidateQueries({ queryKey: [ME_QUERY_KEY] });
       toast({ title: "Welcome back", description: "You are logged in.", duration: 2000 });
     },
@@ -51,6 +53,7 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: register,
     onSuccess: () => {
+      trackEvent(AnalyticsEvents.SIGN_UP, { method: "email" });
       queryClient.invalidateQueries({ queryKey: [ME_QUERY_KEY] });
       toast({ title: "Check your email", description: "If this email can be registered, we sent a verification link." });
     },
@@ -65,6 +68,7 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: logout,
     onSuccess: () => {
+      trackEvent(AnalyticsEvents.LOGOUT);
       queryClient.clear();
       toast({ title: "Logged out", description: "See you soon.", duration: 2000 });
     },
@@ -79,6 +83,7 @@ export const useVerifyEmail = () => {
   return useMutation({
     mutationFn: verifyEmail,
     onSuccess: () => {
+      trackEvent(AnalyticsEvents.EMAIL_VERIFIED);
       queryClient.invalidateQueries({ queryKey: [ME_QUERY_KEY] });
       toast({ title: "Email verified", description: "You can create videos now." });
     },

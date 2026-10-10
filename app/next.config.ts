@@ -11,15 +11,19 @@ const apiOrigin = (() => {
   }
 })();
 
+// PostHog is proxied through /ingest (same origin, so ad blockers and the CSP leave it alone).
+const posthogHost = (process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://eu.i.posthog.com").replace(/\/+$/, "");
+const posthogAssetsHost = posthogHost.replace(".i.posthog.com", "-assets.i.posthog.com");
+
 const contentSecurityPolicy = [
   "default-src 'self'",
   // Next.js injects inline bootstrap scripts and styles; tighten with nonces once a proxy is in front.
-  "script-src 'self' 'unsafe-inline'",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://storage.googleapis.com https://*.googleusercontent.com",
+  "img-src 'self' data: blob: https://storage.googleapis.com https://*.googleusercontent.com https://*.google-analytics.com https://*.googletagmanager.com",
   "media-src 'self' blob: https://storage.googleapis.com",
   "font-src 'self' data:",
-  `connect-src 'self' ${apiOrigin} https://storage.googleapis.com`,
+  `connect-src 'self' ${apiOrigin} https://storage.googleapis.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -46,6 +50,15 @@ const nextConfig: NextConfig = {
   ...(process.env.VERCEL ? {} : { output: "standalone" as const }),
   poweredByHeader: false,
   reactStrictMode: true,
+  // PostHog's API paths carry trailing slashes that must not be redirected.
+  skipTrailingSlashRedirect: true,
+  async rewrites() {
+    return [
+      { source: "/ingest/static/:path*", destination: `${posthogAssetsHost}/static/:path*` },
+      { source: "/ingest/array/:path*", destination: `${posthogAssetsHost}/array/:path*` },
+      { source: "/ingest/:path*", destination: `${posthogHost}/:path*` },
+    ];
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

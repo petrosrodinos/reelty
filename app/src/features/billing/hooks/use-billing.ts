@@ -4,6 +4,7 @@ import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import { getApiErrorMessage } from "@/config/constants/dropdowns/shared/api-error-message.options";
 import type { PurchasesQuery } from "@/features/billing/interfaces/billing.interfaces";
 import { createCheckout, getPurchases } from "@/features/billing/services/billing.services";
+import { AnalyticsEvents, trackEvent } from "@/lib/analytics.utils";
 import { toast } from "@/hooks/use-toast";
 
 export const PURCHASES_QUERY_KEY = "purchases";
@@ -13,6 +14,7 @@ export const useCreateCheckout = () => {
   return useMutation({
     mutationFn: createCheckout,
     onSuccess: ({ url }) => {
+      trackEvent(AnalyticsEvents.BEGIN_CHECKOUT, { currency: "EUR" });
       window.location.assign(url);
     },
     onError: (error) => {

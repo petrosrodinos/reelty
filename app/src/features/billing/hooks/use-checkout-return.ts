@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ME_QUERY_KEY } from "@/features/auth/hooks/use-auth";
 import { PURCHASES_QUERY_KEY } from "@/features/billing/hooks/use-billing";
 import { CREDIT_TRANSACTIONS_QUERY_KEY, CREDITS_QUERY_KEY } from "@/features/credits/hooks/use-credits";
+import { AnalyticsEvents, trackEvent } from "@/lib/analytics.utils";
 import { toast } from "@/hooks/use-toast";
 import { QueryParams } from "@/routes/routes";
 
@@ -26,6 +27,7 @@ export const useCheckoutReturn = (returnPath: string) => {
     router.replace(returnPath);
 
     if (status !== "success") {
+      trackEvent(AnalyticsEvents.CHECKOUT_CANCELLED);
       toast({ title: "Payment cancelled", description: "No charge was made.", variant: "info" });
       return;
     }

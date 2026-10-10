@@ -24,6 +24,7 @@ import {
   submitProject,
   updateProject,
 } from "@/features/projects/services/projects.services";
+import { AnalyticsEvents, trackEvent } from "@/lib/analytics.utils";
 import { toast } from "@/hooks/use-toast";
 import { triggerDownload } from "@/lib/download.utils";
 
@@ -80,6 +81,7 @@ export const useCreateProject = () => {
   return useMutation({
     mutationFn: createProject,
     onSuccess: (project) => {
+      trackEvent(AnalyticsEvents.PROJECT_CREATED, { source_type: project.source_type });
       queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
       toast(
         project.source_type === SourceTypes.UPLOAD
@@ -116,6 +118,7 @@ export const useDeleteProject = () => {
   return useMutation({
     mutationFn: deleteProject,
     onSuccess: (_data, id) => {
+      trackEvent(AnalyticsEvents.PROJECT_DELETED);
       queryClient.removeQueries({ queryKey: [PROJECT_QUERY_KEY, id] });
       queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [USAGE_QUERY_KEY] });
@@ -132,6 +135,7 @@ export const useSubmitProject = () => {
   return useMutation({
     mutationFn: submitProject,
     onSuccess: (project) => {
+      trackEvent(AnalyticsEvents.VIDEO_SUBMITTED, { source_type: project.source_type });
       queryClient.setQueryData<Project>([PROJECT_QUERY_KEY, project.id], (current) => ({
         ...project,
         images: project.images ?? current?.images,
@@ -155,6 +159,7 @@ export const useRetryProject = () => {
   return useMutation({
     mutationFn: retryProject,
     onSuccess: () => {
+      trackEvent(AnalyticsEvents.VIDEO_RETRIED);
       queryClient.invalidateQueries({ queryKey: [PROJECT_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [USAGE_QUERY_KEY] });
@@ -183,6 +188,7 @@ export const useDownloadVideo = () => {
   return useMutation({
     mutationFn: getVideoDownloadUrl,
     onSuccess: (download) => {
+      trackEvent(AnalyticsEvents.VIDEO_DOWNLOADED);
       triggerDownload(download.url, download.filename);
       toast({ title: "Download started", description: "The signed link is valid for 15 minutes.", duration: 2500 });
     },

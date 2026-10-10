@@ -33,6 +33,8 @@ const PrivacyPage: FC = () => (
           <span key="higgsfield"><strong>Higgsfield</strong>: generates video clips from your photos.</span>,
           <span key="email"><strong>Our email provider</strong>: delivers account and status emails.</span>,
           <span key="stripe"><strong>Stripe</strong>: processes credit purchases. Card details go to Stripe directly and never reach our servers.</span>,
+          <span key="ga"><strong>Google Analytics</strong>: page-view statistics, only if you accept analytics cookies.</span>,
+          <span key="posthog"><strong>PostHog</strong>: product analytics (page views and actions such as creating a video, plus the amount of a completed purchase), only if you accept analytics cookies. We identify you by account ID, never by email or name.</span>,
         ]}
       />
     </LegalSection>
@@ -41,7 +43,7 @@ const PrivacyPage: FC = () => (
       <p>
         Essential cookies are always on: a short-lived access cookie, a rotating refresh cookie and a CSRF token that together
         keep you signed in and protect your session. If you choose Accept all, we also use Google Analytics cookies (_ga and
-        _ga_*) to measure how the site is used. Analytics runs only after you accept, advertising features stay off, and you
+        _ga_*) to measure page views, and PostHog (cookie and local storage) to record product events such as creating a video. Analytics runs only after you accept, advertising features stay off, and you
         can change your mind any time from Cookie settings in the footer; withdrawing removes the analytics cookies. There
         are no advertising cookies.
       </p>
