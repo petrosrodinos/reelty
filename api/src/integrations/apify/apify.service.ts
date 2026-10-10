@@ -2,7 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ApifyClient } from 'apify-client';
 import { WorkerConfigService } from '@/background/common/worker-config.service';
 
-export type ApifyFailureKind = 'not_configured' | 'run_failed' | 'timeout';
+/** `unavailable`: the account itself cannot be used (bad token, out of credits / usage limit); retrying will not help. */
+export type ApifyFailureKind = 'not_configured' | 'unavailable' | 'run_failed' | 'timeout';
 
 export class ApifyError extends Error {
   constructor(
@@ -26,6 +27,15 @@ export interface ApifyRunResult<T> {
   items: T[];
   /** Platform usage in USD as reported by Apify (null when unknown). */
   usageUsd: number | null;
+}
+
+const ACCOUNT_PROBLEM_TEXT = /credit|usage|limit|quota|billing|payment|insufficient|subscription|platform-feature-disabled|not-enough/i;
+
+/** True when an apify-client error means our account is unusable (auth, credits, plan limits). Exported for unit tests. */
+export function isApifyAccountProblem(error: unknown): boolean {
+  const e = error as { statusCode?: number; type?: string; message?: string };
+  if (e?.statusCode === 401 || e?.statusCode === 402 || e?.statusCode === 403) return true;
+  return ACCOUNT_PROBLEM_TEXT.test(`${e?.type ?? ''} ${e?.message ?? ''}`) && typeof e?.statusCode === 'number';
 }
 
 const TERMINAL_OK = 'SUCCEEDED';
@@ -57,6 +67,19 @@ export class ApifyService {
     input: Record<string, unknown>,
     opts: ApifyRunOptions = {},
   ): Promise<ApifyRunResult<T>> {
+    try {
+      return await this.execute<T>(actorId, input, opts);
+    } catch (error) {
+      if (error instanceof ApifyError) throw error;
+      if (isApifyAccountProblem(error)) {
+        this.logger.error(`[ALERT] Apify account problem (check token / credits): ${(error as Error).message}`);
+        throw new ApifyError('unavailable', 'Apify account unavailable (auth or credits)');
+      }
+      throw error;
+    }
+  }
+
+  private async execute<T>(actorId: string, input: Record<string, unknown>, opts: ApifyRunOptions): Promise<ApifyRunResult<T>> {
     const client = this.getClient();
     const timeoutMs = opts.timeoutMs ?? 10 * 60 * 1000;
     const pollMs = opts.pollIntervalMs ?? 5_000;

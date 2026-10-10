@@ -65,6 +65,7 @@ export class HiggsfieldProvider implements VideoGenerationProvider {
     try {
       json = await this.call(HIGGSFIELD_CONFIG.endpoints.uploadUrl, { content_type: contentType });
     } catch (error) {
+      this.throwIfAccountProblem(error, true);
       if (error instanceof HiggsfieldHttpError) throw new ProviderRejectedError(`Higgsfield rejected the upload request (HTTP ${error.status}: ${error.bodyText.slice(0, 200)})`);
       throw error;
     }
@@ -98,6 +99,7 @@ export class HiggsfieldProvider implements VideoGenerationProvider {
       if (credits !== undefined) return { creditsPerClip: credits };
     } catch (error) {
       if (error instanceof ProviderConfigError) throw error;
+      this.throwIfAccountProblem(error, false);
       this.logger.warn(`Higgsfield cost estimate failed: ${(error as Error).message}`);
     }
     const fallback = await this.appConfig.getNumber(AppConfigKeys.HIGGSFIELD_FALLBACK_CREDITS_PER_CLIP);
@@ -114,7 +116,13 @@ export class HiggsfieldProvider implements VideoGenerationProvider {
 
   async waitForJobs(jobIds: string[]): Promise<ClipJobState[]> {
     const states = await mapPool(jobIds, HIGGSFIELD_CONFIG.concurrency, async (jobId) => {
-      const json = await this.call(HIGGSFIELD_CONFIG.endpoints.requestStatus(jobId));
+      let json: unknown;
+      try {
+        json = await this.call(HIGGSFIELD_CONFIG.endpoints.requestStatus(jobId));
+      } catch (error) {
+        this.throwIfAccountProblem(error, false);
+        throw error;
+      }
       return parseJobState(jobId, json);
     });
     return states;
@@ -149,10 +157,25 @@ export class HiggsfieldProvider implements VideoGenerationProvider {
       return { index: r.index, imageId: r.imageId, ok: false, errorMessage: 'no request id returned' };
     } catch (error) {
       if (error instanceof HiggsfieldHttpError) {
+        this.throwIfAccountProblem(error, false);
         const outOfCredits = error.status === 402 || looksLikeOutOfCredits(error.bodyText);
         return { index: r.index, imageId: r.imageId, ok: false, outOfCredits, errorMessage: `HTTP ${error.status}: ${error.bodyText.slice(0, 200)}` };
       }
       throw error;
+    }
+  }
+
+  /**
+   * Rejected credentials (401/403) and, when `includeCredits`, an exhausted balance are problems with OUR account,
+   * not with the photo: surface them as a config error so the user sees "temporarily unavailable" and is refunded,
+   * instead of the photo being skipped. (Credits at submit time are handled separately by the BLOCKED_NO_CREDITS flow.)
+   */
+  private throwIfAccountProblem(error: unknown, includeCredits: boolean): void {
+    if (!(error instanceof HiggsfieldHttpError)) return;
+    const auth = error.status === 401 || error.status === 403;
+    const credits = includeCredits && (error.status === 402 || looksLikeOutOfCredits(error.bodyText));
+    if (auth || credits) {
+      throw new ProviderConfigError(`Higgsfield account problem (HTTP ${error.status}): ${auth ? 'credentials rejected' : 'out of credits'}`);
     }
   }
 

@@ -25,7 +25,7 @@ import {
 } from './scrape.utils';
 
 export const ScrapeMessages = {
-  unavailable: "Importing photos from a link isn't available right now. Please upload your photos instead.",
+  unavailable: "Importing photos from a link isn't available right now. Please try again later, or upload your photos instead.",
   empty: "We couldn't find any usable photos on that page. Try another link, or upload your photos instead.",
   failed: "We couldn't fetch photos from that link. Please try again, or upload your photos instead.",
 } as const;
@@ -104,7 +104,7 @@ export class ScrapeService {
       const msg = (error as Error).message;
       this.logger.warn(`Scrape of project ${projectId} failed: ${msg}`);
       await log('error', msg);
-      if (error instanceof ApifyError && error.kind === 'not_configured') {
+      if (error instanceof ApifyError && (error.kind === 'not_configured' || error.kind === 'unavailable')) {
         await this.failScrape(projectId, 'scrape_failed', ScrapeMessages.unavailable);
         return;
       }

@@ -305,13 +305,10 @@ export class RenderService {
     return null;
   }
 
-  private async enterBlocked(project: Project, ctx: RenderContext, reason: string): Promise<RenderOutcome> {
-    if (project.render_step !== 'BLOCKED_NO_CREDITS') {
-      await this.prisma.project.update({ where: { id: project.id }, data: { render_step: 'BLOCKED_NO_CREDITS' } });
-      await this.log(project.id, ctx, 'blocked', 'BLOCKED_NO_CREDITS', reason);
-      this.logger.error(`[ALERT] Render ${project.id} is blocked: provider out of credits (${reason})`);
-    }
-    return delay(BLOCK_RECHECK_MS);
+  /** Provider out of credits: fail fast (user is refunded and told to try later) instead of making them wait. */
+  private async enterBlocked(project: Project, _ctx: RenderContext, reason: string): Promise<never> {
+    this.logger.error(`[ALERT] Render ${project.id} failed: provider out of credits (${reason}). Top up the provider account.`);
+    throw new RenderFailure('provider_error', `Provider out of credits: ${reason}`);
   }
 
   /** ASSEMBLING / UPLOADING: build the video in a temp dir, QA it, upload, mark COMPLETED. */
