@@ -39,6 +39,8 @@ export const BuyCreditsCard: FC<BuyCreditsCardProps> = ({ pricing, returnProject
   const rate = rateFor(credits, baseRate, pricing.rate_tiers);
   const cents = priceCents(credits, rate);
   const baseCents = priceCents(credits, baseRate);
+  const perVideoCents = Math.round(cents / videos);
+  const basePerVideoCents = Math.round(baseCents / videos);
   // The next better rate, as the first slider stop that reaches it (customers pick videos, not credits).
   const next = nextRateTier(credits, baseRate, pricing.rate_tiers);
   const nextVideos = next
@@ -70,8 +72,15 @@ export const BuyCreditsCard: FC<BuyCreditsCardProps> = ({ pricing, returnProject
         <p className="text-sm text-muted-foreground tabular-nums">{pluralize(credits, "credit")}</p>
       </div>
 
+      <p className="mt-1 text-sm text-muted-foreground tabular-nums" aria-live="polite">
+        <span className="font-medium text-ink">{formatEurCents(perVideoCents)}</span> per video
+        {perVideoCents < basePerVideoCents ? (
+          <span className="ml-2 line-through">{formatEurCents(basePerVideoCents)}</span>
+        ) : null}
+      </p>
+
       <Slider
-        className="mt-5"
+        className="mt-4"
         min={VIDEO_STEP}
         max={maxVideos}
         step={VIDEO_STEP}

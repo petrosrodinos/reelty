@@ -1,0 +1,112 @@
+{
+  "taken_at": "2026-10-10T16:51:40.143Z",
+  "source": "staging db :5433",
+  "app_config": [
+    {
+      "key": "apify.fallback_usd_per_run",
+      "value": 0.0055,
+      "unit": "usd",
+      "description": "USD cost of one listing scrape, used only when Apify does not report the run usage."
+    },
+    {
+      "key": "billing.credits_per_eur",
+      "value": 4,
+      "unit": "credits",
+      "description": "Credits a user gets for 1 EUR. Price of a purchase = credits / this value."
+    },
+    {
+      "key": "billing.max_credits_per_purchase",
+      "value": 2600,
+      "unit": "credits",
+      "description": "Largest number of credits one checkout may buy."
+    },
+    {
+      "key": "billing.usd_per_eur",
+      "value": 1.08,
+      "unit": "ratio",
+      "description": "USD per 1 EUR, snapshotted onto each purchase for the USD columns."
+    },
+    {
+      "key": "credits.import_fetch",
+      "value": 0,
+      "unit": "credits",
+      "description": "Flat add-on per video imported from an Airbnb or website link."
+    },
+    {
+      "key": "credits.signup_grant",
+      "value": 24,
+      "unit": "credits",
+      "description": "Free credits given once to every new account."
+    },
+    {
+      "key": "credits.watermark_removal",
+      "value": 1,
+      "unit": "credits",
+      "description": "Flat add-on per video when at least one photo had its watermark removed."
+    },
+    {
+      "key": "dewatermark.credits_per_image",
+      "value": 1,
+      "unit": "credits",
+      "description": "Dewatermark credits charged per image."
+    },
+    {
+      "key": "dewatermark.usd_per_credit",
+      "value": 0.1,
+      "unit": "usd",
+      "description": "USD cost of one dewatermark credit. Set from your plan price."
+    },
+    {
+      "key": "higgsfield.fallback_credits_per_clip",
+      "value": 2.856,
+      "unit": "credits",
+      "description": "Credits per 5 s Kling 2.5 turbo clip, used only when the estimate endpoint is unavailable."
+    },
+    {
+      "key": "higgsfield.usd_per_credit",
+      "value": 0.0627,
+      "unit": "usd",
+      "description": "USD cost of one Higgsfield credit (from the API estimate: $0.179 / 2.856 credits, after the 15% API discount)."
+    }
+  ],
+  "credit_tiers": [
+    {
+      "name": "Short",
+      "min_clips": 3,
+      "max_clips": 6,
+      "credits": 24,
+      "is_default": false
+    },
+    {
+      "name": "Standard",
+      "min_clips": 7,
+      "max_clips": 9,
+      "credits": 26,
+      "is_default": true
+    },
+    {
+      "name": "Long",
+      "min_clips": 10,
+      "max_clips": 12,
+      "credits": 28,
+      "is_default": false
+    }
+  ],
+  "credit_rate_tiers": [
+    {
+      "min_eur": 25,
+      "credits_per_eur": 5
+    },
+    {
+      "min_eur": 50,
+      "credits_per_eur": 6
+    }
+  ],
+  "system_flags": [
+    {
+      "renders_enabled": true,
+      "dewatermark_enabled": true,
+      "scrape_enabled": true
+    }
+  ]
+}
