@@ -39,8 +39,11 @@ const PrivacyPage: FC = () => (
 
     <LegalSection heading="4. Cookies">
       <p>
-        We use essential cookies only: a short-lived access cookie, a rotating refresh cookie and a CSRF token that together keep
-        you signed in and protect your session. There are no advertising or analytics cookies.
+        Essential cookies are always on: a short-lived access cookie, a rotating refresh cookie and a CSRF token that together
+        keep you signed in and protect your session. If you choose Accept all, we also use Google Analytics cookies (_ga and
+        _ga_*) to measure how the site is used. Analytics runs only after you accept, advertising features stay off, and you
+        can change your mind any time from Cookie settings in the footer; withdrawing removes the analytics cookies. There
+        are no advertising cookies.
       </p>
     </LegalSection>
 

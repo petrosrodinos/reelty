@@ -1,6 +1,5 @@
 import type { FC } from "react";
 import { ScrollToTop } from "@/components/layout/scroll-to-top";
-import { CookieNotice } from "@/components/layout/cookie-notice";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { AtAGlanceSection } from "@/views/landing/components/at-a-glance-section";
@@ -27,7 +26,6 @@ const LandingPage: FC = () => (
       <CtaBand />
     </main>
     <SiteFooter />
-    <CookieNotice />
   </>
 );
 

@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import Link from "next/link";
 import { BrandLogo } from "@/components/layout/brand-logo";
+import { CookieSettingsButton } from "@/components/layout/cookie-settings-button";
 import { PoweredBy } from "@/components/layout/powered-by";
 import { Routes } from "@/routes/routes";
 
@@ -54,6 +55,11 @@ export const SiteFooter: FC = () => (
                   </Link>
                 </li>
               ))}
+              {column.title === "Legal" && (
+                <li>
+                  <CookieSettingsButton className="rounded-sm text-on-dark-soft transition-colors hover:text-on-dark" />
+                </li>
+              )}
             </ul>
           </div>
         ))}

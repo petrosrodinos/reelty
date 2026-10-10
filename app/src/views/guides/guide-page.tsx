@@ -2,7 +2,6 @@ import type { FC } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
-import { CookieNotice } from "@/components/layout/cookie-notice";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { environments } from "@/config/environments";
@@ -206,7 +205,6 @@ export const GuidePage: FC<{ guide: Guide }> = ({ guide }) => {
         </article>
       </main>
       <SiteFooter />
-      <CookieNotice />
     </>
   );
 };
