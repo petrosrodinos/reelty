@@ -81,6 +81,8 @@ export const useCompletionNotifier = () => {
     queryKey: [PROJECTS_QUERY_KEY, "notifier"],
     queryFn: () => getProjects({ limit: 20 }),
     enabled,
+    // the whole point is to notice a finish while the tab is hidden, so keep polling in the background
+    refetchIntervalInBackground: true,
     refetchInterval: (q) =>
       q.state.data?.data.some((project) => InProgressStatuses.includes(project.status)) ? POLL_INTERVAL_MS : false,
   });
