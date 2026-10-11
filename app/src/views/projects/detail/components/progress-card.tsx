@@ -4,16 +4,18 @@ import { useEffect, useRef, useState, type FC } from "react";
 import Link from "next/link";
 import { BellIcon, BellOffIcon, CheckIcon, ClockIcon, InfoIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNotificationPreference } from "@/features/notifications/hooks/use-completion-notifications";
 import { ProjectStatusBadge } from "@/components/ui/project-status-badge";
 import { RenderStepperOrder, getRenderStepLabel } from "@/config/constants/dropdowns/projects/render-step-form.options";
 import { RenderSteps, type Project } from "@/features/projects/interfaces/projects.interfaces";
 import { cn } from "@/lib/utils";
 import { Routes } from "@/routes/routes";
-import type { CompletionNotification } from "@/views/projects/detail/hooks/use-completion-notification";
 import { getActiveStepIndex, getProgressPercent } from "@/views/projects/detail/utils/progress";
 
 /** Persistent "come back later" banner (FR-BG-1) shown for every queued or creating project. */
-export const BackgroundBanner: FC<{ notification?: CompletionNotification }> = ({ notification }) => (
+export const BackgroundBanner: FC = () => {
+  const notification = useNotificationPreference();
+  return (
   <div className="flex items-start gap-3 rounded-lg bg-surface-card px-4 py-3.5 text-sm text-ink" role="status">
     <InfoIcon className="mt-0.5 size-[18px] shrink-0 text-brand" aria-hidden="true" />
     <div className="flex flex-col gap-3">
@@ -25,7 +27,7 @@ export const BackgroundBanner: FC<{ notification?: CompletionNotification }> = (
         </Link>{" "}
         when it&apos;s ready.
       </p>
-      {notification && notification.permission !== "unsupported" ? (
+      {notification.permission !== "unsupported" ? (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
           <Button
             size="sm"
@@ -34,7 +36,7 @@ export const BackgroundBanner: FC<{ notification?: CompletionNotification }> = (
             disabled={notification.permission === "denied"}
           >
             {notification.enabled ? <BellOffIcon /> : <BellIcon />}
-            {notification.enabled ? "Notifications on (turn off)" : "Notify me when it's ready"}
+            {notification.enabled ? "Video notifications on (turn off)" : "Notify me when my videos are ready"}
           </Button>
           <span className="text-[0.8125rem] text-muted-foreground">
             {notification.permission === "denied"
@@ -45,7 +47,8 @@ export const BackgroundBanner: FC<{ notification?: CompletionNotification }> = (
       ) : null}
     </div>
   </div>
-);
+  );
+};
 
 /** Eases the displayed number toward `target` so the percentage counts up instead of jumping. */
 function useAnimatedNumber(target: number): number {

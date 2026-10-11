@@ -14,12 +14,13 @@ export const requestBrowserNotificationPermission = async (): Promise<BrowserNot
 };
 
 /** Shows a notification if permission was granted; clicking it focuses the tab. Never throws. */
-export const showBrowserNotification = (title: string, body: string, tag?: string): void => {
+export const showBrowserNotification = (title: string, body: string, tag?: string, url?: string): void => {
   if (getBrowserNotificationPermission() !== "granted") return;
   try {
     const notification = new Notification(title, { body, tag, icon: "/favicon.ico" });
     notification.onclick = () => {
       window.focus();
+      if (url) window.location.assign(url);
       notification.close();
     };
   } catch {

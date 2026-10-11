@@ -18,7 +18,6 @@ import { CompletedView } from "@/views/projects/detail/components/completed-view
 import { CreatedDialog } from "@/views/projects/detail/components/created-dialog";
 import { DetailSkeleton } from "@/views/projects/detail/components/detail-skeleton";
 import { ProjectActionsMenu } from "@/views/projects/detail/components/project-actions-menu";
-import { useCompletionNotification } from "@/views/projects/detail/hooks/use-completion-notification";
 import { FailedCard } from "@/views/projects/detail/components/failed-card";
 
 const ProjectDetailPage: FC<{ id: string }> = ({ id }) => {
@@ -27,7 +26,6 @@ const ProjectDetailPage: FC<{ id: string }> = ({ id }) => {
   const { data: project, error, isPending, refetch, isFetching } = useProject(id);
   const retry = useRetryProject();
   const deleteProject = useDeleteProject();
-  const notification = useCompletionNotification(project);
   const [deleting, setDeleting] = useState(false);
 
   // Drafts, fetching projects and scrape failures are edited, not viewed.
@@ -94,7 +92,7 @@ const ProjectDetailPage: FC<{ id: string }> = ({ id }) => {
 
       {inProgress ? (
         <div className="mb-6">
-          <BackgroundBanner notification={notification} />
+          <BackgroundBanner />
         </div>
       ) : null}
 

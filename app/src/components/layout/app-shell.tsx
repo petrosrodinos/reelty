@@ -2,6 +2,7 @@ import type { FC, ReactNode } from "react";
 import Link from "next/link";
 import { AppHeader } from "@/components/layout/app-header";
 import { PoweredBy } from "@/components/layout/powered-by";
+import { CompletionNotifier } from "@/components/layout/completion-notifier";
 import { OfflineBanner, VerificationBanner } from "@/components/layout/app-banners";
 import type { Me } from "@/features/auth/interfaces/auth.interfaces";
 import { Routes } from "@/routes/routes";
@@ -15,6 +16,7 @@ interface AppShellProps {
 export const AppShell: FC<AppShellProps> = ({ me, children }) => (
   <>
     <AppHeader me={me} />
+    <CompletionNotifier />
     <OfflineBanner />
     {!me.email_verified ? <VerificationBanner /> : null}
     <main id="main" className="flex-1">
