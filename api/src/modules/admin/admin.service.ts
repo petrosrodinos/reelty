@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
-import type { SystemFlag } from 'generated/prisma';
+import type { Prisma, SystemFlag } from 'generated/prisma';
 import { AuthRole, CreditTxKind, ProjectStatus } from 'generated/prisma';
 import { GcsObjectsService } from '@/integrations/storage/gcs/services/gcs-objects.service';
 import { StoragePaths } from '@/integrations/storage/gcs/storage-paths';
@@ -19,6 +19,7 @@ import { ReplaceCreditTiersDto } from '@/modules/credits/dto/credit-tier.dto';
 import { GrantCreditsDto } from '@/modules/credits/dto/grant-credits.dto';
 import { ErrorCodes } from '@/shared/config/error-codes';
 import { ApiException } from '@/shared/errors/api-exception';
+import { ERROR_EVENT_STATUSES, type AdminErrorsQueryType } from './dto/errors-query.schema';
 import { UpdateFlagsDto } from './dto/update-flags.dto';
 
 @Injectable()
@@ -148,6 +149,71 @@ export class AdminService {
       this.credits.apply(tx, userId, dto.credits, CreditTxKind.admin_adjustment, { note: dto.note ?? null }),
     );
     return { user_id: userId, balance: await this.credits.getBalance(userId) };
+  }
+
+  /** Every failed / error / warning job event (render, scrape, dewatermark) with its project and user, newest first. */
+  async getErrors(query: AdminErrorsQueryType) {
+    const where: Prisma.JobEventWhereInput = {
+      status: query.status ?? { in: [...ERROR_EVENT_STATUSES] },
+      ...(query.job_name ? { job_name: query.job_name } : {}),
+      ...(query.project_id ? { project_id: query.project_id } : {}),
+      ...(query.from || query.to
+        ? {
+            created_at: {
+              ...(query.from ? { gte: new Date(query.from) } : {}),
+              ...(query.to ? { lt: new Date(query.to) } : {}),
+            },
+          }
+        : {}),
+    };
+
+    const [rows, total, jobNames] = await Promise.all([
+      this.prisma.jobEvent.findMany({
+        where,
+        orderBy: { created_at: 'desc' },
+        skip: (query.page - 1) * query.limit,
+        take: query.limit,
+        include: {
+          project: {
+            select: {
+              status: true,
+              failure_code: true,
+              failure_reason: true,
+              user: { select: { id: true, email: true } },
+            },
+          },
+        },
+      }),
+      this.prisma.jobEvent.count({ where }),
+      this.prisma.jobEvent.findMany({ distinct: ['job_name'], select: { job_name: true } }),
+    ]);
+
+    const totalPages = Math.max(1, Math.ceil(total / query.limit));
+    return {
+      data: rows.map((r) => ({
+        id: r.id,
+        project_id: r.project_id,
+        job_name: r.job_name,
+        step: r.step,
+        status: r.status,
+        message: r.message,
+        created_at: r.created_at.toISOString(),
+        project_status: r.project.status,
+        project_failure_code: r.project.failure_code,
+        project_failure_reason: r.project.failure_reason,
+        user_id: r.project.user.id,
+        user_email: r.project.user.email,
+      })),
+      job_names: jobNames.map((j) => j.job_name).sort(),
+      pagination: {
+        total,
+        page: query.page,
+        limit: query.limit,
+        total_pages: totalPages,
+        has_next: query.page < totalPages,
+        has_prev: query.page > 1,
+      },
+    };
   }
 
   getCostHistory(query: AdminUsageQueryType) {

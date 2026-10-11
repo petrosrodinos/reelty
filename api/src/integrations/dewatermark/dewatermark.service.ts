@@ -136,7 +136,7 @@ export class DewatermarkService {
 export function findCredits(body: unknown, depth = 0): number | null {
   if (!body || typeof body !== 'object' || depth > 2) return null;
   const o = body as Record<string, unknown>;
-  for (const k of ['credits', 'credit', 'remaining_credits', 'credit_balance', 'balance']) {
+  for (const k of ['available_credit', 'credits', 'credit', 'remaining_credits', 'credit_balance', 'balance']) {
     const v = o[k];
     if (typeof v === 'number' && Number.isFinite(v)) return v;
     if (typeof v === 'string' && v.trim() !== '' && Number.isFinite(Number(v))) return Number(v);

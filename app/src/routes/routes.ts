@@ -22,6 +22,7 @@ export const Routes = {
   adminUsage: "/admin/usage",
   adminCreditTiers: "/admin/credit-tiers",
   adminPurchases: "/admin/purchases",
+  adminErrors: "/admin/errors",
   adminUsers: "/admin/users",
   project: (id: string) => `/projects/${id}`,
   projectCreated: (id: string) => `/projects/${id}?created=1`,

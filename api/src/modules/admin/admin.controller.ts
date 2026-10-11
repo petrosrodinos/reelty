@@ -33,6 +33,7 @@ import {
 } from '@/modules/billing/dto/purchases-query.schema';
 import { AdminService } from './admin.service';
 import { AnalyticsQuerySchema, type AnalyticsQueryType } from './dto/analytics-query.schema';
+import { AdminErrorsQuerySchema, type AdminErrorsQueryType } from './dto/errors-query.schema';
 import { UpdateFlagsDto } from './dto/update-flags.dto';
 import { AdminStatsEntity, FlagsEntity } from './entities/admin.entity';
 import { AnalyticsEntity } from './entities/analytics.entity';
@@ -183,6 +184,19 @@ export class AdminController {
   @ApiResponse({ status: 200, type: CostHistoryEntity })
   getCostHistory(@Query(new ZodValidationPipe(AdminUsageQuerySchema)) query: AdminUsageQueryType) {
     return this.adminService.getCostHistory(query);
+  }
+
+  @Get('errors')
+  @ApiOperation({ summary: 'Failed / error / warning job events (render, scrape, dewatermark) with project and user' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'max 100' })
+  @ApiQuery({ name: 'status', required: false, enum: ['failed', 'error', 'warning'] })
+  @ApiQuery({ name: 'job_name', required: false, type: String })
+  @ApiQuery({ name: 'project_id', required: false, type: String })
+  @ApiQuery({ name: 'from', required: false, type: String, description: 'ISO datetime, inclusive' })
+  @ApiQuery({ name: 'to', required: false, type: String, description: 'ISO datetime, exclusive' })
+  getErrors(@Query(new ZodValidationPipe(AdminErrorsQuerySchema)) query: AdminErrorsQueryType) {
+    return this.adminService.getErrors(query);
   }
 
   @Get('projects/:id/cost')

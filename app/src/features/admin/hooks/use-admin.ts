@@ -2,11 +2,12 @@
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getApiErrorMessage } from "@/config/constants/dropdowns/shared/api-error-message.options";
-import type { CostHistoryQuery } from "@/features/admin/interfaces/admin.interfaces";
+import type { AdminErrorsQuery, CostHistoryQuery } from "@/features/admin/interfaces/admin.interfaces";
 import type { AnalyticsRange } from "@/features/admin/interfaces/analytics.interfaces";
 import {
   adjustUserCredits,
   deleteAdminUser,
+  getAdminErrors,
   getAdminPurchases,
   getAdminUsers,
   getAnalytics,
@@ -155,6 +156,16 @@ export const useAdminPurchases = (query: AdminPurchasesQuery = {}) => {
   return useQuery({
     queryKey: [ADMIN_PURCHASES_QUERY_KEY, query],
     queryFn: () => getAdminPurchases(query),
+    placeholderData: keepPreviousData,
+    staleTime: 15_000,
+  });
+};
+
+/** Failed / error / warning job events across all projects (admin only). */
+export const useAdminErrors = (query: AdminErrorsQuery = {}) => {
+  return useQuery({
+    queryKey: ["admin-errors", query],
+    queryFn: () => getAdminErrors(query),
     placeholderData: keepPreviousData,
     staleTime: 15_000,
   });

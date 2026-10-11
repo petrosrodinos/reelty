@@ -45,6 +45,7 @@ export const ApiRoutes = {
     creditTiers: "/admin/credit-tiers",
     creditRates: "/admin/credit-rates",
     purchases: "/admin/purchases",
+    errors: "/admin/errors",
   },
   usage: {
     prefix: "/usage",

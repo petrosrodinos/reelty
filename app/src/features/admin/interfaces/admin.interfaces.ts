@@ -103,3 +103,40 @@ export interface ProviderBalance {
   note: string | null;
   resets_at: string | null;
 }
+
+export type ErrorEventStatus = "failed" | "error" | "warning";
+
+export interface AdminErrorEvent {
+  id: string;
+  project_id: string;
+  /** Which job wrote it, e.g. render_video, scrape_listing, dewatermark. */
+  job_name: string;
+  /** Failure code or pipeline step, e.g. ASSEMBLING, provider_timeout. */
+  step: string | null;
+  status: ErrorEventStatus;
+  /** The detailed reason, written for admins. */
+  message: string | null;
+  created_at: string;
+  project_status: string;
+  project_failure_code: string | null;
+  project_failure_reason: string | null;
+  user_id: string;
+  user_email: string;
+}
+
+export interface AdminErrors {
+  data: AdminErrorEvent[];
+  /** Every job name seen in job_events, for the filter. */
+  job_names: string[];
+  pagination: Pagination;
+}
+
+export interface AdminErrorsQuery {
+  page?: number;
+  limit?: number;
+  status?: ErrorEventStatus;
+  job_name?: string;
+  project_id?: string;
+  from?: string;
+  to?: string;
+}
