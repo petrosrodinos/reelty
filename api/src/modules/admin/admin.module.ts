@@ -8,11 +8,15 @@ import { CreditsModule } from '@/modules/credits/credits.module';
 import { BillingModule } from '@/modules/billing/billing.module';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
+import { ApifyModule } from '@/integrations/apify/apify.module';
+import { DewatermarkModule } from '@/integrations/dewatermark/dewatermark.module';
+import { VideoGenerationModule } from '@/integrations/video-generation/video-generation.module';
+import { ProviderBalancesService } from './services/provider-balances.service';
 import { AnalyticsService } from './services/analytics.service';
 
 @Module({
-  imports: [PrismaModule, GcsIntegrationModule, SystemFlagsModule, AppConfigModule, UsageModule, CreditsModule, BillingModule],
+  imports: [PrismaModule, GcsIntegrationModule, SystemFlagsModule, AppConfigModule, UsageModule, CreditsModule, BillingModule, ApifyModule, DewatermarkModule, VideoGenerationModule],
   controllers: [AdminController],
-  providers: [AdminService, AnalyticsService],
+  providers: [AdminService, AnalyticsService, ProviderBalancesService],
 })
 export class AdminModule {}

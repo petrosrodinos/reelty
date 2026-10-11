@@ -81,3 +81,25 @@ export interface AdminUserOption {
   created_at: string;
   projects_count: number;
 }
+
+export type ProviderKey = "higgsfield" | "apify" | "dewatermark";
+export type ProviderStatus = "ok" | "not_configured" | "unavailable";
+
+export interface ProviderMetric {
+  label: string;
+  value: number;
+  unit: "usd" | "credits" | "count";
+  /** Cap for the value (monthly spend limit, job slots); null when there is none. */
+  limit: number | null;
+  /** "remaining": a low value is bad. "used": a value near the limit is bad. */
+  kind: "remaining" | "used";
+}
+
+export interface ProviderBalance {
+  key: ProviderKey;
+  name: string;
+  status: ProviderStatus;
+  metrics: ProviderMetric[];
+  note: string | null;
+  resets_at: string | null;
+}

@@ -22,7 +22,6 @@ import { mapPool } from '../common/pool';
 import { SystemFlagsService } from '../common/system-flags.service';
 import { withTempDir } from '../common/temp-dir';
 import { WorkerConfigService } from '../common/worker-config.service';
-import { NotifyQueueService } from '../notify/notify-queue.service';
 import { AssemblyError, AssemblyService } from './assembly.service';
 import { selectPrompt } from './prompts';
 import {
@@ -66,7 +65,6 @@ export class RenderService {
     private readonly config: WorkerConfigService,
     private readonly flags: SystemFlagsService,
     private readonly events: JobEventsService,
-    private readonly notify: NotifyQueueService,
     private readonly credits: CreditsService,
     private readonly tiers: CreditTiersService,
   ) {}
@@ -323,7 +321,7 @@ export class RenderService {
     }
     await this.log(project.id, ctx, 'started', 'ASSEMBLING', `${clips.length} clips`);
 
-    const completed = await withTempDir(`render-${project.id.slice(0, 8)}`, async (dir) => {
+    await withTempDir(`render-${project.id.slice(0, 8)}`, async (dir) => {
       // download the clips (from our own bucket: resumable and independent of provider URL expiry)
       const clipFiles = clips.map((_, i) => join(dir, `c${i + 1}.mp4`));
       await mapPool(clips, 4, (img, i) => this.gcs.downloadToFile(img.clip_gcs_path as string, clipFiles[i]));
@@ -379,8 +377,6 @@ export class RenderService {
       await this.log(project.id, ctx, 'completed', 'COMPLETED', `duration ${result.durationSeconds}s`);
       return true;
     });
-
-    if (completed) await this.notify.videoReady(project.user_id, project.id);
   }
 
   // -------------------------------------------------------------------------------------------------
@@ -586,6 +582,5 @@ export class RenderService {
       }
     });
     await this.log(projectId, ctx, 'failed', failure.code, failure.detail);
-    await this.notify.videoFailed(project.user_id, projectId);
   }
 }

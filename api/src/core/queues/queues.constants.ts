@@ -87,9 +87,9 @@ export const QueueDefaults = {
 } as const;
 
 export const WorkerConcurrency = {
-  [QueueNames.SCRAPE]: 5,
-  [QueueNames.IMAGE_PROCESS]: 3,
-  [QueueNames.RENDER]: 2,
+  [QueueNames.SCRAPE]: 5, // Apify plan: maxConcurrentActorJobs = 5
+  [QueueNames.IMAGE_PROCESS]: 1000, // BullMQ has no "unlimited"; effectively uncapped
+  [QueueNames.RENDER]: 10, // Higgsfield concurrent-job limit
   [QueueNames.NOTIFY]: 10,
 } as const;
 

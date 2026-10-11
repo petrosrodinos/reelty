@@ -18,6 +18,7 @@ import {
   XIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RoomTypeFormOptions } from "@/config/constants/dropdowns/images/room-type-form.options";
 import { WatermarkStatusFormOptions } from "@/config/constants/dropdowns/images/watermark-status-form.options";
@@ -35,6 +36,10 @@ interface ImageCardProps {
   onRoomChange: (room: RoomType) => void;
   onRemoveWatermark: () => void;
   onUseProcessed: (useProcessed: boolean) => void;
+  /** Photo can still have its watermark removed, so it gets a bulk-select checkbox. */
+  selectable?: boolean;
+  selected?: boolean;
+  onSelectChange?: (selected: boolean) => void;
 }
 
 const roomItems = RoomTypeFormOptions.map((option) => ({ value: option.id, label: option.label }));
@@ -63,6 +68,9 @@ export const ImageCard: FC<ImageCardProps> = ({
   onRoomChange,
   onRemoveWatermark,
   onUseProcessed,
+  selectable = false,
+  selected = false,
+  onSelectChange,
 }) => {
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id: image.id });
   const number = index + 1;
@@ -183,13 +191,25 @@ export const ImageCard: FC<ImageCardProps> = ({
           </Button>
         </div>
 
-        <WatermarkControls
-          image={image}
-          attemptsLeft={attemptsLeft}
-          onRemoveWatermark={onRemoveWatermark}
-          onUseProcessed={onUseProcessed}
-          onPreview={onPreview}
-        />
+        <div className="flex items-start gap-2.5">
+          {selectable ? (
+            <Checkbox
+              checked={selected}
+              onCheckedChange={(checked) => onSelectChange?.(checked)}
+              aria-label={`Select photo ${number} for watermark removal`}
+              className="mt-2.5 size-5"
+            />
+          ) : null}
+          <div className="min-w-0 flex-1">
+            <WatermarkControls
+              image={image}
+              attemptsLeft={attemptsLeft}
+              onRemoveWatermark={onRemoveWatermark}
+              onUseProcessed={onUseProcessed}
+              onPreview={onPreview}
+            />
+          </div>
+        </div>
       </div>
     </li>
   );

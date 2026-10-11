@@ -1,6 +1,6 @@
 import axiosInstance from "@/config/api/axios";
 import { ApiRoutes } from "@/config/api/routes";
-import type { AdminUserOption, AppConfigItem, CostHistory, CostHistoryQuery } from "@/features/admin/interfaces/admin.interfaces";
+import type { AdminUserOption, AppConfigItem, ProviderBalance, CostHistory, CostHistoryQuery } from "@/features/admin/interfaces/admin.interfaces";
 import type { Analytics, AnalyticsRange } from "@/features/admin/interfaces/analytics.interfaces";
 import type { AdminPurchases, AdminPurchasesQuery } from "@/features/billing/interfaces/billing.interfaces";
 import type { CreditRateTier, CreditTier } from "@/features/credits/interfaces/credits.interfaces";
@@ -79,5 +79,10 @@ export const replaceCreditRates = async (tiers: CreditRateTierInput[]): Promise<
 
 export const getAdminPurchases = async (query: AdminPurchasesQuery = {}): Promise<AdminPurchases> => {
   const response = await axiosInstance.get<AdminPurchases>(ApiRoutes.admin.purchases, { params: query });
+  return response.data;
+};
+
+export const getProviderBalances = async (): Promise<ProviderBalance[]> => {
+  const response = await axiosInstance.get<ProviderBalance[]>(ApiRoutes.admin.providers);
   return response.data;
 };

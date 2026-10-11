@@ -17,6 +17,7 @@ export const Routes = {
   usage: "/usage",
   credits: "/credits",
   adminAnalytics: "/admin/analytics",
+  adminProviders: "/admin/providers",
   adminConfig: "/admin/config",
   adminUsage: "/admin/usage",
   adminCreditTiers: "/admin/credit-tiers",

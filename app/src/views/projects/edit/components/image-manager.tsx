@@ -12,8 +12,9 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { InfoIcon, UploadIcon } from "lucide-react";
+import { EraserIcon, InfoIcon, UploadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import ConfirmationDialog from "@/components/ui/confirmation-dialog";
 import { UploadProgressList } from "@/components/ui/upload-progress-list";
 import {
@@ -24,12 +25,13 @@ import {
   useUpdateImage,
 } from "@/features/images/hooks/use-images";
 import { useVideoLimits } from "@/features/credits/hooks/use-credits";
-import type { ProjectImage } from "@/features/images/interfaces/images.interfaces";
+import { UploadItemStatuses, WatermarkStatuses, type ProjectImage, type UploadItem } from "@/features/images/interfaces/images.interfaces";
 import { ACCEPT_ATTRIBUTE, prepareUploadBatch } from "@/features/images/utils/image-validation";
 import type { Project } from "@/features/projects/interfaces/projects.interfaces";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { ImageCard } from "@/views/projects/edit/components/image-card";
+import { ImageCardSkeleton } from "@/views/projects/edit/components/image-card-skeleton";
 import { ImageLightbox } from "@/views/projects/edit/components/image-lightbox";
 import { UploadTile } from "@/views/projects/edit/components/upload-tile";
 
@@ -104,6 +106,37 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
     removeWatermark.mutate({ id: image.id, dto: {} });
   };
 
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const isEligible = (image: ProjectImage) =>
+    (image.wm_status === WatermarkStatuses.NONE || image.wm_status === WatermarkStatuses.FAILED) && image.wm_attempts < image.wm_max_attempts;
+  const eligibleIds = images.filter(isEligible).map((image) => image.id);
+  // Photos that started processing or ran out of attempts drop out of the selection on their own.
+  const selectedEligible = eligibleIds.filter((id) => selectedIds.has(id));
+  const allSelected = eligibleIds.length > 0 && selectedEligible.length === eligibleIds.length;
+
+  const toggleSelected = (id: string, selected: boolean) =>
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (selected) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+
+  const removeSelectedWatermarks = () => {
+    if (watermarkNeedsCredits) {
+      onBuyCredits();
+      return;
+    }
+    const ids = selectedEligible;
+    setSelectedIds(new Set());
+    ids.forEach((id) => removeWatermark.mutate({ id, dto: {}, quiet: true }));
+    toast({
+      title: `Removing the watermark from ${ids.length} ${ids.length === 1 ? "photo" : "photos"}`,
+      description: "This usually takes under 30 seconds. You can keep editing.",
+      duration: 3500,
+    });
+  };
+
   // Credits cap the photo count below the tier maximum; at the cap, uploading means buying credits first.
   const cap = Math.min(limits.maxImages, affordablePhotos ?? limits.maxImages);
   const creditLimited = cap < limits.maxImages;
@@ -157,7 +190,11 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
 
   const previewImage = images.find((image) => image.id === previewId) ?? null;
   const previewPosition = previewImage ? images.indexOf(previewImage) + 1 : 0;
-  const uploadFinished = uploader.items.length > 0 && !uploader.isUploading;
+  // In-flight photos render as skeleton cards in the grid; only failures keep a text reason.
+  const isFailed = (item: UploadItem) => item.status === UploadItemStatuses.REJECTED || item.status === UploadItemStatuses.ERROR;
+  const pendingItems = uploader.isUploading ? uploader.items.filter((item) => !isFailed(item)) : [];
+  const failedItems = uploader.items.filter(isFailed);
+  const uploadFinished = failedItems.length > 0 && !uploader.isUploading;
 
   return (
     <section aria-labelledby="photos-heading">
@@ -199,9 +236,9 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
         <p className="mb-4 rounded-md bg-notice-warn px-4 py-3 text-sm text-ink">{project.failure_reason}</p>
       ) : null}
 
-      {uploader.items.length > 0 ? (
+      {failedItems.length > 0 ? (
         <div className="mb-4">
-          <UploadProgressList items={uploader.items} />
+          <UploadProgressList items={failedItems} />
           {uploadFinished ? (
             <Button variant="ghost" size="sm" className="mt-2" onClick={uploader.reset}>
               Clear list
@@ -214,6 +251,25 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
         <div className="mb-4 rounded-lg border border-dashed border-hairline px-6 py-10 text-center">
           <p className="text-lg font-medium text-ink">Add at least {limits.minImages} photos to continue.</p>
           <p className="mt-1 text-muted-foreground">Upload your own photos using the tile below.</p>
+        </div>
+      ) : null}
+
+      {eligibleIds.length > 0 ? (
+        <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <label className="flex cursor-pointer items-center gap-2.5 text-sm font-medium text-ink">
+            <Checkbox
+              checked={allSelected}
+              indeterminate={selectedEligible.length > 0 && !allSelected}
+              onCheckedChange={(checked) => setSelectedIds(checked ? new Set(eligibleIds) : new Set())}
+              className="size-5"
+            />
+            {allSelected ? "Unselect all" : "Select all"} for watermark removal
+          </label>
+          {selectedEligible.length > 0 ? (
+            <Button variant="outline" size="sm" className="max-sm:w-full" onClick={removeSelectedWatermarks}>
+              <EraserIcon /> Remove watermark from {selectedEligible.length} {selectedEligible.length === 1 ? "photo" : "photos"}
+            </Button>
+          ) : null}
         </div>
       ) : null}
 
@@ -231,8 +287,14 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
                 onPreview={() => setPreviewId(image.id)}
                 onRoomChange={(room) => updateImage.mutate({ id: image.id, dto: { room_type: room } })}
                 onRemoveWatermark={() => startWatermarkRemoval(image)}
+                selectable={isEligible(image)}
+                selected={selectedIds.has(image.id)}
+                onSelectChange={(selected) => toggleSelected(image.id, selected)}
                 onUseProcessed={(useProcessed) => updateImage.mutate({ id: image.id, dto: { use_processed: useProcessed } })}
               />
+            ))}
+            {pendingItems.map((item) => (
+              <ImageCardSkeleton key={item.id} item={item} />
             ))}
             <UploadTile
               onFiles={handleFiles}

@@ -10,6 +10,7 @@ import {
   getAdminPurchases,
   getAdminUsers,
   getAnalytics,
+  getProviderBalances,
   getCreditRates,
   replaceCreditRates,
   getAppConfig,
@@ -156,5 +157,15 @@ export const useAdminPurchases = (query: AdminPurchasesQuery = {}) => {
     queryFn: () => getAdminPurchases(query),
     placeholderData: keepPreviousData,
     staleTime: 15_000,
+  });
+};
+
+/** Live provider balances; each load calls the providers, so it is not refetched on focus. */
+export const useProviderBalances = () => {
+  return useQuery({
+    queryKey: ["admin-provider-balances"],
+    queryFn: getProviderBalances,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
   });
 };

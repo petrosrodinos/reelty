@@ -29,6 +29,12 @@ export interface ApifyRunResult<T> {
   usageUsd: number | null;
 }
 
+export interface ApifyAccountLimits {
+  limits: { maxMonthlyUsageUsd: number; maxConcurrentActorJobs: number; maxActorMemoryGbytes: number };
+  current: { monthlyUsageUsd: number; activeActorJobCount: number };
+  monthlyUsageCycle: { startAt: string; endAt: string };
+}
+
 const ACCOUNT_PROBLEM_TEXT = /credit|usage|limit|quota|billing|payment|insufficient|subscription|platform-feature-disabled|not-enough/i;
 
 /** True when an apify-client error means our account is unusable (auth, credits, plan limits). Exported for unit tests. */
@@ -53,6 +59,23 @@ export class ApifyService {
 
   isConfigured(): boolean {
     return !!this.config.apifyToken;
+  }
+
+  /** Plan limits and current usage of the account (`GET /v2/users/me/limits`); null when unavailable. */
+  async getAccountLimits(): Promise<ApifyAccountLimits | null> {
+    const token = this.config.apifyToken;
+    if (!token) return null;
+    try {
+      const res = await fetch('https://api.apify.com/v2/users/me/limits', {
+        headers: { Authorization: `Bearer ${token}` },
+        signal: AbortSignal.timeout(10_000),
+      });
+      if (!res.ok) return null;
+      const body = (await res.json()) as { data?: ApifyAccountLimits };
+      return body.data ?? null;
+    } catch {
+      return null;
+    }
   }
 
   private getClient(): ApifyClient {

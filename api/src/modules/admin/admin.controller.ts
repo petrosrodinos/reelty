@@ -36,6 +36,7 @@ import { AnalyticsQuerySchema, type AnalyticsQueryType } from './dto/analytics-q
 import { UpdateFlagsDto } from './dto/update-flags.dto';
 import { AdminStatsEntity, FlagsEntity } from './entities/admin.entity';
 import { AnalyticsEntity } from './entities/analytics.entity';
+import { ProviderBalancesService } from './services/provider-balances.service';
 import { AnalyticsService } from './services/analytics.service';
 
 @ApiTags('admin')
@@ -47,6 +48,7 @@ export class AdminController {
   constructor(
     private readonly adminService: AdminService,
     private readonly analyticsService: AnalyticsService,
+    private readonly providerBalances: ProviderBalancesService,
   ) {}
 
   @Get('analytics')
@@ -57,6 +59,12 @@ export class AdminController {
   @ApiResponse({ status: 200, type: AnalyticsEntity })
   getAnalytics(@Query(new ZodValidationPipe(AnalyticsQuerySchema)) query: AnalyticsQueryType) {
     return this.analyticsService.getAnalytics(query);
+  }
+
+  @Get('providers')
+  @ApiOperation({ summary: 'Live balance / usage cap of each provider (Higgsfield, Apify, Dewatermark)' })
+  getProviders() {
+    return this.providerBalances.getAll();
   }
 
   @Get('stats')

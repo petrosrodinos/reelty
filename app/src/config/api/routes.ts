@@ -35,6 +35,7 @@ export const ApiRoutes = {
   },
   admin: {
     analytics: "/admin/analytics",
+    providers: "/admin/providers",
     config: "/admin/config",
     configByKey: (key: string) => `/admin/config/${encodeURIComponent(key)}`,
     usage: "/admin/usage",

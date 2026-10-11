@@ -7,6 +7,7 @@ import {
   UploadItemStatuses,
   type ImageDownloadVersion,
   type ProjectImage,
+  type RemoveWatermarkDto,
   type UploadItem,
   type UploadSummary,
 } from "@/features/images/interfaces/images.interfaces";
@@ -129,19 +130,20 @@ export const useRemoveWatermark = (projectId: string) => {
   const queryClient = useQueryClient();
   const key = [PROJECT_QUERY_KEY, projectId];
   return useMutation({
-    mutationFn: removeWatermark,
-    onSuccess: (updated) => {
+    // `quiet` skips the per-photo toast when a bulk run shows a single summary instead.
+    mutationFn: ({ id, dto }: { id: string; dto: RemoveWatermarkDto; quiet?: boolean }) => removeWatermark({ id, dto }),
+    onSuccess: (updated, { quiet }) => {
       trackEvent(AnalyticsEvents.WATERMARK_REMOVAL_STARTED);
       queryClient.setQueryData<Project>(key, (current) => {
         const next = patchProjectImages(current, (images) => images.map((image) => (image.id === updated.id ? updated : image)));
         return next ? { ...next, watermark_consent: true } : next;
       });
       queryClient.invalidateQueries({ queryKey: [PROJECT_QUERY_KEY] });
-      toast({ title: "Removing the watermark", description: "This usually takes under 30 seconds. You can keep editing.", duration: 3500 });
+      if (!quiet) toast({ title: "Removing the watermark", description: "This usually takes under 30 seconds. You can keep editing.", duration: 3500 });
     },
-    onError: (error) => {
+    onError: (error, { quiet }) => {
       queryClient.invalidateQueries({ queryKey: [PROJECT_QUERY_KEY] });
-      toast({ title: "Could not remove the watermark", description: getApiErrorMessage(error), variant: "error" });
+      if (!quiet) toast({ title: "Could not remove the watermark", description: getApiErrorMessage(error), variant: "error" });
     },
   });
 };
@@ -272,10 +274,11 @@ export const useImageUploader = () => {
       }
       return summary;
     },
-    onSuccess: (summary) => {
+    onSuccess: async (summary) => {
       if (summary.uploaded > 0) trackEvent(AnalyticsEvents.PHOTOS_UPLOADED, { count: summary.uploaded });
-      queryClient.invalidateQueries({ queryKey: [PROJECT_QUERY_KEY] });
       queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
+      // Awaited so the skeletons stay until the real cards have arrived.
+      await queryClient.invalidateQueries({ queryKey: [PROJECT_QUERY_KEY] });
       const problems = summary.rejected + summary.failed;
       if (summary.uploaded > 0) {
         toast({
