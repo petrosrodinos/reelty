@@ -117,14 +117,15 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
       </div>
 
       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <ImageManager
-          project={project}
-          affordablePhotos={affordablePhotos}
-          watermarkNeedsCredits={watermarkNeedsCredits}
-          onBuyCredits={() => setBuying(true)}
-        />
-        <aside className="flex flex-col gap-5 lg:self-stretch" aria-label="Video details and summary">
-          <VideoDetailsForm project={project} form={form} />
+        <div className="order-2 min-w-0 lg:order-none lg:col-start-1 lg:row-span-2 lg:row-start-1">
+          <ImageManager
+            project={project}
+            affordablePhotos={affordablePhotos}
+            watermarkNeedsCredits={watermarkNeedsCredits}
+            onBuyCredits={() => setBuying(true)}
+          />
+        </div>
+        <div className="order-1 lg:order-none lg:col-start-2 lg:row-start-1">
           <SummaryPanel
             blockers={blockers}
             quote={quote}
@@ -134,7 +135,10 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
             submitError={submit.error}
             onSubmit={handleSubmit}
           />
-        </aside>
+        </div>
+        <div className="order-3 lg:order-none lg:col-start-2 lg:row-start-2">
+          <VideoDetailsForm project={project} form={form} />
+        </div>
       </div>
 
       <MobileCreateBar blockers={blockers} isSubmitting={submit.isPending} onSubmit={handleSubmit} />
