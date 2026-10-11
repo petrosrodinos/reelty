@@ -10,6 +10,16 @@ export const HIGGSFIELD_CONFIG = {
   /** Locked parameters for every clip (Kling 2.5 turbo image-to-video, 5 s). */
   generation: {
     duration: 5,
+    /** 0 to 1 (default 0.5): how strictly Kling follows the prompt. Higher keeps motion closer to what we ask for. */
+    cfgScale: 0.8,
+    /**
+     * Sent as Kling's `negative_prompt` (the place where naming things to avoid works; in the main prompt it backfires).
+     * Keeps the sky and every object still, fans stopped, and stops leaves or objects from appearing or flying.
+     */
+    negativePrompt:
+      'moving clouds, fast clouds, moving sky, time-lapse, fast motion, moving objects, moving umbrella, moving decorations, ' +
+      'spinning ceiling fan, rotating fan, flying leaves, falling leaves, floating particles, dust, petals, ' +
+      'new objects appearing, plants growing, morphing, warping, flickering, people, text, watermark',
   },
 
   /** Verified against https://docs.higgsfield.ai (Key auth, model-path based API). */

@@ -92,6 +92,8 @@ export class HiggsfieldProvider implements VideoGenerationProvider {
     try {
       const json = await this.call(HIGGSFIELD_CONFIG.endpoints.estimate, {
         prompt: query.prompt,
+        negative_prompt: HIGGSFIELD_CONFIG.generation.negativePrompt,
+        cfg_scale: HIGGSFIELD_CONFIG.generation.cfgScale,
         image_url: query.mediaId,
         duration: HIGGSFIELD_CONFIG.generation.duration,
       });
@@ -149,6 +151,8 @@ export class HiggsfieldProvider implements VideoGenerationProvider {
     try {
       const json = await this.call(HIGGSFIELD_CONFIG.endpoints.generateVideo, {
         prompt: r.prompt,
+        negative_prompt: HIGGSFIELD_CONFIG.generation.negativePrompt,
+        cfg_scale: HIGGSFIELD_CONFIG.generation.cfgScale,
         image_url: r.mediaId,
         duration: HIGGSFIELD_CONFIG.generation.duration,
       });
