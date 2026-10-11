@@ -1,5 +1,4 @@
 import posthog from "posthog-js";
-import { readConsent } from "@/lib/consent.utils";
 
 declare global {
   interface Window {
@@ -10,10 +9,10 @@ declare global {
 
 /**
  * Sends a custom event to PostHog and Google Analytics. Each destination is skipped when it is not configured or not
- * loaded yet; nothing is sent unless the visitor accepted cookies.
+ * loaded yet.
  */
 export function trackEvent(name: string, params?: Record<string, unknown>) {
-  if (typeof window === "undefined" || readConsent() !== "granted") return;
+  if (typeof window === "undefined") return;
   if (posthog.__loaded) posthog.capture(name, params);
   if (typeof window.gtag === "function") window.gtag("event", name, params);
 }
