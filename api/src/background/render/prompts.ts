@@ -8,14 +8,15 @@ export const GENERIC_PROMPT =
 /**
  * Short and positive on purpose. Image-to-video models act on every noun in the prompt (even in a negation), so
  * "no flying leaves" produced flying leaves and "plants" produced new plants. Keep the wording minimal and never
- * mention leaves, petals, dust, particles or fans (a named fan gets added and spun).
+ * mention leaves, petals, dust, particles or fans (a named fan gets added and spun), and do not name specific
+ * decorations either: say "every object" instead.
  */
 const OUTDOOR_MOTION =
-  'the plants and trees that are in the photo sway very slightly, water ripples softly, any clouds drift only a tiny amount very slowly';
+  'only the plants and trees that are in the photo sway very slightly and water ripples softly, while the sky is completely static like a still photograph and every object, decoration and piece of furniture stays completely fixed and motionless'
 
 /** Added to every room type. Interiors stay still; only what is visible outside a window or door may move. */
 export const AMBIENT_MOTION =
-  'Real-time speed, never time-lapse. Everything inside the room stays perfectly still and fixed. Greenery, water and clouds visible outside a window or door move only very slightly and slowly. Keep the scene exactly as in the photo';
+  'Real-time speed, never time-lapse. Everything inside the room stays perfectly still and fixed. The sky is completely static like a still photograph. Every object, decoration and piece of furniture, indoors or outdoors, stays completely fixed and motionless. Only greenery and water visible outside a window or door may move, very slightly and slowly. Keep the scene exactly as in the photo'
 
 export const ROOM_PROMPTS: Partial<Record<RoomType, string>> = {
   EXTERIOR: `Cinematic luxury real estate reveal, smooth slow dolly push-in toward the building facade, warm architectural lighting, ${OUTDOOR_MOTION}, professional real estate cinematography`,
