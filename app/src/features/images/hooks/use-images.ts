@@ -99,7 +99,8 @@ export const useUpdateImage = (projectId: string) => {
   });
 };
 
-export const useDeleteImage = (projectId: string) => {
+/** `quiet` skips the per-photo success toast (bulk delete shows one summary toast instead). */
+export const useDeleteImage = (projectId: string, options: { quiet?: boolean } = {}) => {
   const queryClient = useQueryClient();
   const key = [PROJECT_QUERY_KEY, projectId];
   return useMutation({
@@ -113,6 +114,7 @@ export const useDeleteImage = (projectId: string) => {
       return { previous };
     },
     onSuccess: () => {
+      if (options.quiet) return;
       toast({ title: "Photo removed", description: "It stays in storage until you delete the project.", duration: 2500 });
     },
     onError: (error, _id, context) => {

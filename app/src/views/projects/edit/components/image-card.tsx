@@ -35,8 +35,7 @@ interface ImageCardProps {
   onRoomChange: (room: RoomType) => void;
   onRemoveWatermark: () => void;
   onUseProcessed: (useProcessed: boolean) => void;
-  /** Photo can still have its watermark removed: clicking the image selects it for bulk removal. */
-  selectable?: boolean;
+  /** Clicking the image selects the photo for the bulk actions (watermark removal, delete). */
   selected?: boolean;
   onSelectChange?: (selected: boolean) => void;
 }
@@ -67,7 +66,6 @@ export const ImageCard: FC<ImageCardProps> = ({
   onRoomChange,
   onRemoveWatermark,
   onUseProcessed,
-  selectable = false,
   selected = false,
   onSelectChange,
 }) => {
@@ -102,15 +100,13 @@ export const ImageCard: FC<ImageCardProps> = ({
           </span>
         )}
 
-        {selectable ? (
-          <button
-            type="button"
-            onClick={() => onSelectChange?.(!selected)}
-            aria-pressed={selected}
-            aria-label={`${selected ? "Unselect" : "Select"} photo ${number} for watermark removal`}
-            className="absolute inset-0 cursor-pointer outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-ring"
-          />
-        ) : null}
+        <button
+          type="button"
+          onClick={() => onSelectChange?.(!selected)}
+          aria-pressed={selected}
+          aria-label={`${selected ? "Unselect" : "Select"} photo ${number}`}
+          className="absolute inset-0 cursor-pointer outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-ring"
+        />
 
         {selected ? (
           <span className="pointer-events-none absolute bottom-2 right-2 grid size-6 place-items-center rounded-full bg-brand text-ink" aria-hidden="true">

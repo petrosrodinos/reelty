@@ -12,7 +12,7 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { EraserIcon, InfoIcon, UploadIcon } from "lucide-react";
+import { EraserIcon, InfoIcon, Trash2Icon, UploadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ConfirmationDialog from "@/components/ui/confirmation-dialog";
 import { UploadProgressList } from "@/components/ui/upload-progress-list";
@@ -64,11 +64,14 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
   const reorder = useReorderImages(projectId);
   const updateImage = useUpdateImage(projectId);
   const deleteImage = useDeleteImage(projectId);
+  const bulkDeleteImage = useDeleteImage(projectId, { quiet: true });
   const removeWatermark = useRemoveWatermark(projectId);
   const uploader = useImageUploader();
 
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [removing, setRemoving] = useState<ProjectImage | null>(null);
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [bulkBusy, setBulkBusy] = useState(false);
   const headerInputRef = useRef<HTMLInputElement>(null);
 
   const sensors = useSensors(
@@ -108,10 +111,12 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const isEligible = (image: ProjectImage) =>
     (image.wm_status === WatermarkStatuses.NONE || image.wm_status === WatermarkStatuses.FAILED) && image.wm_attempts < image.wm_max_attempts;
-  const eligibleIds = images.filter(isEligible).map((image) => image.id);
-  // Photos that started processing or ran out of attempts drop out of the selection on their own.
-  const selectedEligible = eligibleIds.filter((id) => selectedIds.has(id));
-  const allSelected = eligibleIds.length > 0 && selectedEligible.length === eligibleIds.length;
+  const allIds = images.map((image) => image.id);
+  // The selection is shared by both bulk actions; photos that no longer exist drop out of it on their own.
+  const selectedAll = allIds.filter((id) => selectedIds.has(id));
+  const allSelected = allIds.length > 0 && selectedAll.length === allIds.length;
+  // Photos that started processing or ran out of attempts cannot be sent to watermark removal.
+  const selectedEligible = images.filter((image) => selectedIds.has(image.id) && isEligible(image)).map((image) => image.id);
 
   const toggleSelected = (id: string, selected: boolean) =>
     setSelectedIds((current) => {
@@ -134,6 +139,31 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
       description: "This usually takes under 30 seconds. You can keep editing.",
       duration: 3500,
     });
+  };
+
+  const deleteSelected = async () => {
+    const ids = selectedAll;
+    setBulkBusy(true);
+    // one at a time: the API re-packs photo positions on every delete
+    let removed = 0;
+    for (const id of ids) {
+      try {
+        await bulkDeleteImage.mutateAsync(id);
+        removed += 1;
+      } catch {
+        break; // the mutation already toasted the error
+      }
+    }
+    setSelectedIds(new Set());
+    setBulkBusy(false);
+    setBulkDeleting(false);
+    if (removed > 0) {
+      toast({
+        title: `${removed} ${removed === 1 ? "photo" : "photos"} removed`,
+        description: "They stay in storage until you delete the project.",
+        duration: 2500,
+      });
+    }
   };
 
   // Credits cap the photo count below the tier maximum; at the cap, uploading means buying credits first.
@@ -253,14 +283,19 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
         </div>
       ) : null}
 
-      {eligibleIds.length > 0 ? (
-        <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-          <Button variant="outline" size="sm" onClick={() => setSelectedIds(allSelected ? new Set() : new Set(eligibleIds))}>
+      {total > 0 ? (
+        <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+          <Button variant="outline" size="sm" onClick={() => setSelectedIds(allSelected ? new Set() : new Set(allIds))}>
             {allSelected ? "Unselect all" : "Select all"}
           </Button>
           {selectedEligible.length > 0 ? (
             <Button size="sm" className="max-sm:w-full" onClick={removeSelectedWatermarks}>
               <EraserIcon /> Remove watermark from {selectedEligible.length} {selectedEligible.length === 1 ? "photo" : "photos"}
+            </Button>
+          ) : null}
+          {selectedAll.length > 0 ? (
+            <Button variant="destructive" size="sm" className="max-sm:w-full" onClick={() => setBulkDeleting(true)}>
+              <Trash2Icon /> Delete {selectedAll.length} {selectedAll.length === 1 ? "photo" : "photos"}
             </Button>
           ) : null}
         </div>
@@ -280,7 +315,6 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
                 onPreview={() => setPreviewId(image.id)}
                 onRoomChange={(room) => updateImage.mutate({ id: image.id, dto: { room_type: room } })}
                 onRemoveWatermark={() => startWatermarkRemoval(image)}
-                selectable={isEligible(image)}
                 selected={selectedIds.has(image.id)}
                 onSelectChange={(selected) => toggleSelected(image.id, selected)}
                 onUseProcessed={(useProcessed) => updateImage.mutate({ id: image.id, dto: { use_processed: useProcessed } })}
@@ -303,6 +337,17 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
       </DndContext>
 
       <ImageLightbox image={previewImage} position={previewPosition} onClose={() => setPreviewId(null)} />
+
+      <ConfirmationDialog
+        isOpen={bulkDeleting}
+        onClose={() => setBulkDeleting(false)}
+        title={`Remove ${selectedAll.length} ${selectedAll.length === 1 ? "photo" : "photos"}?`}
+        description="They will no longer be used in the video. They stay in storage until you delete the project, and you can upload them again any time."
+        confirmText="Remove photos"
+        variant="destructive"
+        isLoading={bulkBusy}
+        onConfirm={() => void deleteSelected()}
+      />
 
       <ConfirmationDialog
         isOpen={!!removing}
