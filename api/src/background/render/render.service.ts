@@ -342,7 +342,7 @@ export class RenderService {
           });
         } catch (error) {
           lastError = error as AssemblyError;
-          this.logger.warn(`Assembly attempt ${attempt} for ${project.id} failed: ${lastError.message}`);
+          this.logger.warn(`Assembly attempt ${attempt} for ${project.id} failed: ${lastError.message}${lastError.details ? ` (${lastError.details})` : ''}`);
           await this.log(project.id, ctx, 'error', 'ASSEMBLING', `attempt ${attempt}: ${lastError.details ?? lastError.message}`);
         }
       }
