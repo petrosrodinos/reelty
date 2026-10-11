@@ -173,12 +173,13 @@ const AnalyticsBody: FC<{ data: Analytics }> = ({ data }) => {
       </Section>
 
       <Section id="users-heading" title="Users">
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
           <KpiTile label="Total users" value={formatCount(t.users_total)} hint="All time" />
           <KpiTile label="New users" value={formatCount(t.users_new)} />
           <KpiTile label="Paying users" value={formatCount(t.paying_users)} hint="Bought credits in this period" />
           <KpiTile label="Revenue per paying user" value={formatEur(toEur(t.arppu_eur_cents))} />
           <KpiTile label="Average purchase" value={formatEur(toEur(t.avg_purchase_eur_cents))} />
+          <KpiTile label="Average videos per purchase" value={formatCount(t.avg_videos_per_purchase, 1)} hint="Slider choice at checkout" />
         </div>
         <TimeSeriesChart
           title="New users"

@@ -21,6 +21,7 @@ export class AnalyticsTotalsEntity {
   @ApiProperty() purchases: number;
   @ApiProperty() paying_users: number;
   @ApiProperty(nullableNumber) avg_purchase_eur_cents: number | null;
+  @ApiProperty(nullableNumber) avg_videos_per_purchase: number | null;
   @ApiProperty(nullableNumber) arppu_eur_cents: number | null;
   @ApiProperty() users_total: number;
   @ApiProperty() users_new: number;

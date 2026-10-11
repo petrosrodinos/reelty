@@ -28,6 +28,7 @@ export interface AnalyticsTotals {
   purchases: number;
   paying_users: number;
   avg_purchase_eur_cents: number | null;
+  avg_videos_per_purchase: number | null;
   /** Revenue per paying user. */
   arppu_eur_cents: number | null;
 

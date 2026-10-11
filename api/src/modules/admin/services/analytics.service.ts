@@ -113,6 +113,7 @@ export class AnalyticsService {
           paid_at: true,
           amount_eur_cents: true,
           stripe_fee_eur_cents: true,
+          videos_selected: true,
         },
       }),
       this.prisma.creditPurchase.findMany({
@@ -221,6 +222,12 @@ export class AnalyticsService {
 
     const creditSum = (kind: CreditTxKind) =>
       creditsByKind.find((row) => row.kind === kind)?._sum.credits ?? 0;
+    // Slider choice at checkout; purchases without it (older or API-made) are left out of the average.
+    const withVideos = purchases.filter((p) => p.videos_selected !== null);
+    const videosBought = withVideos.reduce(
+      (sum, p) => sum + (p.videos_selected ?? 0),
+      0,
+    );
     const payingUsers = new Set(purchases.map((p) => p.user_id)).size;
     const round = Math.round;
 
@@ -268,6 +275,7 @@ export class AnalyticsService {
         paying_users: payingUsers,
         avg_purchase_eur_cents:
           purchases.length > 0 ? round(total.revenue / purchases.length) : null,
+        avg_videos_per_purchase: ratio(videosBought, withVideos.length),
         arppu_eur_cents:
           payingUsers > 0 ? round(total.revenue / payingUsers) : null,
 
