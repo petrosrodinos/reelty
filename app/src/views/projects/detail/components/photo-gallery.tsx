@@ -67,6 +67,9 @@ export const PhotoGallery: FC<PhotoGalleryProps> = ({ projectId, images }) => {
                 )}
               </span>
             </div>
+            <p className="px-2.5 pt-2.5 text-sm font-medium text-ink">
+              {getDropdownOptionLabel(RoomTypeFormOptions, image.room_type)}
+            </p>
             <div className="flex flex-wrap gap-2 p-2.5">
               <Button
                 variant="outline"
