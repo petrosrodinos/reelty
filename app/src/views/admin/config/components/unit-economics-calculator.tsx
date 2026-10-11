@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { AppConfigItem } from "@/features/admin/interfaces/admin.interfaces";
@@ -81,6 +82,7 @@ export const UnitEconomicsCalculator: FC<UnitEconomicsCalculatorProps> = ({
   const [rateDraft, setRateDraft] = useState<DraftRate[]>(() => rateTiers.map(toDraft));
   const [watermarkRemoval, setWatermarkRemoval] = useState(false);
   const [imported, setImported] = useState(false);
+  const [videos, setVideos] = useState(PURCHASE_VIDEO_STEP);
 
   const parsedBase = toInt(baseDraft);
   const baseValid = Number.isFinite(parsedBase) && parsedBase >= 1;
@@ -115,6 +117,24 @@ export const UnitEconomicsCalculator: FC<UnitEconomicsCalculatorProps> = ({
   ].sort((a, b) => a - b);
   const packs = packVideos.map((videos) => ({ videos, ...priceOf(videos) }));
   const addons = { watermarkRemoval, imported };
+
+  // The slider pack, like the customer's: N videos, priced with the draft rates, costed at the tier's worst case.
+  const sliderVideos = Math.min(Math.max(videos, PURCHASE_VIDEO_STEP), maxVideos);
+  const sliderPack = priceOf(sliderVideos);
+  const sliderMargin = defaultTier ? tierEconomics(defaultTier, sliderPack.netCentsPerCredit, addons, rates) : null;
+  // Add-ons use more credits per video, so price one video from the pack's own rate.
+  const grossPerVideoCents = sliderMargin ? (sliderMargin.credits * sliderPack.amountCents) / sliderPack.credits : 0;
+  const slider = sliderMargin
+    ? {
+        paysTotal: grossPerVideoCents * sliderVideos,
+        feeTotal: (grossPerVideoCents - sliderMargin.revenueCents) * sliderVideos,
+        costPerVideo: sliderMargin.costCents,
+        costTotal: sliderMargin.costCents * sliderVideos,
+        profitPerVideo: sliderMargin.marginCents,
+        profitTotal: sliderMargin.marginCents * sliderVideos,
+        marginPct: sliderMargin.marginPct,
+      }
+    : null;
 
   // Stepped rates can make a bigger pack cheaper than the one before it; customers would skip that range.
   const cliffs: { from: number; to: number; fromCents: number; toCents: number }[] = [];
@@ -302,6 +322,70 @@ export const UnitEconomicsCalculator: FC<UnitEconomicsCalculatorProps> = ({
           </div>
         </div>
       </div>
+
+      {slider ? (
+        <div className="mt-5 rounded-lg border border-hairline-soft p-4 sm:p-5">
+          <div className="flex items-baseline justify-between gap-4">
+            <p className="text-display-sm tabular-nums">{pluralize(sliderVideos, "video")}</p>
+            <p className="text-sm text-muted-foreground tabular-nums">
+              {pluralize(sliderPack.credits, "credit")} · {sliderPack.rate} / €1
+            </p>
+          </div>
+          <Slider
+            className="mt-4"
+            min={PURCHASE_VIDEO_STEP}
+            max={maxVideos}
+            step={PURCHASE_VIDEO_STEP}
+            value={[sliderVideos]}
+            onValueChange={(value) => setVideos(Array.isArray(value) ? value[0] : value)}
+            aria-label="Number of videos"
+          />
+          <div className="mt-2 flex justify-between text-xs text-muted-foreground tabular-nums">
+            <span>{PURCHASE_VIDEO_STEP}</span>
+            <span>{maxVideos}</span>
+          </div>
+          <dl className="mt-5 grid grid-cols-[auto_1fr_1fr] gap-x-6 gap-y-2 text-sm">
+            <dt />
+            <dd className="text-right text-xs text-muted-foreground">Per video</dd>
+            <dd className="text-right text-xs text-muted-foreground">Total</dd>
+            <dt className="text-muted-foreground">Customer pays</dt>
+            <dd className="text-right tabular-nums">{formatEurCents(grossPerVideoCents)}</dd>
+            <dd className="text-right tabular-nums">{formatEurCents(slider.paysTotal)}</dd>
+            {slider.feeTotal > 0 ? (
+              <>
+                <dt className="text-muted-foreground">Stripe fee</dt>
+                <dd className="text-right tabular-nums">−{formatEurCents(slider.feeTotal / sliderVideos)}</dd>
+                <dd className="text-right tabular-nums">−{formatEurCents(slider.feeTotal)}</dd>
+              </>
+            ) : null}
+            <dt className="text-muted-foreground">Provider cost</dt>
+            <dd className="text-right tabular-nums">−{formatEurCents(slider.costPerVideo)}</dd>
+            <dd className="text-right tabular-nums">−{formatEurCents(slider.costTotal)}</dd>
+            <dt className="border-t border-hairline-soft pt-2 font-medium text-ink">
+              Profit
+              {slider.marginPct !== null ? (
+                <span className="ml-2 text-xs font-normal text-muted-foreground">{formatPercent(slider.marginPct)}</span>
+              ) : null}
+            </dt>
+            <dd
+              className={cn(
+                "border-t border-hairline-soft pt-2 text-right font-medium tabular-nums",
+                slider.profitPerVideo < 0 && "text-destructive",
+              )}
+            >
+              {formatEurCents(slider.profitPerVideo)}
+            </dd>
+            <dd
+              className={cn(
+                "border-t border-hairline-soft pt-2 text-right font-medium tabular-nums",
+                slider.profitTotal < 0 && "text-destructive",
+              )}
+            >
+              {formatEurCents(slider.profitTotal)}
+            </dd>
+          </dl>
+        </div>
+      ) : null}
 
       <div className="mt-3 overflow-x-auto">
         <Table>
