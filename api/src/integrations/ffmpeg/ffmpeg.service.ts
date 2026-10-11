@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { existsSync } from 'fs';
+import { join } from 'path';
 import { ProcessResult, runProcess, RunProcessOptions } from './process.utils';
 
 export interface ProbeStream {
@@ -19,7 +20,10 @@ export interface ProbeResult {
   format: { duration?: string; size?: string; format_name?: string };
 }
 
-/** Default bold font per platform; `FFMPEG_FONT_PATH` overrides (the worker Dockerfile installs fonts-dejavu-core). */
+/** DejaVu Sans Bold shipped in the repo, so rendering does not depend on fonts installed on the host. */
+const BUNDLED_FONT = join(process.cwd(), 'assets', 'fonts', 'DejaVuSans-Bold.ttf');
+
+/** Default bold font per platform; used only when the bundled font is missing. `FFMPEG_FONT_PATH` overrides both. */
 export function defaultFontPath(platform: NodeJS.Platform): string {
   if (platform === 'win32') return 'C:/Windows/Fonts/arialbd.ttf';
   if (platform === 'darwin') return '/System/Library/Fonts/Supplemental/Arial Bold.ttf';
@@ -62,7 +66,7 @@ export class FfmpegService {
 
   /** Absolute font file used by drawtext. Throws a clear error when missing. */
   getFontPath(): string {
-    const font = this.configuredFont || defaultFontPath(process.platform);
+    const font = this.configuredFont || (existsSync(BUNDLED_FONT) ? BUNDLED_FONT : defaultFontPath(process.platform));
     if (!existsSync(font)) {
       throw new Error(`Font file not found at "${font}". Set FFMPEG_FONT_PATH to a TrueType font.`);
     }
