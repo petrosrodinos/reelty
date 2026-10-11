@@ -40,8 +40,15 @@ RUN npm ci --omit=dev && npm cache clean --force
 
 # ---- runtime --------------------------------------------------------------------------------
 FROM base AS runner
+# System FFmpeg: the ffmpeg-static npm binary is built without the `drawtext` filter (no libfreetype), which the
+# title/closing cards need. Debian's build has it. The fonts package is the fallback if the bundled font is missing.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core \
+  && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production \
-    PORT=3000
+    PORT=3000 \
+    FFMPEG_PATH=/usr/bin/ffmpeg \
+    FFPROBE_PATH=/usr/bin/ffprobe
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY assets ./assets

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "deploy": {
+    "aptPackages": ["ffmpeg", "fonts-dejavu-core"],
+    "variables": {
+      "FFMPEG_PATH": "/usr/bin/ffmpeg",
+      "FFPROBE_PATH": "/usr/bin/ffprobe"
+    }
+  }
+}
