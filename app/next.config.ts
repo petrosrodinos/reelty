@@ -21,7 +21,7 @@ const contentSecurityPolicy = [
   "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://storage.googleapis.com https://*.googleusercontent.com https://*.google-analytics.com https://*.googletagmanager.com",
-  "media-src 'self' blob: https://storage.googleapis.com",
+  "media-src 'self' blob: https://storage.googleapis.com https://0elvzqvrl5nq3cj7.public.blob.vercel-storage.com",
   "font-src 'self' data:",
   `connect-src 'self' ${apiOrigin} https://storage.googleapis.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com`,
   "object-src 'none'",
