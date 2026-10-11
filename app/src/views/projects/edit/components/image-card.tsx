@@ -18,7 +18,6 @@ import {
   XIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RoomTypeFormOptions } from "@/config/constants/dropdowns/images/room-type-form.options";
 import { WatermarkStatusFormOptions } from "@/config/constants/dropdowns/images/watermark-status-form.options";
@@ -36,7 +35,7 @@ interface ImageCardProps {
   onRoomChange: (room: RoomType) => void;
   onRemoveWatermark: () => void;
   onUseProcessed: (useProcessed: boolean) => void;
-  /** Photo can still have its watermark removed, so it gets a bulk-select checkbox. */
+  /** Photo can still have its watermark removed: clicking the image selects it for bulk removal. */
   selectable?: boolean;
   selected?: boolean;
   onSelectChange?: (selected: boolean) => void;
@@ -85,6 +84,7 @@ export const ImageCard: FC<ImageCardProps> = ({
       className={cn(
         "relative flex list-none flex-col overflow-hidden rounded-lg border border-hairline bg-canvas",
         isDragging && "z-20 opacity-80 shadow-[0_8px_24px_rgba(20,20,19,0.18)] ring-2 ring-brand",
+        selected && "border-brand ring-2 ring-brand",
       )}
     >
       <div className="relative aspect-[3/2] bg-surface-card">
@@ -101,6 +101,22 @@ export const ImageCard: FC<ImageCardProps> = ({
             <ImageIcon className="size-8" aria-hidden="true" />
           </span>
         )}
+
+        {selectable ? (
+          <button
+            type="button"
+            onClick={() => onSelectChange?.(!selected)}
+            aria-pressed={selected}
+            aria-label={`${selected ? "Unselect" : "Select"} photo ${number} for watermark removal`}
+            className="absolute inset-0 cursor-pointer outline-none focus-visible:ring-3 focus-visible:ring-inset focus-visible:ring-ring"
+          />
+        ) : null}
+
+        {selected ? (
+          <span className="pointer-events-none absolute bottom-2 right-2 grid size-6 place-items-center rounded-full bg-brand text-ink" aria-hidden="true">
+            <CircleCheckIcon className="size-4" />
+          </span>
+        ) : null}
 
         <button
           type="button"
@@ -134,7 +150,7 @@ export const ImageCard: FC<ImageCardProps> = ({
           </button>
         </div>
 
-        <div className="absolute bottom-2 left-2 right-2 flex flex-wrap gap-1.5">
+        <div className="pointer-events-none absolute bottom-2 left-2 right-10 flex flex-wrap gap-1.5">
           {image.wm_status === WatermarkStatuses.DONE && image.use_processed ? (
             <Pill tone="ok" icon={CircleCheckIcon}>{getDropdownOptionLabel(WatermarkStatusFormOptions, WatermarkStatuses.DONE)}</Pill>
           ) : null}
@@ -191,25 +207,13 @@ export const ImageCard: FC<ImageCardProps> = ({
           </Button>
         </div>
 
-        <div className="flex items-start gap-2.5">
-          {selectable ? (
-            <Checkbox
-              checked={selected}
-              onCheckedChange={(checked) => onSelectChange?.(checked)}
-              aria-label={`Select photo ${number} for watermark removal`}
-              className="mt-2.5 size-5"
-            />
-          ) : null}
-          <div className="min-w-0 flex-1">
-            <WatermarkControls
-              image={image}
-              attemptsLeft={attemptsLeft}
-              onRemoveWatermark={onRemoveWatermark}
-              onUseProcessed={onUseProcessed}
-              onPreview={onPreview}
-            />
-          </div>
-        </div>
+        <WatermarkControls
+          image={image}
+          attemptsLeft={attemptsLeft}
+          onRemoveWatermark={onRemoveWatermark}
+          onUseProcessed={onUseProcessed}
+          onPreview={onPreview}
+        />
       </div>
     </li>
   );

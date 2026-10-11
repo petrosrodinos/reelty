@@ -5,29 +5,20 @@ import { Routes } from "@/routes/routes";
 
 const HERO_VIDEO_URL = "https://0elvzqvrl5nq3cj7.public.blob.vercel-storage.com/sunlift-villa-in-corfu.mp4";
 
-/** Sample output in a dark product card: a real generated video that loops silently, with controls to unmute. */
+/** The sample video only: loops silently, with controls to unmute or go fullscreen. */
 const HeroVisual: FC = () => (
-  <div className="dark rounded-xl bg-surface-dark p-4 text-on-dark sm:p-5">
-    <div className="relative aspect-video overflow-hidden rounded-lg bg-surface-dark-soft">
-      <video
-        className="size-full bg-black object-contain"
-        src={HERO_VIDEO_URL}
-        autoPlay
-        muted
-        loop
-        playsInline
-        controls
-        preload="metadata"
-        aria-label="Sample video created with Reelty: Sunlit villa in Corfu"
-      />
-    </div>
-    <div className="mt-3 flex items-center justify-between gap-3 text-sm">
-      <span className="text-on-dark-soft">Sample output</span>
-      <span className="inline-flex items-center gap-2 rounded-full bg-surface-dark-elevated px-3 py-1 text-[0.8125rem] font-medium">
-        <span className="size-2 rounded-full bg-success" aria-hidden="true" />
-        Completed
-      </span>
-    </div>
+  <div className="aspect-video overflow-hidden rounded-xl bg-black">
+    <video
+      className="size-full bg-black object-contain"
+      src={HERO_VIDEO_URL}
+      autoPlay
+      muted
+      loop
+      playsInline
+      controls
+      preload="metadata"
+      aria-label="Sample video created with Reelty: Sunlit villa in Corfu"
+    />
   </div>
 );
 

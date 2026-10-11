@@ -14,7 +14,6 @@ import {
 import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { EraserIcon, InfoIcon, UploadIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import ConfirmationDialog from "@/components/ui/confirmation-dialog";
 import { UploadProgressList } from "@/components/ui/upload-progress-list";
 import {
@@ -256,17 +255,11 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
 
       {eligibleIds.length > 0 ? (
         <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-          <label className="flex cursor-pointer items-center gap-2.5 text-sm font-medium text-ink">
-            <Checkbox
-              checked={allSelected}
-              indeterminate={selectedEligible.length > 0 && !allSelected}
-              onCheckedChange={(checked) => setSelectedIds(checked ? new Set(eligibleIds) : new Set())}
-              className="size-5"
-            />
-            {allSelected ? "Unselect all" : "Select all"} for watermark removal
-          </label>
+          <Button variant="outline" size="sm" onClick={() => setSelectedIds(allSelected ? new Set() : new Set(eligibleIds))}>
+            {allSelected ? "Unselect all" : "Select all"}
+          </Button>
           {selectedEligible.length > 0 ? (
-            <Button variant="outline" size="sm" className="max-sm:w-full" onClick={removeSelectedWatermarks}>
+            <Button size="sm" className="max-sm:w-full" onClick={removeSelectedWatermarks}>
               <EraserIcon /> Remove watermark from {selectedEligible.length} {selectedEligible.length === 1 ? "photo" : "photos"}
             </Button>
           ) : null}
