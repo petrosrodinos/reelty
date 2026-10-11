@@ -2,26 +2,48 @@
 
 import { useEffect, useRef, useState, type FC } from "react";
 import Link from "next/link";
-import { CheckIcon, ClockIcon, InfoIcon } from "lucide-react";
+import { BellIcon, BellOffIcon, CheckIcon, ClockIcon, InfoIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ProjectStatusBadge } from "@/components/ui/project-status-badge";
 import { RenderStepperOrder, getRenderStepLabel } from "@/config/constants/dropdowns/projects/render-step-form.options";
 import { RenderSteps, type Project } from "@/features/projects/interfaces/projects.interfaces";
 import { cn } from "@/lib/utils";
 import { Routes } from "@/routes/routes";
+import type { CompletionNotification } from "@/views/projects/detail/hooks/use-completion-notification";
 import { getActiveStepIndex, getProgressPercent } from "@/views/projects/detail/utils/progress";
 
 /** Persistent "come back later" banner (FR-BG-1) shown for every queued or creating project. */
-export const BackgroundBanner: FC = () => (
+export const BackgroundBanner: FC<{ notification?: CompletionNotification }> = ({ notification }) => (
   <div className="flex items-start gap-3 rounded-lg bg-surface-card px-4 py-3.5 text-sm text-ink" role="status">
     <InfoIcon className="mt-0.5 size-[18px] shrink-0 text-brand" aria-hidden="true" />
-    <p>
-      <strong className="font-medium">Your video is being created.</strong> This can take several minutes. You don&apos;t need to wait here. Close this
-      page and come back later; it will appear in{" "}
-      <Link href={Routes.videos} className="font-medium text-primary underline underline-offset-2">
-        My Videos
-      </Link>{" "}
-      when it&apos;s ready.
-    </p>
+    <div className="flex flex-col gap-3">
+      <p>
+        <strong className="font-medium">Your video is being created.</strong> This can take several minutes. You don&apos;t need to wait here. Close
+        this page and come back later; it will appear in{" "}
+        <Link href={Routes.videos} className="font-medium text-primary underline underline-offset-2">
+          My Videos
+        </Link>{" "}
+        when it&apos;s ready.
+      </p>
+      {notification && notification.permission !== "unsupported" ? (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <Button
+            size="sm"
+            variant={notification.enabled ? "secondary" : "outline"}
+            onClick={() => void notification.toggle()}
+            disabled={notification.permission === "denied"}
+          >
+            {notification.enabled ? <BellOffIcon /> : <BellIcon />}
+            {notification.enabled ? "Notifications on (turn off)" : "Notify me when it's ready"}
+          </Button>
+          <span className="text-[0.8125rem] text-muted-foreground">
+            {notification.permission === "denied"
+              ? "Notifications are blocked in your browser settings."
+              : "Keep this tab open (it can be in the background) and we'll send a browser notification."}
+          </span>
+        </div>
+      ) : null}
+    </div>
   </div>
 );
 
