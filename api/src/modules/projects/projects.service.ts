@@ -287,7 +287,8 @@ export class ProjectsService {
         user_id: userId,
         source_type: source.source_type,
         source_url: source.source_url,
-        status: ProjectStatus.DRAFT,
+        // DRAFT until a photo exists (matches the upload flow); the copy already has its photos, so it is READY
+        status: images.length > 0 ? ProjectStatus.READY : ProjectStatus.DRAFT,
         title: `${source.title.slice(0, 51)} (copy)`.trim(),
         subtitle: source.subtitle,
         location_line: source.location_line,
