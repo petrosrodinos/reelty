@@ -396,7 +396,14 @@ exports.RoomType = exports.$Enums.RoomType = {
   BEDROOM: 'BEDROOM',
   BATHROOM: 'BATHROOM',
   TERRACE_VIEW: 'TERRACE_VIEW',
-  OTHER: 'OTHER'
+  OTHER: 'OTHER',
+  DINING_ROOM: 'DINING_ROOM',
+  OFFICE: 'OFFICE',
+  POOL: 'POOL',
+  GARDEN: 'GARDEN',
+  BALCONY: 'BALCONY',
+  OUTDOOR_DINING: 'OUTDOOR_DINING',
+  BEACH_SEA: 'BEACH_SEA'
 };
 
 exports.WatermarkStatus = exports.$Enums.WatermarkStatus = {

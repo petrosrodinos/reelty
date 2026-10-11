@@ -7,6 +7,13 @@ export const RoomTypes = {
   BATHROOM: "BATHROOM",
   TERRACE_VIEW: "TERRACE_VIEW",
   OTHER: "OTHER",
+  DINING_ROOM: "DINING_ROOM",
+  OFFICE: "OFFICE",
+  POOL: "POOL",
+  GARDEN: "GARDEN",
+  BALCONY: "BALCONY",
+  OUTDOOR_DINING: "OUTDOOR_DINING",
+  BEACH_SEA: "BEACH_SEA",
 } as const;
 export type RoomType = (typeof RoomTypes)[keyof typeof RoomTypes];
 

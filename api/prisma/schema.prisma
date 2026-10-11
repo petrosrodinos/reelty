@@ -67,6 +67,13 @@ enum RoomType {
   BATHROOM
   TERRACE_VIEW
   OTHER
+  DINING_ROOM
+  OFFICE
+  POOL
+  GARDEN
+  BALCONY
+  OUTDOOR_DINING
+  BEACH_SEA
 }
 
 enum ConsentType {
