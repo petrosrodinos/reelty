@@ -1,7 +1,14 @@
+/**
+ * Optional env prefix (e.g. `stg_`) so environments sharing a parent COOKIE_DOMAIN do not read each other's cookies.
+ * Read from process.env at import time, so set it as a real environment variable (not only in an .env file).
+ * Must match NEXT_PUBLIC_COOKIE_PREFIX in the app.
+ */
+const COOKIE_PREFIX = process.env.COOKIE_PREFIX ?? '';
+
 export const AuthCookies = {
-  ACCESS: 'reelty_at',
-  REFRESH: 'reelty_rt',
-  CSRF: 'reelty_csrf',
+  ACCESS: `${COOKIE_PREFIX}reelty_at`,
+  REFRESH: `${COOKIE_PREFIX}reelty_rt`,
+  CSRF: `${COOKIE_PREFIX}reelty_csrf`,
 } as const;
 
 export const CSRF_HEADER = 'x-csrf-token';

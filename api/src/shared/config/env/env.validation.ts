@@ -11,6 +11,7 @@ const EnvSchema = z.object({
   CORS_URLS: z.preprocess(parseCorsUrls, z.array(z.string().url()).optional()),
   API_URL: z.string().url().optional(),
   COOKIE_DOMAIN: z.string().optional(),
+  COOKIE_PREFIX: z.string().regex(/^[A-Za-z0-9_-]*$/).optional(),
 
   // Infra (required in staging/production, see superRefine)
   DATABASE_URL: z.string().optional(),

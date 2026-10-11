@@ -34,6 +34,23 @@ export function ratesFromConfig(items: AppConfigItem[]): EconomicsRates {
   ) as unknown as EconomicsRates;
 }
 
+/** What Stripe takes from one payment: a percentage of the amount plus a fixed fee per charge. */
+export interface StripeFee {
+  pct: number;
+  fixedCents: number;
+}
+
+/** Stripe's standard card rate (2.9% + €0.30), the most widely quoted one; used until real fees are known. */
+export const STANDARD_STRIPE_FEE: StripeFee = { pct: 2.9, fixedCents: 30 };
+
+/**
+ * The fee to model: the real average % Stripe charged on past purchases (already includes the fixed part, so no
+ * extra per-charge fee), or the standard rate when there are no paid purchases yet.
+ */
+export function stripeFeeFor(actualPct: number | null): StripeFee {
+  return actualPct === null ? STANDARD_STRIPE_FEE : { pct: actualPct, fixedCents: 0 };
+}
+
 export interface PackEconomics {
   credits: number;
   /** Credits per €1 this pack is priced at: the base rate or a better volume tier. */
@@ -51,17 +68,17 @@ export interface PackEconomics {
 
 /**
  * One checkout of `credits` credits, priced like the API: the base rate (rates.creditsPerEur) or the best volume
- * tier reached. `stripeFeePct` is the real average fee Stripe charged on past purchases; null when there are none.
+ * tier reached, minus the Stripe fee.
  */
 export function packEconomics(
   credits: number,
   rates: EconomicsRates,
-  stripeFeePct: number | null,
+  stripeFee: StripeFee,
   rateTiers: Pick<CreditRateTier, "min_eur" | "credits_per_eur">[] = [],
 ): PackEconomics {
   const rate = rateFor(credits, rates.creditsPerEur, rateTiers);
   const amountCents = priceCents(credits, rate);
-  const feeCents = Math.round((amountCents * (stripeFeePct ?? 0)) / 100);
+  const feeCents = Math.round((amountCents * stripeFee.pct) / 100) + stripeFee.fixedCents;
   const netCents = amountCents - feeCents;
   return {
     credits,

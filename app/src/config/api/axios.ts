@@ -2,7 +2,8 @@ import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { ApiRoutes } from "@/config/api/routes";
 import { environments } from "@/config/environments";
 
-export const CSRF_COOKIE = "reelty_csrf";
+/** Must match COOKIE_PREFIX on the API (keeps environments on a shared cookie domain apart). */
+export const CSRF_COOKIE = `${process.env.NEXT_PUBLIC_COOKIE_PREFIX ?? ""}reelty_csrf`;
 
 /** Origin comes from env; the /api path prefix lives here. */
 export const API_BASE_URL = `${environments.apiUrl}/api`;
