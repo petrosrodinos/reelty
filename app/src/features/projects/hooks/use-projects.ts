@@ -215,6 +215,9 @@ export const useVideoPlayUrl = (id: string, enabled: boolean) => {
     enabled: enabled && !!id,
     staleTime: 10 * 60_000,
     gcTime: 10 * 60_000,
+    // A refetch signs a new URL, which changes the <video> src and restarts playback mid-stream.
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
     retry: 1,
   });
 };

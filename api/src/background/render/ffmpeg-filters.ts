@@ -37,12 +37,18 @@ export const Brand = {
 
 const round3 = (n: number) => Math.round(n * 1000) / 1000;
 
-/** Expected final duration: 8 + 5N - 0.8 (N + 1) seconds (spec §4.3). */
-export function expectedDurationSeconds(clipCount: number): number {
+/** Which optional cards the video carries. A card is skipped when the user left its text empty. */
+export interface CardPlan {
+  title: boolean;
+  end: boolean;
+}
+
+const ALL_CARDS: CardPlan = { title: true, end: true };
+
+/** Expected final duration: the segments summed minus one crossfade per transition (spec §4.3). */
+export function expectedDurationSeconds(clipCount: number, cards: CardPlan = ALL_CARDS): number {
   const n = Math.max(0, Math.floor(clipCount));
-  return round3(
-    Timing.titleSeconds + Timing.endSeconds + Timing.clipSeconds * n - Timing.crossfadeSeconds * (n + 1),
-  );
+  return computeTransitionOffsets(segmentDurations(n, cards)).total;
 }
 
 export interface TransitionPlan {
@@ -67,12 +73,12 @@ export function computeTransitionOffsets(
   return { offsets, total: round3(total) };
 }
 
-/** Segment durations in order: title card, N clips, end card. */
-export function segmentDurations(clipCount: number): number[] {
+/** Segment durations in order: optional title card, N clips, optional end card. */
+export function segmentDurations(clipCount: number, cards: CardPlan = ALL_CARDS): number[] {
   return [
-    Timing.titleSeconds,
+    ...(cards.title ? [Timing.titleSeconds] : []),
     ...Array.from({ length: clipCount }, () => Timing.clipSeconds),
-    Timing.endSeconds,
+    ...(cards.end ? [Timing.endSeconds] : []),
   ];
 }
 
@@ -211,24 +217,12 @@ export function layoutTitleCard(input: {
   );
 }
 
-/** End card: the closing line, falling back to title + location line when the user left it empty. */
-export function layoutEndCard(input: {
-  closingLine?: string | null;
-  title: string;
-  locationLine?: string | null;
-}): CardLayout {
+/** End card: just the closing line. Empty layout (no card) when the user left it empty. */
+export function layoutEndCard(input: { closingLine?: string | null }): CardLayout {
   const closing = sanitizeCardText(input.closingLine);
-  if (closing) {
-    return layoutSections(
-      [{ text: closing, fontSize: closing.length <= 40 ? 68 : 54, color: Brand.cream, maxLines: 4 }],
-      true,
-    );
-  }
+  if (!closing) return { lines: [], accentY: null };
   return layoutSections(
-    [
-      { text: input.title, fontSize: titleFontSize(input.title), color: Brand.cream, maxLines: 3 },
-      { text: input.locationLine ?? '', fontSize: 36, color: Brand.softText, maxLines: 2 },
-    ],
+    [{ text: closing, fontSize: closing.length <= 40 ? 68 : 54, color: Brand.cream, maxLines: 4 }],
     true,
   );
 }
@@ -331,6 +325,8 @@ export function buildNormalizeArgs(input: { inputFile: string; outFile: string }
 export interface AssemblyGraphInput {
   clipCount: number;
   music: boolean;
+  /** Defaults to both cards present. */
+  cards?: CardPlan;
 }
 
 export interface AssemblyGraph {
@@ -355,10 +351,9 @@ export function buildAssemblyFilterGraph(input: AssemblyGraphInput): AssemblyGra
   if (!Number.isInteger(input.clipCount) || input.clipCount < 1) {
     throw new Error('Assembly requires at least one clip');
   }
-  const durations = segmentDurations(input.clipCount);
+  const durations = segmentDurations(input.clipCount, input.cards);
   const videoInputCount = durations.length;
   const { offsets, total } = computeTransitionOffsets(durations);
-  const expected = expectedDurationSeconds(input.clipCount);
   const parts: string[] = [];
 
   // Make every input identical for xfade: 30 fps (timebase 1/30), zero-based pts, same sar / pixel format.
@@ -367,6 +362,10 @@ export function buildAssemblyFilterGraph(input: AssemblyGraphInput): AssemblyGra
   }
 
   let current = 's0';
+  if (videoInputCount === 1) {
+    parts.push('[s0]null[xend]');
+    current = 'xend';
+  }
   for (let i = 1; i < videoInputCount; i++) {
     const out = i === videoInputCount - 1 ? 'xend' : `x${i}`;
     parts.push(
@@ -409,7 +408,7 @@ export function buildAssemblyFilterGraph(input: AssemblyGraphInput): AssemblyGra
 export type AudioSource = { kind: 'music'; file: string } | { kind: 'silent' };
 
 export function buildAssemblyArgs(input: {
-  /** title card, normalised clips in order, end card */
+  /** optional title card, normalised clips in order, optional end card */
   videoFiles: string[];
   audio: AudioSource;
   graph: AssemblyGraph;
@@ -447,9 +446,9 @@ export function buildAssemblyArgs(input: {
   return args;
 }
 
-/** A poster frame taken from the first clip (after the title card and its crossfade). */
-export function posterTimestamp(totalSeconds: number): number {
-  const t = Timing.titleSeconds - Timing.crossfadeSeconds + 1.5;
+/** A poster frame taken from the first clip (after the title card and its crossfade, when there is one). */
+export function posterTimestamp(totalSeconds: number, hasTitleCard = true): number {
+  const t = hasTitleCard ? Timing.titleSeconds - Timing.crossfadeSeconds + 1.5 : 1.5;
   return round3(Math.min(t, Math.max(0, totalSeconds / 2)));
 }
 

@@ -333,7 +333,7 @@ export class RenderService {
           result = await this.assembly.assemble({
             dir,
             clipFiles,
-            title: project.title.trim() || 'Property walkthrough',
+            title: project.title.trim(),
             subtitle: project.subtitle,
             locationLine: project.location_line,
             closingLine: project.closing_line,

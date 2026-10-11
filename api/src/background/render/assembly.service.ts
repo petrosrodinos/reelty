@@ -67,7 +67,6 @@ export class AssemblyService {
   async assemble(input: AssemblyInput): Promise<AssemblyResult> {
     const { dir } = input;
     const n = input.clipFiles.length;
-    const expected = expectedDurationSeconds(n);
 
     try {
       const font = this.ffmpeg.getFontPath();
@@ -78,13 +77,12 @@ export class AssemblyService {
         subtitle: input.subtitle,
         locationLine: input.locationLine,
       });
-      const endLayout = layoutEndCard({
-        closingLine: input.closingLine,
-        title: input.title,
-        locationLine: input.locationLine,
-      });
-      await this.renderCard(dir, 'title', titleLayout, Timing.titleSeconds, font);
-      await this.renderCard(dir, 'end', endLayout, Timing.endSeconds, font);
+      const endLayout = layoutEndCard({ closingLine: input.closingLine });
+      // a card with no text is left out of the video entirely
+      const cards = { title: titleLayout.lines.length > 0, end: endLayout.lines.length > 0 };
+      const expected = expectedDurationSeconds(n, cards);
+      if (cards.title) await this.renderCard(dir, 'title', titleLayout, Timing.titleSeconds, font);
+      if (cards.end) await this.renderCard(dir, 'end', endLayout, Timing.endSeconds, font);
 
       // 2. normalise every clip to 1920x1080 @ 30 fps, exactly 5 s, blurred fill
       const normalized = input.clipFiles.map((_, i) => join(dir, `n${i + 1}.mp4`));
@@ -96,11 +94,11 @@ export class AssemblyService {
       const audio = await this.prepareAudio(dir, input.music, input.soundtrackId);
 
       // 4. xfade chain + fades + audio
-      const graph = buildAssemblyFilterGraph({ clipCount: n, music: audio.source.kind === 'music' });
+      const graph = buildAssemblyFilterGraph({ clipCount: n, music: audio.source.kind === 'music', cards });
       const finalFile = join(dir, 'final.mp4');
       await this.ffmpeg.run(
         buildAssemblyArgs({
-          videoFiles: [join(dir, 'title.mp4'), ...normalized, join(dir, 'end.mp4')],
+          videoFiles: [...(cards.title ? [join(dir, 'title.mp4')] : []), ...normalized, ...(cards.end ? [join(dir, 'end.mp4')] : [])],
           audio: audio.source,
           graph,
           outFile: finalFile,
@@ -118,7 +116,7 @@ export class AssemblyService {
       // 6. poster frame
       const posterFile = join(dir, 'poster.jpg');
       await this.ffmpeg.run(
-        buildPosterArgs({ inputFile: finalFile, outFile: posterFile, atSeconds: posterTimestamp(graph.expectedDuration) }),
+        buildPosterArgs({ inputFile: finalFile, outFile: posterFile, atSeconds: posterTimestamp(graph.expectedDuration, cards.title) }),
         { cwd: dir },
       );
 
