@@ -35,6 +35,27 @@
   --color-notice-bad: #f4dcd8;
   --color-notice-ok: #dfeedd;
   --animate-ken-burns: ken-burns 16s ease-in-out infinite alternate;
+  --animate-shimmer: shimmer 1.8s linear infinite;
+  --animate-pop-in: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+  @keyframes shimmer {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+  @keyframes pop-in {
+    from {
+      transform: scale(0.4);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
 
   @keyframes ken-burns {
     from {

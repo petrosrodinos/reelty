@@ -1,6 +1,6 @@
 "use client";
 
-import type { FC } from "react";
+import { useEffect, useRef, useState, type FC } from "react";
 import Link from "next/link";
 import { CheckIcon, ClockIcon, InfoIcon } from "lucide-react";
 import { ProjectStatusBadge } from "@/components/ui/project-status-badge";
@@ -25,10 +25,52 @@ export const BackgroundBanner: FC = () => (
   </div>
 );
 
+/** Eases the displayed number toward `target` so the percentage counts up instead of jumping. */
+function useAnimatedNumber(target: number): number {
+  const [value, setValue] = useState(target);
+  const valueRef = useRef(target);
+
+  useEffect(() => {
+    const from = valueRef.current;
+    if (from === target) return;
+    const start = performance.now();
+    const duration = 600;
+    let frame = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const next = Math.round(from + (target - from) * (1 - Math.pow(1 - t, 3)));
+      valueRef.current = next;
+      setValue(next);
+      if (t < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [target]);
+
+  return value;
+}
+
+/** Live "m:ss" counter since the project was submitted. */
+function useElapsed(since: string | null): string | null {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (!since) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [since]);
+
+  if (!since) return null;
+  const seconds = Math.max(0, Math.floor((now - new Date(since).getTime()) / 1000));
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
 export const ProgressCard: FC<{ project: Project }> = ({ project }) => {
   const delayed = project.render_step === RenderSteps.BLOCKED_NO_CREDITS;
   const activeIndex = getActiveStepIndex(project.render_step);
   const percent = getProgressPercent(project);
+  const shownPercent = useAnimatedNumber(percent);
+  const elapsed = useElapsed(project.submitted_at ?? null);
 
   return (
     <section className="rounded-lg border border-hairline bg-canvas p-5 sm:p-8" aria-labelledby="progress-heading">
@@ -37,7 +79,7 @@ export const ProgressCard: FC<{ project: Project }> = ({ project }) => {
           Video progress
         </h2>
         <ProjectStatusBadge status={project.status} renderStep={project.render_step} />
-        <span className="text-[0.8125rem] text-muted-foreground">Only one video at a time</span>
+        <span className="text-[0.8125rem] text-muted-foreground">{elapsed ? `Elapsed ${elapsed}` : "Only one video at a time"}</span>
       </div>
 
       {delayed ? (
@@ -50,15 +92,23 @@ export const ProgressCard: FC<{ project: Project }> = ({ project }) => {
         </div>
       ) : null}
 
+      <div className="mt-6 flex items-baseline justify-between">
+        <span className="text-sm text-muted-foreground">{delayed ? "Waiting to resume" : "Creating your video"}</span>
+        <span className="text-display-sm tabular-nums" aria-hidden="true">
+          {shownPercent}%
+        </span>
+      </div>
       <div
-        className="mt-6 h-2 overflow-hidden rounded-full bg-surface-card"
+        className="mt-2 h-2.5 overflow-hidden rounded-full bg-surface-card"
         role="progressbar"
         aria-label="Video progress"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={percent}
       >
-        <div className="h-full rounded-full bg-brand transition-[width] duration-500" style={{ width: `${percent}%` }} />
+        <div className="relative h-full overflow-hidden rounded-full bg-brand transition-[width] duration-700 ease-out" style={{ width: `${percent}%` }}>
+          {delayed ? null : <span className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent" />}
+        </div>
       </div>
 
       <ol className="mt-6 flex flex-col gap-3.5">
@@ -73,13 +123,18 @@ export const ProgressCard: FC<{ project: Project }> = ({ project }) => {
             >
               <span
                 className={cn(
-                  "grid size-[22px] shrink-0 place-items-center rounded-full border-[1.5px]",
+                  "relative grid size-[22px] shrink-0 place-items-center rounded-full border-[1.5px] transition-colors duration-300",
                   done ? "border-teal bg-teal text-ink" : current ? "border-brand text-brand" : "border-hairline bg-canvas",
                 )}
                 aria-hidden="true"
               >
-                {done ? <CheckIcon className="size-3" /> : null}
-                {current && !done ? <span className="size-2 animate-pulse rounded-full bg-brand" /> : null}
+                {done ? <CheckIcon className="size-3 animate-pop-in" /> : null}
+                {current && !done ? (
+                  <>
+                    <span className="absolute inset-0 animate-ping rounded-full bg-brand/30" />
+                    <span className="relative size-2 rounded-full bg-brand" />
+                  </>
+                ) : null}
               </span>
               {getRenderStepLabel(step, project.clips_done, project.clips_total)}
               <span className="sr-only">{done ? " (done)" : current ? " (in progress)" : ""}</span>
