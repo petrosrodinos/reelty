@@ -18,7 +18,7 @@ import { ClientIp } from '@/shared/decorators/client-ip.decorator';
 import { ZodValidationPipe } from '@/shared/pipes/zod.validation.pipe';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { UpdateProjectDto } from './dto/update-project.dto';
+import { RenameProjectDto, UpdateProjectDto } from './dto/update-project.dto';
 import { SubmitProjectDto } from './dto/submit-project.dto';
 import { ProjectQuerySchema, type ProjectQueryType } from './dto/project-query.schema';
 import {
@@ -70,6 +70,22 @@ export class ProjectsController {
   @ApiResponse({ status: 409, description: 'project_locked' })
   update(@CurrentUser('id') userId: string, @Param('id') id: string, @Body() dto: UpdateProjectDto) {
     return this.projectsService.update(userId, id, dto);
+  }
+
+  @Patch(':id/title')
+  @ApiOperation({ summary: 'Rename a project (also after it was submitted). The rendered video is not changed.' })
+  @ApiResponse({ status: 200, type: ProjectEntity })
+  @ApiResponse({ status: 409, description: 'render_in_progress' })
+  rename(@CurrentUser('id') userId: string, @Param('id') id: string, @Body() dto: RenameProjectDto) {
+    return this.projectsService.rename(userId, id, dto);
+  }
+
+  @Post(':id/duplicate')
+  @ApiOperation({ summary: 'Copy a completed project (details and photos) into a new draft' })
+  @ApiResponse({ status: 201, type: ProjectEntity })
+  @ApiResponse({ status: 409, description: 'invalid_status' })
+  duplicate(@CurrentUser('id') userId: string, @Param('id') id: string) {
+    return this.projectsService.duplicate(userId, id);
   }
 
   @Delete(':id')

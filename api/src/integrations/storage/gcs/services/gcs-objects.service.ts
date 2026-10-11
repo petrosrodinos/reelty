@@ -79,6 +79,11 @@ export class GcsObjectsService {
     return { size: Number(meta.size), contentType: meta.contentType };
   }
 
+  /** Server-side copy inside the bucket (no download). */
+  async copyObject(fromPath: string, toPath: string): Promise<void> {
+    await this.bucket().file(fromPath).copy(this.bucket().file(toPath));
+  }
+
   async deleteObject(path: string): Promise<void> {
     await this.bucket().file(path).delete({ ignoreNotFound: true });
   }

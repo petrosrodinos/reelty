@@ -1,7 +1,7 @@
 "use client";
 
 import type { FC } from "react";
-import { AlertTriangleIcon, DownloadIcon, Trash2Icon } from "lucide-react";
+import { AlertTriangleIcon, DownloadIcon } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ProjectStatusBadge } from "@/components/ui/project-status-badge";
@@ -14,10 +14,9 @@ import { ProjectPlayer } from "@/views/projects/detail/components/project-player
 
 interface CompletedViewProps {
   project: Project;
-  onDelete: () => void;
 }
 
-export const CompletedView: FC<CompletedViewProps> = ({ project, onDelete }) => {
+export const CompletedView: FC<CompletedViewProps> = ({ project }) => {
   const download = useDownloadVideo();
   const images = project.images ?? [];
   const skipped = images.filter((image) => image.skipped);
@@ -40,9 +39,6 @@ export const CompletedView: FC<CompletedViewProps> = ({ project, onDelete }) => 
               <Button size="lg" onClick={() => download.mutate(project.id)} disabled={download.isPending}>
                 {download.isPending ? <Spinner /> : <DownloadIcon />}
                 Download MP4
-              </Button>
-              <Button size="lg" variant="outline" onClick={onDelete}>
-                <Trash2Icon /> Delete
               </Button>
             </div>
           </section>

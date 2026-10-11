@@ -15,11 +15,13 @@ import {
 import {
   createProject,
   deleteProject,
+  duplicateProject,
   getProject,
   getProjects,
   getSoundtracks,
   getVideoDownloadUrl,
   getVideoPlayUrl,
+  renameProject,
   retryProject,
   submitProject,
   updateProject,
@@ -109,6 +111,39 @@ export const useUpdateProject = (options: { silent?: boolean } = {}) => {
     },
     onError: (error) => {
       toast({ title: "Could not save your changes", description: getApiErrorMessage(error), variant: "error" });
+    },
+  });
+};
+
+export const useRenameProject = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: renameProject,
+    onSuccess: (updated, { id }) => {
+      trackEvent(AnalyticsEvents.PROJECT_RENAMED);
+      queryClient.setQueryData<Project>([PROJECT_QUERY_KEY, id], (current) =>
+        current ? { ...current, ...updated, images: current.images } : current,
+      );
+      queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
+      toast({ title: "Renamed", description: "The finished video was not changed.", duration: 2500 });
+    },
+    onError: (error) => {
+      toast({ title: "Could not rename the project", description: getApiErrorMessage(error), variant: "error" });
+    },
+  });
+};
+
+export const useDuplicateProject = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: duplicateProject,
+    onSuccess: () => {
+      trackEvent(AnalyticsEvents.PROJECT_DUPLICATED);
+      queryClient.invalidateQueries({ queryKey: [PROJECTS_QUERY_KEY] });
+      toast({ title: "Project duplicated", description: "Edit the copy, then create a new video from it." });
+    },
+    onError: (error) => {
+      toast({ title: "Could not duplicate the project", description: getApiErrorMessage(error), variant: "error" });
     },
   });
 };

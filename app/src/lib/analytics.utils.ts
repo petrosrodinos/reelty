@@ -48,6 +48,8 @@ export const AnalyticsEvents = {
   VIDEO_RETRIED: "video_retried",
   VIDEO_DOWNLOADED: "video_downloaded",
   PROJECT_DELETED: "project_deleted",
+  PROJECT_DUPLICATED: "project_duplicated",
+  PROJECT_RENAMED: "project_renamed",
   BEGIN_CHECKOUT: "begin_checkout",
   CHECKOUT_CANCELLED: "checkout_cancelled",
   CONTACT_SENT: "contact_message_sent",

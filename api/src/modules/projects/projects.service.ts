@@ -1,5 +1,6 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { randomUUID } from 'crypto';
 import {
   ConsentType,
   CreditTxKind,
@@ -22,7 +23,7 @@ import { UsageService } from '@/modules/usage/usage.service';
 import { CreditsService } from '@/modules/credits/credits.service';
 import { CreditTiersService } from '@/modules/credits/services/credit-tiers.service';
 import { CreateProjectDto } from './dto/create-project.dto';
-import { UpdateProjectDto } from './dto/update-project.dto';
+import { RenameProjectDto, UpdateProjectDto } from './dto/update-project.dto';
 import { SubmitProjectDto } from './dto/submit-project.dto';
 import type { ProjectQueryType } from './dto/project-query.schema';
 import type {
@@ -248,6 +249,102 @@ export class ProjectsService {
     });
 
     return this.findOne(userId, projectId);
+  }
+
+  /** Title only; allowed after submit because the finished video keeps the title it was rendered with. */
+  async rename(userId: string, projectId: string, dto: RenameProjectDto): Promise<ProjectJson> {
+    const project = await this.findOwnedOrThrow(userId, projectId);
+    if (project.status === ProjectStatus.QUEUED || project.status === ProjectStatus.CREATING) {
+      throw new ApiException(
+        HttpStatus.CONFLICT,
+        ErrorCodes.RENDER_IN_PROGRESS,
+        'This video is being created. You can rename it once it is finished.',
+      );
+    }
+    await this.prisma.project.update({ where: { id: project.id }, data: { title: dto.title.trim() } });
+    return this.findOne(userId, projectId);
+  }
+
+  // ------------------------------------------------------------------ duplicate
+
+  /** New draft with the same details and photos (files copied inside the bucket). Needs a fresh submit. */
+  async duplicate(userId: string, projectId: string): Promise<ProjectJson> {
+    const source = await this.findOwnedOrThrow(userId, projectId);
+    if (source.status !== ProjectStatus.COMPLETED) {
+      throw new ApiException(
+        HttpStatus.CONFLICT,
+        ErrorCodes.INVALID_STATUS,
+        'Only finished videos can be duplicated.',
+      );
+    }
+    const images = await this.prisma.image.findMany({
+      where: { project_id: source.id, ...READY_IMAGES },
+      orderBy: { position: 'asc' },
+    });
+
+    const copy = await this.prisma.project.create({
+      data: {
+        user_id: userId,
+        source_type: source.source_type,
+        source_url: source.source_url,
+        status: ProjectStatus.DRAFT,
+        title: `${source.title.slice(0, 51)} (copy)`.trim(),
+        subtitle: source.subtitle,
+        location_line: source.location_line,
+        closing_line: source.closing_line,
+        music_enabled: source.music_enabled,
+        soundtrack_id: source.soundtrack_id,
+      },
+    });
+
+    try {
+      for (const image of images) {
+        const id = randomUUID();
+        const ext = image.gcs_original_path?.split('.').pop() ?? 'jpg';
+        const originalPath = image.gcs_original_path
+          ? StoragePaths.imageOriginal(userId, copy.id, id, ext)
+          : null;
+        const processedPath = image.gcs_processed_path ? StoragePaths.imageProcessed(userId, copy.id, id) : null;
+        const thumbPath = image.gcs_thumb_path ? StoragePaths.imageThumb(userId, copy.id, id) : null;
+        const pairs: [string | null, string | null][] = [
+          [image.gcs_original_path, originalPath],
+          [image.gcs_processed_path, processedPath],
+          [image.gcs_thumb_path, thumbPath],
+        ];
+        await Promise.all(pairs.filter(([from, to]) => from && to).map(([from, to]) => this.gcs.copyObject(from!, to!)));
+        await this.prisma.image.create({
+          data: {
+            id,
+            project_id: copy.id,
+            position: image.position,
+            gcs_original_path: originalPath,
+            gcs_processed_path: processedPath,
+            gcs_thumb_path: thumbPath,
+            width: image.width,
+            height: image.height,
+            bytes: image.bytes,
+            content_hash: image.content_hash,
+            source_url: image.source_url,
+            room_type: image.room_type,
+            use_processed: image.use_processed,
+            wm_status: image.wm_status === WatermarkStatus.processing ? WatermarkStatus.none : image.wm_status,
+            wm_attempts: image.wm_attempts,
+            ready: true,
+          },
+        });
+      }
+    } catch (error) {
+      this.logger.error(`Failed to duplicate project ${source.id}: ${(error as Error).message}`);
+      await this.gcs.deletePrefix(StoragePaths.projectPrefix(userId, copy.id)).catch(() => undefined);
+      await this.prisma.project.delete({ where: { id: copy.id } }).catch(() => undefined);
+      throw new ApiException(
+        HttpStatus.BAD_GATEWAY,
+        ErrorCodes.STORAGE_ERROR,
+        'Could not copy the photos. Nothing was created, please try again.',
+      );
+    }
+
+    return this.findOne(userId, copy.id);
   }
 
   // ------------------------------------------------------------------ delete

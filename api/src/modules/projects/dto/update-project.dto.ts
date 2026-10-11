@@ -1,6 +1,6 @@
-import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsIn, IsString, MaxLength, ValidateIf } from 'class-validator';
+import { IsBoolean, IsIn, IsNotEmpty, IsString, MaxLength, ValidateIf } from 'class-validator';
 import { SOUNDTRACK_IDS } from '@/shared/constants/soundtracks.constants';
 
 const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
@@ -44,3 +44,13 @@ export class ProjectDetailsDto {
 
 export class UpdateProjectDto extends PartialType(ProjectDetailsDto) {}
 
+
+/** Rename of a finished project. The rendered video is not touched. */
+export class RenameProjectDto {
+  @ApiProperty({ maxLength: 60, example: 'Sunny 2-bedroom in Athens' })
+  @Transform(trim)
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(60)
+  title: string;
+}

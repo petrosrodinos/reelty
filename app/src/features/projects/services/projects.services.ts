@@ -35,6 +35,16 @@ export const updateProject = async ({ id, dto }: { id: string; dto: UpdateProjec
   return response.data;
 };
 
+export const renameProject = async ({ id, title }: { id: string; title: string }): Promise<Project> => {
+  const response = await axiosInstance.patch<Project>(ApiRoutes.projects.title(id), { title });
+  return response.data;
+};
+
+export const duplicateProject = async (id: string): Promise<Project> => {
+  const response = await axiosInstance.post<Project>(ApiRoutes.projects.duplicate(id));
+  return response.data;
+};
+
 export const getSoundtracks = async (): Promise<Soundtrack[]> => {
   const response = await axiosInstance.get<Soundtrack[]>(ApiRoutes.soundtracks.prefix);
   return response.data;

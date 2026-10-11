@@ -17,6 +17,7 @@ import { BackgroundBanner, ProgressCard } from "@/views/projects/detail/componen
 import { CompletedView } from "@/views/projects/detail/components/completed-view";
 import { CreatedDialog } from "@/views/projects/detail/components/created-dialog";
 import { DetailSkeleton } from "@/views/projects/detail/components/detail-skeleton";
+import { ProjectActionsMenu } from "@/views/projects/detail/components/project-actions-menu";
 import { FailedCard } from "@/views/projects/detail/components/failed-card";
 
 const ProjectDetailPage: FC<{ id: string }> = ({ id }) => {
@@ -79,9 +80,14 @@ const ProjectDetailPage: FC<{ id: string }> = ({ id }) => {
           <h1 className="text-display-lg mt-2 break-words">{project.title || "Untitled video"}</h1>
           {subtitle ? <p className="mt-1 text-muted-foreground">{subtitle}</p> : null}
         </div>
-        <Button variant="outline" render={<Link href={Routes.videos} />} nativeButton={false}>
-          Back to My Videos
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          {project.status === ProjectStatuses.COMPLETED ? (
+            <ProjectActionsMenu project={project} onDelete={() => setDeleting(true)} />
+          ) : null}
+          <Button variant="outline" render={<Link href={Routes.videos} />} nativeButton={false}>
+            Back to My Videos
+          </Button>
+        </div>
       </div>
 
       {inProgress ? (
@@ -94,7 +100,7 @@ const ProjectDetailPage: FC<{ id: string }> = ({ id }) => {
       {project.status === ProjectStatuses.FAILED ? (
         <FailedCard project={project} isRetrying={retry.isPending} onRetry={() => retry.mutate(project.id)} onDelete={() => setDeleting(true)} />
       ) : null}
-      {project.status === ProjectStatuses.COMPLETED ? <CompletedView project={project} onDelete={() => setDeleting(true)} /> : null}
+      {project.status === ProjectStatuses.COMPLETED ? <CompletedView project={project} /> : null}
 
       <CreatedDialog isOpen={justCreated && inProgress} onClose={() => router.replace(Routes.project(id))} />
 
