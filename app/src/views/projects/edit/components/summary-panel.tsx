@@ -11,6 +11,7 @@ import { VideoAddonFormOptions } from "@/config/constants/dropdowns/credits/vide
 import { useResendVerification } from "@/features/auth/hooks/use-auth";
 import type { VideoQuote } from "@/features/credits/interfaces/credits.interfaces";
 import { getDropdownOptionLabel } from "@/lib/dropdown-option-label.utils";
+import { cn } from "@/lib/utils";
 import { pluralize } from "@/lib/format.utils";
 
 interface SummaryPanelProps {
@@ -18,6 +19,8 @@ interface SummaryPanelProps {
   quote: VideoQuote | undefined;
   /** The balance does not cover the quote: show a buy link next to the reason. */
   needsCredits: boolean;
+  /** More photos than a video can use: the reason is shown in red so it is hard to miss. */
+  overLimit: boolean;
   /** Opens the buy-credits modal over the editor. */
   onBuyCredits: () => void;
   isSubmitting: boolean;
@@ -29,6 +32,7 @@ export const SummaryPanel: FC<SummaryPanelProps> = ({
   blockers,
   quote,
   needsCredits,
+  overLimit,
   onBuyCredits,
   isSubmitting,
   submitError,
@@ -38,9 +42,9 @@ export const SummaryPanel: FC<SummaryPanelProps> = ({
   const blocked = blockers.length > 0;
 
   return (
-    <section id="summary" className="rounded-lg border border-hairline bg-canvas p-5 sm:p-6">
+    <section id="summary" className="rounded-lg border border-hairline bg-canvas p-4">
       {quote?.tier ? (
-        <div className="mb-4 flex items-start justify-between gap-3 border-b border-hairline-soft pb-4">
+        <div className="mb-3 flex items-start justify-between gap-3 border-b border-hairline-soft pb-3">
           <div className="flex items-start gap-2 text-sm">
             <CoinsIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
             <div>
@@ -63,10 +67,16 @@ export const SummaryPanel: FC<SummaryPanelProps> = ({
         Create video
       </Button>
 
-      <p id="create-reason" className="mt-3 flex items-start gap-2 text-[0.8125rem] text-muted-foreground">
+      <p
+        id="create-reason"
+        className={cn(
+          "mt-3 flex items-start gap-2 text-[0.8125rem]",
+          blocked && overLimit ? "rounded-md border border-destructive/40 bg-destructive/10 p-2.5 text-sm font-semibold text-destructive" : "text-muted-foreground",
+        )}
+      >
         {blocked ? (
           <>
-            <InfoIcon className="mt-0.5 size-3.5 shrink-0 text-warning" aria-hidden="true" />
+            <InfoIcon className={cn("mt-0.5 size-3.5 shrink-0", overLimit ? "text-destructive" : "text-warning")} aria-hidden="true" />
             <span>
               {blockers[0]}
               {needsCredits ? (

@@ -28,7 +28,7 @@ import type {
 } from '@/modules/projects/interfaces/project.interface';
 import { getLimits } from '@/modules/projects/utils/limits.utils';
 import { slugify } from '@/modules/projects/utils/source-url.utils';
-import { ConfirmImagesDto, OrderImagesDto } from './dto/image-ids.dto';
+import { ConfirmImagesDto, OrderImagesDto, RemoveImagesDto } from './dto/image-ids.dto';
 import { UploadUrlsDto } from './dto/upload-urls.dto';
 import { UpdateImageDto } from './dto/update-image.dto';
 import { RemoveWatermarkDto } from './dto/remove-watermark.dto';
@@ -389,15 +389,22 @@ export class ImagesService {
     return this.serializeOne(image.project, updated);
   }
 
-  async remove(userId: string, imageId: string): Promise<void> {
-    const image = await this.findOwnedImage(userId, imageId);
-    this.projects.assertUnlocked(image.project);
+  /** Removes one or many photos in a single transaction and re-packs the positions once. */
+  async remove(userId: string, projectId: string, dto: RemoveImagesDto): Promise<void> {
+    const project = await this.projects.findOwnedOrThrow(userId, projectId);
+    this.projects.assertUnlocked(project);
 
     await this.prisma.$transaction(async (tx) => {
-      await tx.image.update({ where: { id: image.id }, data: { removed: true, position: 0 } });
+      const { count } = await tx.image.updateMany({
+        where: { id: { in: dto.image_ids }, project_id: project.id, ...READY },
+        data: { removed: true, position: 0 },
+      });
+      if (count !== dto.image_ids.length) {
+        throw new ApiException(HttpStatus.NOT_FOUND, ErrorCodes.NOT_FOUND, 'Not found');
+      }
 
       const remaining = await tx.image.findMany({
-        where: { project_id: image.project_id, ...READY },
+        where: { project_id: project.id, ...READY },
         orderBy: { position: 'asc' },
         select: { id: true, position: true },
       });
@@ -407,8 +414,8 @@ export class ImagesService {
         }
       }
 
-      if (remaining.length === 0 && image.project.status === ProjectStatus.READY) {
-        await tx.project.update({ where: { id: image.project_id }, data: { status: ProjectStatus.DRAFT } });
+      if (remaining.length === 0 && project.status === ProjectStatus.READY) {
+        await tx.project.update({ where: { id: project.id }, data: { status: ProjectStatus.DRAFT } });
       }
     });
   }

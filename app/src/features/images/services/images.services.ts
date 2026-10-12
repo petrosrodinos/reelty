@@ -74,8 +74,8 @@ export const updateImage = async ({ id, dto }: { id: string; dto: UpdateImageDto
   return response.data;
 };
 
-export const deleteImage = async (id: string): Promise<void> => {
-  await axiosInstance.delete(ApiRoutes.images.byId(id));
+export const deleteImages = async ({ projectId, imageIds }: { projectId: string; imageIds: string[] }): Promise<void> => {
+  await axiosInstance.delete(ApiRoutes.projects.images(projectId), { data: { image_ids: imageIds } });
 };
 
 export const removeWatermark = async ({ id, dto }: { id: string; dto: RemoveWatermarkDto }): Promise<ProjectImage> => {

@@ -13,7 +13,7 @@ import {
 } from "@/features/images/interfaces/images.interfaces";
 import {
   confirmImages,
-  deleteImage,
+  deleteImages,
   getImageDownloadUrl,
   putFileToSignedUrl,
   removeWatermark,
@@ -99,27 +99,32 @@ export const useUpdateImage = (projectId: string) => {
   });
 };
 
-/** `quiet` skips the per-photo success toast (bulk delete shows one summary toast instead). */
-export const useDeleteImage = (projectId: string, options: { quiet?: boolean } = {}) => {
+/** One request removes a single photo or many; `quiet` skips the success toast (the caller shows its own summary). */
+export const useDeleteImages = (projectId: string, options: { quiet?: boolean } = {}) => {
   const queryClient = useQueryClient();
   const key = [PROJECT_QUERY_KEY, projectId];
   return useMutation({
-    mutationFn: deleteImage,
-    onMutate: async (id) => {
+    mutationFn: (imageIds: string[]) => deleteImages({ projectId, imageIds }),
+    onMutate: async (imageIds) => {
       await queryClient.cancelQueries({ queryKey: key });
       const previous = queryClient.getQueryData<Project>(key);
+      const removed = new Set(imageIds);
       queryClient.setQueryData<Project>(key, (current) =>
-        patchProjectImages(current, (images) => repack(images.filter((image) => image.id !== id))),
+        patchProjectImages(current, (images) => repack(images.filter((image) => !removed.has(image.id)))),
       );
       return { previous };
     },
-    onSuccess: () => {
+    onSuccess: (_data, imageIds) => {
       if (options.quiet) return;
-      toast({ title: "Photo removed", description: "It stays in storage until you delete the project.", duration: 2500 });
+      toast({
+        title: imageIds.length === 1 ? "Photo removed" : `${imageIds.length} photos removed`,
+        description: "They stay in storage until you delete the project.",
+        duration: 2500,
+      });
     },
-    onError: (error, _id, context) => {
+    onError: (error, _ids, context) => {
       if (context?.previous) queryClient.setQueryData(key, context.previous);
-      toast({ title: "Could not remove the photo", description: getApiErrorMessage(error), variant: "error" });
+      toast({ title: "Could not remove the photos", description: getApiErrorMessage(error), variant: "error" });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: [PROJECT_QUERY_KEY] });

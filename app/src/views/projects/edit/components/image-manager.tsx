@@ -12,12 +12,12 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import { EraserIcon, InfoIcon, Trash2Icon, UploadIcon } from "lucide-react";
+import { EraserIcon, InfoIcon, Trash2Icon, UploadIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ConfirmationDialog from "@/components/ui/confirmation-dialog";
 import { UploadProgressList } from "@/components/ui/upload-progress-list";
 import {
-  useDeleteImage,
+  useDeleteImages,
   useImageUploader,
   useRemoveWatermark,
   useReorderImages,
@@ -63,8 +63,8 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
 
   const reorder = useReorderImages(projectId);
   const updateImage = useUpdateImage(projectId);
-  const deleteImage = useDeleteImage(projectId);
-  const bulkDeleteImage = useDeleteImage(projectId, { quiet: true });
+  const deleteImages = useDeleteImages(projectId);
+  const bulkDeleteImages = useDeleteImages(projectId, { quiet: true });
   const removeWatermark = useRemoveWatermark(projectId);
   const uploader = useImageUploader();
 
@@ -144,15 +144,12 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
   const deleteSelected = async () => {
     const ids = selectedAll;
     setBulkBusy(true);
-    // one at a time: the API re-packs photo positions on every delete
     let removed = 0;
-    for (const id of ids) {
-      try {
-        await bulkDeleteImage.mutateAsync(id);
-        removed += 1;
-      } catch {
-        break; // the mutation already toasted the error
-      }
+    try {
+      await bulkDeleteImages.mutateAsync(ids);
+      removed = ids.length;
+    } catch {
+      // the mutation already toasted the error
     }
     setSelectedIds(new Set());
     setBulkBusy(false);
@@ -207,15 +204,20 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
 
   const under = total < limits.minImages;
   const over = total > limits.maxImages;
+  // Credits allow fewer photos than the tier maximum and the video already has more than that.
+  const overCredits = creditLimited && !over && total > cap;
   const helper = under
     ? `Add at least ${limits.minImages} photos to continue.`
     : over
       ? `Remove ${total - limits.maxImages} to continue (max ${limits.maxImages}).`
-      : creditLimited
-        ? needsCredits
-          ? "Your credits cover no more photos. Buy credits to add more."
-          : `Your credits cover ${cap - total} more ${cap - total === 1 ? "photo" : "photos"}. Buy credits to add more.`
-        : "Drag the handle to reorder, or use the arrows. The video follows this order.";
+      : overCredits
+        ? `Your credits only cover ${cap} ${cap === 1 ? "photo" : "photos"}. Remove ${total - cap} or buy credits to continue.`
+        : creditLimited
+          ? needsCredits
+            ? `Your credits only cover ${cap} ${cap === 1 ? "photo" : "photos"}. Buy credits to add more.`
+            : `Your credits only cover ${cap} ${cap === 1 ? "photo" : "photos"} (${cap - total} more). Buy credits to add more.`
+          : "Drag the handle to reorder, or use the arrows. The video follows this order.";
+  const creditWarning = creditLimited && !over;
 
   const previewImage = images.find((image) => image.id === previewId) ?? null;
   const previewPosition = previewImage ? images.indexOf(previewImage) + 1 : 0;
@@ -229,11 +231,28 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
     <section aria-labelledby="photos-heading">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 id="photos-heading" className="text-[1.375rem] font-medium leading-snug text-ink">
-            {total} of {limits.maxImages} photos
+          <h2
+            id="photos-heading"
+            className={cn("text-[1.375rem] font-medium leading-snug", over || overCredits ? "font-semibold text-destructive" : "text-ink")}
+          >
+            {total} of {cap} photos
           </h2>
-          <p className={cn("flex items-center gap-1.5 text-sm", under || over ? "text-ink" : "text-muted-foreground")} aria-live="polite">
-            {under || over ? <InfoIcon className="size-4 shrink-0 text-warning" aria-hidden="true" /> : null}
+          <p
+            className={cn(
+              "flex items-center gap-1.5 text-sm",
+              over || overCredits
+                ? "font-semibold text-destructive"
+                : creditWarning
+                  ? "font-semibold text-warning"
+                  : under
+                    ? "text-ink"
+                    : "text-muted-foreground",
+            )}
+            aria-live="polite"
+          >
+            {under || over || creditWarning ? (
+              <InfoIcon className={cn("size-4 shrink-0", over || overCredits ? "text-destructive" : "text-warning")} aria-hidden="true" />
+            ) : null}
             {helper}
           </p>
         </div>
@@ -301,6 +320,16 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
         </div>
       ) : null}
 
+      {over || overCredits ? (
+        <p className="mb-3 flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-2.5 text-sm text-destructive" role="status">
+          <Trash2Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          <span>
+            <strong className="font-semibold">Remove {total - (over ? limits.maxImages : cap)} {total - (over ? limits.maxImages : cap) === 1 ? "photo" : "photos"}.</strong>{" "}
+            Click photos to select them, then press <strong className="font-semibold">Delete</strong> above, or click the <XIcon className="mx-0.5 inline size-3.5 align-[-2px]" aria-hidden="true" /> in a photo&apos;s top-right corner.
+          </span>
+        </p>
+      ) : null}
+
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={images.map((image) => image.id)} strategy={rectSortingStrategy}>
           <ul className="grid grid-cols-1 gap-3 min-[26rem]:grid-cols-2 sm:grid-cols-3 md:gap-4 lg:grid-cols-2 xl:grid-cols-3">
@@ -356,8 +385,8 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
         description="It will no longer be used in the video. It stays in storage until you delete the project, and you can upload it again any time."
         confirmText="Remove photo"
         variant="destructive"
-        isLoading={deleteImage.isPending}
-        onConfirm={() => removing && deleteImage.mutate(removing.id, { onSettled: () => setRemoving(null) })}
+        isLoading={deleteImages.isPending}
+        onConfirm={() => removing && deleteImages.mutate([removing.id], { onSettled: () => setRemoving(null) })}
       />
     </section>
   );

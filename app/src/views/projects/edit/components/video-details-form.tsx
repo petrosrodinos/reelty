@@ -23,27 +23,27 @@ export const VideoDetailsForm: FC<VideoDetailsFormProps> = ({ project, form }) =
   const titleLength = form.watch("title").length;
 
   return (
-    <section className="rounded-lg border border-hairline bg-canvas p-5 sm:p-6" aria-labelledby="details-heading">
-      <h2 id="details-heading" className="mb-4 text-lg font-medium text-ink">
+    <section className="rounded-lg border border-hairline bg-canvas p-4" aria-labelledby="details-heading">
+      <h2 id="details-heading" className="mb-3 text-lg font-medium text-ink">
         Video details
       </h2>
       <Form {...form}>
-        <form onSubmit={(event) => event.preventDefault()} className="flex flex-col gap-4" noValidate>
+        <form onSubmit={(event) => event.preventDefault()} className="flex flex-col gap-3" noValidate>
           <FormField
             control={form.control}
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title</FormLabel>
-                <FormControl>
-                  <Input maxLength={VideoLimits.maxTitle} placeholder="Sunlit Loft in Plaka" autoComplete="off" {...field} />
-                </FormControl>
-                <div className="flex justify-between gap-3">
-                  <FormMessage />
-                  <span className="ml-auto text-xs tabular-nums text-muted-foreground">
+                <div className="flex items-baseline justify-between gap-3">
+                  <FormLabel>Title</FormLabel>
+                  <span className="text-xs tabular-nums text-muted-foreground">
                     {titleLength}/{VideoLimits.maxTitle}
                   </span>
                 </div>
+                <FormControl>
+                  <Input maxLength={VideoLimits.maxTitle} placeholder="Sunlit Loft in Plaka" autoComplete="off" {...field} />
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -89,7 +89,7 @@ export const VideoDetailsForm: FC<VideoDetailsFormProps> = ({ project, form }) =
         </form>
       </Form>
 
-      <div className="mt-5 border-t border-hairline-soft pt-5">
+      <div className="mt-4 border-t border-hairline-soft pt-4">
         <div className="flex items-center justify-between gap-4">
           <Label htmlFor="music-switch" className="text-sm font-medium text-ink">
             Music
@@ -101,13 +101,13 @@ export const VideoDetailsForm: FC<VideoDetailsFormProps> = ({ project, form }) =
             onCheckedChange={(checked) => updateProject.mutate({ id: project.id, dto: { music_enabled: checked } })}
           />
         </div>
-        <p className="mt-1.5 text-[0.8125rem] text-muted-foreground">
-          {project.music_enabled
-            ? "Choose a royalty-free track. It fades in and out."
-            : "No music. A silent audio track keeps the file compatible everywhere."}
-        </p>
+        {project.music_enabled ? null : (
+          <p className="mt-1.5 text-[0.8125rem] text-muted-foreground">
+            No music. A silent audio track keeps the file compatible everywhere.
+          </p>
+        )}
         {project.music_enabled && soundtracks ? (
-          <div className="mt-3">
+          <div className="mt-2">
             <SoundtrackPicker
               tracks={soundtracks}
               value={project.soundtrack_id}

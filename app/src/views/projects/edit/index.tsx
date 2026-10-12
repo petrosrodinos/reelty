@@ -117,7 +117,7 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
       </div>
 
       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="order-2 min-w-0 lg:order-none lg:col-start-1 lg:row-span-2 lg:row-start-1">
+        <div className="order-2 min-w-0 lg:order-none lg:col-start-1 lg:row-start-1">
           <ImageManager
             project={project}
             affordablePhotos={affordablePhotos}
@@ -125,20 +125,19 @@ const Editor: FC<EditorProps> = ({ project, me, onCreated }) => {
             onBuyCredits={() => setBuying(true)}
           />
         </div>
-        <div className="order-1 lg:order-none lg:col-start-2 lg:row-start-1">
+        <aside className="order-1 flex flex-col gap-3 lg:order-none lg:sticky lg:top-[4.5rem] lg:col-start-2 lg:row-start-1" aria-label="Video details and summary">
           <SummaryPanel
             blockers={blockers}
             quote={quote}
             needsCredits={!!quote && me.credits.balance < quote.total}
+            overLimit={(project.images?.length ?? 0) > limits.maxImages}
             onBuyCredits={() => setBuying(true)}
             isSubmitting={submit.isPending}
             submitError={submit.error}
             onSubmit={handleSubmit}
           />
-        </div>
-        <div className="order-3 lg:order-none lg:col-start-2 lg:row-start-2">
           <VideoDetailsForm project={project} form={form} />
-        </div>
+        </aside>
       </div>
 
       <MobileCreateBar blockers={blockers} isSubmitting={submit.isPending} onSubmit={handleSubmit} />

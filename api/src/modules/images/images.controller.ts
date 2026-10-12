@@ -21,7 +21,7 @@ import { ZodValidationPipe } from '@/shared/pipes/zod.validation.pipe';
 import { ProjectImageEntity, SignedDownloadEntity } from '@/modules/projects/entities/project.entity';
 import { ImagesService } from './images.service';
 import { UploadUrlsDto } from './dto/upload-urls.dto';
-import { ConfirmImagesDto, OrderImagesDto } from './dto/image-ids.dto';
+import { ConfirmImagesDto, OrderImagesDto, RemoveImagesDto } from './dto/image-ids.dto';
 import { UpdateImageDto } from './dto/update-image.dto';
 import { RemoveWatermarkDto } from './dto/remove-watermark.dto';
 import { DownloadUrlQuerySchema, type DownloadUrlQueryType } from './dto/download-url-query.schema';
@@ -70,6 +70,18 @@ export class ProjectImagesController {
     return this.imagesService.reorder(userId, projectId, dto);
   }
 
+  @Delete()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Remove one or many images from the project (soft delete)' })
+  @ApiResponse({ status: 204 })
+  remove(
+    @CurrentUser('id') userId: string,
+    @Param('projectId') projectId: string,
+    @Body() dto: RemoveImagesDto,
+  ) {
+    return this.imagesService.remove(userId, projectId, dto);
+  }
+
   @Get('download-zip')
   @ApiOperation({ summary: 'Stream a ZIP of the photos used, in video order' })
   @ApiProduces('application/zip')
@@ -106,14 +118,6 @@ export class ImagesController {
   @ApiResponse({ status: 200, type: ProjectImageEntity })
   update(@CurrentUser('id') userId: string, @Param('id') id: string, @Body() dto: UpdateImageDto) {
     return this.imagesService.update(userId, id, dto);
-  }
-
-  @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Remove an image from the project (soft delete)' })
-  @ApiResponse({ status: 204 })
-  remove(@CurrentUser('id') userId: string, @Param('id') id: string) {
-    return this.imagesService.remove(userId, id);
   }
 
   @Post(':id/remove-watermark')

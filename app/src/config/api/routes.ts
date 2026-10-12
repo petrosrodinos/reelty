@@ -16,6 +16,7 @@ export const ApiRoutes = {
   projects: {
     prefix: "/projects",
     byId: (id: string) => `/projects/${id}`,
+    images: (id: string) => `/projects/${id}/images`,
     uploadUrls: (id: string) => `/projects/${id}/images/upload-urls`,
     confirmImages: (id: string) => `/projects/${id}/images/confirm`,
     imageOrder: (id: string) => `/projects/${id}/images/order`,

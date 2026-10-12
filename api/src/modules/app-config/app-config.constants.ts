@@ -80,7 +80,7 @@ export const APP_CONFIG_DEFAULTS: Record<AppConfigKey, AppConfigDefault> = {
     min: 1,
   },
   [AppConfigKeys.CREDITS_SIGNUP_GRANT]: {
-    value: 12,
+    value: 24,
     unit: 'credits',
     description: 'Free credits given once to every new account.',
     integer: true,

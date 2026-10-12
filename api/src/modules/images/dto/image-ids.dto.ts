@@ -20,3 +20,13 @@ export class OrderImagesDto {
   @IsString({ each: true })
   image_ids: string[];
 }
+
+export class RemoveImagesDto {
+  @ApiProperty({ type: [String], description: 'Images to remove from the project (one or many)' })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(appConfig.limits.maxImagesCeiling)
+  @ArrayUnique()
+  @IsString({ each: true })
+  image_ids: string[];
+}

@@ -58,14 +58,14 @@ const NewVideoPage: FC = () => {
       ) : null}
 
       <Tabs value={tab} onValueChange={(value) => setTab(value as NewProjectTab)} className="mt-8 gap-5">
-        <TabsList className="h-auto w-full flex-wrap justify-start gap-1 bg-transparent p-0" aria-label="How do you want to add photos?">
+        <TabsList className="grid h-auto w-full group-data-horizontal/tabs:h-auto grid-cols-3 gap-1 bg-transparent p-0 sm:flex sm:flex-wrap sm:justify-start" aria-label="How do you want to add photos?">
           {NewProjectTabFormOptions.map((option) => {
             const Icon = tabIcons[option.id];
             return (
               <TabsTrigger
                 key={option.id}
                 value={option.id}
-                className="h-11 flex-none gap-2 rounded-md px-4 text-sm text-muted-foreground hover:text-ink data-active:bg-surface-card data-active:text-ink data-active:shadow-none dark:data-active:bg-surface-card"
+                className="min-h-14 flex-none flex-col gap-1.5 whitespace-normal rounded-md px-2 py-2 text-sm leading-tight text-muted-foreground sm:h-11 sm:min-h-0 sm:flex-row sm:gap-2 sm:whitespace-nowrap sm:px-4 sm:py-0 hover:text-ink data-active:bg-surface-card data-active:text-ink data-active:shadow-none dark:data-active:bg-surface-card"
               >
                 <Icon className="size-4" />
                 {option.label}
