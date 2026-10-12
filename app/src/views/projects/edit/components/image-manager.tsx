@@ -215,7 +215,7 @@ export const ImageManager: FC<ImageManagerProps> = ({ project, affordablePhotos,
         : creditLimited
           ? needsCredits
             ? `Your credits only cover ${cap} ${cap === 1 ? "photo" : "photos"}. Buy credits to add more.`
-            : `Your credits only cover ${cap} ${cap === 1 ? "photo" : "photos"} (${cap - total} more). Buy credits to add more.`
+            : `Your credits cover ${cap} ${cap === 1 ? "photo" : "photos"} (you can add ${cap - total} more). Buy credits to add more.`
           : "Drag the handle to reorder, or use the arrows. The video follows this order.";
   const creditWarning = creditLimited && !over;
 

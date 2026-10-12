@@ -42,7 +42,7 @@ const NewVideoPage: FC = () => {
     <div className="page-container max-w-3xl py-10 md:py-14">
       <p className="text-eyebrow text-muted-foreground">Step 1 of 3</p>
       <h1 className="text-display-lg mt-2">New video</h1>
-      <p className="mt-2 text-muted-foreground">Start from a listing link or your own photos. You will pick and order the shots next.</p>
+      <p className="mt-2 text-muted-foreground">Start from a listing link or your own photos. You will pick and order the images next.</p>
 
       {outOfCredits ? (
         <Alert className="mt-6 border-hairline bg-notice-warn">

@@ -295,9 +295,6 @@ export class ImagesService {
       if (!width || !height) return reject('invalid_image', 'This image could not be read.');
 
       // Small photos are accepted; they surface as `low_resolution` in the project payload instead of being rejected.
-      if (Math.min(width, height) < Limits.MIN_SIDE_REJECT) {
-        this.logger.warn(`Accepting low-resolution upload ${image.id} (${width}x${height})`);
-      }
 
       const thumb = await sharp(buffer)
         .rotate()
