@@ -356,9 +356,10 @@ export function buildAssemblyFilterGraph(input: AssemblyGraphInput): AssemblyGra
   const { offsets, total } = computeTransitionOffsets(durations);
   const parts: string[] = [];
 
-  // Make every input identical for xfade: 30 fps (timebase 1/30), zero-based pts, same sar / pixel format.
+  // Make every input identical for xfade: zero-based pts, same sar / pixel format, then fps LAST: setpts can leave the link
+  // frame rate unset (1/0) on newer ffmpeg, and xfade rejects that ("inputs needs to be a constant frame rate").
   for (let i = 0; i < videoInputCount; i++) {
-    parts.push(`[${i}:v]fps=${VideoSpec.fps},setpts=PTS-STARTPTS,setsar=1,format=yuv420p[s${i}]`);
+    parts.push(`[${i}:v]setpts=PTS-STARTPTS,setsar=1,format=yuv420p,fps=${VideoSpec.fps}[s${i}]`);
   }
 
   let current = 's0';
