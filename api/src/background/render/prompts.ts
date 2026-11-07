@@ -14,14 +14,25 @@ export const GENERIC_PROMPT =
 const OUTDOOR_MOTION =
   'only the plants and trees that are in the photo sway very slightly and water ripples softly, while the sky is completely static like a still photograph and every object, decoration and piece of furniture stays completely fixed and motionless'
 
-/** Added to every room type. Interiors stay still; only what is visible outside a window or door may move. */
-export const AMBIENT_MOTION =
-  'Real-time speed, never time-lapse. Everything inside the room stays perfectly still and fixed. The sky is completely static like a still photograph. Every object, decoration and piece of furniture, indoors or outdoors, stays completely fixed and motionless. Only greenery and water visible outside a window or door may move, very slightly and slowly. Keep the scene exactly as in the photo'
+/**
+ * Indoor rule. Mentions NO door, window, curtain or anything allowed to move: an earlier version said "greenery and water
+ * visible outside a window or door may move" and Kling opened doors and blew curtains. Only the camera moves.
+ */
+const STILL_SCENE =
+  'Real-time speed, never time-lapse. Only the camera moves. The scene itself is completely frozen like a still photograph: ' +
+  'every object, surface, fabric and piece of furniture stays exactly where it is, perfectly fixed and motionless. Keep the scene exactly as in the photo';
+
+/** Outdoor rule: same frozen scene; the slight natural motion comes from OUTDOOR_MOTION in the room template. */
+const OUTDOOR_SCENE =
+  'Real-time speed, never time-lapse. The sky is completely static like a still photograph. Every object, decoration and ' +
+  'piece of furniture stays completely fixed and motionless. Keep the scene exactly as in the photo';
+
+const OUTDOOR_ROOMS: ReadonlySet<string> = new Set(['EXTERIOR', 'POOL', 'GARDEN', 'TERRACE_VIEW', 'BALCONY', 'OUTDOOR_DINING', 'BEACH_SEA']);
 
 export const ROOM_PROMPTS: Partial<Record<RoomType, string>> = {
   EXTERIOR: `Cinematic luxury real estate reveal, smooth slow dolly push-in toward the building facade, warm architectural lighting, ${OUTDOOR_MOTION}, professional real estate cinematography`,
   LIVING_ROOM:
-    'Slow graceful camera glide across a bright luxury living room, natural daylight, airy and serene, professional interior cinematography',
+    'Slow steady camera glide across a bright luxury living room, natural daylight, calm and serene, professional interior cinematography',
   DINING_ROOM:
     'Slow smooth camera glide along an elegant dining table, soft natural light, refined and inviting, professional interior cinematography',
   KITCHEN:
@@ -46,5 +57,6 @@ export const PROMPT_SUFFIX = 'One single continuous camera move. No people.';
  */
 export function selectPrompt(roomType: RoomType | null | undefined): string {
   const base = (roomType && ROOM_PROMPTS[roomType]) || GENERIC_PROMPT;
-  return `${base.replace(/[.\s]+$/, '')}. ${AMBIENT_MOTION}. ${PROMPT_SUFFIX}`;
+  const scene = roomType && OUTDOOR_ROOMS.has(roomType) ? OUTDOOR_SCENE : STILL_SCENE;
+  return `${base.replace(/[.\s]+$/, '')}. ${scene}. ${PROMPT_SUFFIX}`;
 }

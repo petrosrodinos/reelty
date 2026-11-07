@@ -15,10 +15,14 @@ export const HIGGSFIELD_CONFIG = {
     /**
      * Sent as Kling's `negative_prompt` (the place where naming things to avoid works; in the main prompt it backfires).
      * Keeps the sky and every object still, fans stopped, and stops leaves or objects from appearing or flying.
+     * Also stops interior motion: doors/cabinets opening, curtains or blinds moving in a breeze, lights or screens changing.
      */
     negativePrompt:
       'moving clouds, fast clouds, moving sky, time-lapse, fast motion, moving objects, moving umbrella, moving decorations, ' +
       'spinning ceiling fan, rotating fan, flying leaves, falling leaves, floating particles, dust, petals, ' +
+      'opening door, closing door, moving door, swinging door, door opening, cabinet opening, drawer opening, ' +
+      'moving curtains, billowing curtains, curtains blowing, swaying drapes, moving blinds, fluttering fabric, wind, breeze, ' +
+      'moving furniture, moving chairs, lights turning on, lights turning off, screen turning on, ' +
       'new objects appearing, plants growing, morphing, warping, flickering, people, text, watermark',
   },
 
